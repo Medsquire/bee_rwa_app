@@ -3,158 +3,229 @@ import { useRwa } from '../context/RwaContext';
 import { 
   LayoutDashboard, 
   Building2, 
-  Users, 
-  UserCheck, 
-  UserPlus, 
   AlertTriangle, 
-  PlusCircle, 
-  Dumbbell, 
-  CalendarCheck, 
-  Bookmark, 
-  Wallet, 
-  Receipt, 
-  ArrowLeftRight, 
   Megaphone, 
-  Bell, 
-  User, 
-  Settings,
-  ChevronRight,
-  Shield,
-  Home
+  Home, 
+  Briefcase,
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 
 export const Sidebar = () => {
   const { 
     activeTab, 
     setActiveTab, 
-    isSidebarOpen, 
     currentUser, 
-    currentRoleKey,
-    registrationRequests,
     complaints,
-    maintenanceDues,
-    announcements
+    logout
   } = useRwa();
 
-  // Badges
-  const pendingApprovalsCount = registrationRequests.filter(r => r.status === 'Pending').length;
   const openComplaintsCount = complaints.filter(c => ['Submitted', 'Assigned', 'In Progress'].includes(c.status)).length;
-  const overdueDuesCount = maintenanceDues.filter(d => d.status === 'Overdue').length;
 
-  const navGroups = [
-    {
-      title: 'OVERVIEW',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'register', label: 'New Resident Registration', icon: UserPlus }
-      ]
+  const isTabActive = (itemId) => {
+    if (activeTab === itemId) return true;
+    if (itemId === 'property' && (activeTab === 'apartments' || activeTab === 'property')) return true;
+    if (itemId === 'apartments' && (activeTab === 'apartments' || activeTab === 'property')) return true;
+    if (itemId === 'residence' && (activeTab === 'residents' || activeTab === 'residence')) return true;
+    if (itemId === 'residents' && (activeTab === 'residents' || activeTab === 'residence')) return true;
+    if (itemId === 'complaints' && (activeTab === 'complaint' || activeTab === 'complaints')) return true;
+    if (itemId === 'employee' && (activeTab === 'employees' || activeTab === 'employee')) return true;
+    if (itemId === 'agency' && (activeTab === 'agency' || activeTab === 'agencies')) return true;
+    if (itemId === 'announcements' && (activeTab === 'annouments' || activeTab === 'announcements')) return true;
+    return false;
+  };
+
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'property', label: 'Property', icon: Building2 },
+    { 
+      id: 'complaints', 
+      label: 'Complaint', 
+      icon: AlertTriangle, 
+      badge: openComplaintsCount, 
+      badgeColor: '#2563EB' 
     },
-    {
-      title: 'APARTMENTS & ACCESS',
-      roleRestrict: ['president', 'vice_president', 'finance_manager'],
-      items: [
-        { id: 'apartments', label: 'Apartment Complexes', icon: Building2 },
-        { id: 'residents', label: 'Resident Directory', icon: Users },
-        { 
-          id: 'approvals', 
-          label: 'Registration Approvals', 
-          icon: UserCheck, 
-          badge: pendingApprovalsCount, 
-          badgeColor: 'var(--warning)',
-          roleRestrict: ['president'] 
-        }
-      ]
-    },
-    {
-      title: 'COMPLAINTS & HELPDESK',
-      items: [
-        { 
-          id: 'complaints', 
-          label: 'Complaints Register', 
-          icon: AlertTriangle, 
-          badge: openComplaintsCount, 
-          badgeColor: 'var(--electric-blue)' 
-        },
-        { id: 'submit-complaint', label: 'Submit Complaint', icon: PlusCircle }
-      ]
-    },
-    {
-      title: 'FACILITIES & SPORTS',
-      items: [
-        { id: 'facilities', label: 'Facilities & Status', icon: Dumbbell },
-        { id: 'book-facility', label: 'Book a Slot', icon: CalendarCheck },
-        { id: 'my-bookings', label: 'My Bookings', icon: Bookmark }
-      ]
-    },
-    {
-      title: 'FINANCE & ACCOUNTS',
-      roleRestrict: ['president', 'finance_manager'],
-      items: [
-        { id: 'finance', label: 'Finance Dashboard', icon: Wallet },
-        { 
-          id: 'maintenance', 
-          label: 'Maintenance Dues', 
-          icon: Receipt,
-          badge: overdueDuesCount,
-          badgeColor: 'var(--error)'
-        },
-        { id: 'transactions', label: 'Ledger & Expenses', icon: ArrowLeftRight }
-      ]
-    },
-    {
-      title: 'COMMUNITY & SYSTEM',
-      items: [
-        { id: 'announcements', label: 'Announcements', icon: Megaphone },
-        { id: 'notifications', label: 'Notifications', icon: Bell },
-        { id: 'profile', label: 'My Profile', icon: User },
-        { id: 'settings', label: 'System Settings', icon: Settings }
-      ]
-    }
+    { id: 'residence', label: 'Residence (Tower & Floor & Flat)', icon: Home },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone },
+    { id: 'employee', label: 'Employee', icon: Briefcase },
+    { id: 'agency', label: 'Agency', icon: ShieldCheck }
   ];
-
-  if (!isSidebarOpen) {
-    return null;
-  }
 
   return (
     <aside style={{
-      width: '280px',
-      backgroundColor: 'var(--sidebar-bg)',
-      color: 'var(--sidebar-text)',
+      width: '260px',
+      backgroundColor: '#0B1B3D',
+      color: '#CBD5E1',
       display: 'flex',
       flexDirection: 'column',
       flexShrink: 0,
-      borderRight: '1px solid var(--border-color)',
-      height: 'calc(100vh - 61px)',
+      borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+      height: '100vh',
       position: 'sticky',
-      top: '61px',
-      overflowY: 'auto'
+      top: 0,
+      zIndex: 50
     }}>
-      {/* Current Role Identity Card in Sidebar */}
+      {/* Brand Header matching parallel application */}
       <div style={{
-        padding: '16px 20px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        background: 'rgba(255, 255, 255, 0.03)'
+        padding: '20px 22px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Blue B square logo */}
+        <div style={{
+          width: '36px',
+          height: '36px',
+          borderRadius: '8px',
+          backgroundColor: '#2563EB',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#FFFFFF',
+          fontWeight: 900,
+          fontSize: '1.25rem',
+          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
+        }}>
+          B
+        </div>
+
+        <div>
+          <div style={{ fontWeight: 900, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#FFFFFF', lineHeight: 1.1 }}>
+            BEE
+          </div>
+          <div style={{ fontSize: '0.625rem', fontWeight: 700, color: '#93C5FD', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '2px' }}>
+            RWA PORTAL
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation section */}
+      <div style={{ padding: '20px 14px', flex: 1, overflowY: 'auto' }}>
+        <div style={{
+          fontSize: '0.6875rem',
+          fontWeight: 700,
+          color: '#64748B',
+          letterSpacing: '0.08em',
+          padding: '0 10px',
+          marginBottom: '10px',
+          textTransform: 'uppercase'
+        }}>
+          NAVIGATION
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {navItems.map(item => {
+            const isActive = isTabActive(item.id);
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: isActive ? '#2563EB' : 'transparent',
+                  color: isActive ? '#FFFFFF' : '#CBD5E1',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '0.875rem',
+                  fontWeight: isActive ? 600 : 500,
+                  transition: 'all 0.15s ease',
+                  width: '100%'
+                }}
+                onMouseEnter={e => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <Icon size={18} style={{ color: isActive ? '#FFFFFF' : '#94A3B8', flexShrink: 0 }} />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.label}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span style={{
+                      backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : '#2563EB',
+                      color: '#FFFFFF',
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      minWidth: '20px',
+                      height: '20px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 6px',
+                      borderRadius: '9999px',
+                      lineHeight: 1
+                    }}>
+                      {item.badge}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span style={{
+                      width: '4px',
+                      height: '4px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FFFFFF'
+                    }} />
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bottom Profile & Logout matching parallel application */}
+      <div style={{
+        padding: '16px 14px',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px'
+      }}>
+        {/* User profile card */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '8px 10px',
+          borderRadius: '8px',
+          backgroundColor: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.08)'
+        }}>
           <div style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
-            background: 'var(--grad-royal)',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            backgroundColor: '#2563EB',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 800,
-            fontSize: '0.875rem'
+            fontSize: '0.75rem',
+            flexShrink: 0
           }}>
-            {currentUser.avatar}
+            {currentUser.avatar || 'JD'}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+
+          <div style={{ flex: 1, minWidth: 0, lineHeight: 1.2 }}>
             <div style={{ 
               fontWeight: 700, 
-              fontSize: '0.875rem', 
+              fontSize: '0.8125rem', 
               color: '#FFFFFF', 
               overflow: 'hidden', 
               textOverflow: 'ellipsis', 
@@ -164,128 +235,58 @@ export const Sidebar = () => {
             </div>
             <div style={{ 
               fontSize: '0.6875rem', 
-              color: 'var(--cyan-blue)', 
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
+              color: '#94A3B8', 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis', 
+              whiteSpace: 'nowrap' 
             }}>
-              <Shield size={11} /> {currentUser.roleTitle.split(' ')[0]}
+              {currentUser.email}
             </div>
           </div>
+
+          <span style={{
+            fontSize: '0.5625rem',
+            fontWeight: 800,
+            backgroundColor: '#1D4ED8',
+            color: '#FFFFFF',
+            padding: '2px 5px',
+            borderRadius: '4px',
+            letterSpacing: '0.05em'
+          }}>
+            {currentUser.roleKey === 'president' ? 'ADMIN' : 'VP'}
+          </span>
         </div>
 
-        <div style={{ 
-          marginTop: '10px', 
-          fontSize: '0.6875rem', 
-          color: 'var(--sidebar-text-muted)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          padding: '6px 10px',
-          borderRadius: '6px'
-        }}>
-          <span>{currentUser.apartment.split(' ')[0]} Apt</span>
-          <span style={{ color: '#FFFFFF', fontWeight: 600 }}>{currentUser.flatNumber}</span>
-        </div>
-      </div>
-
-      {/* Navigation Sections */}
-      <div style={{ padding: '16px 12px', flex: 1 }}>
-        {navGroups.map((group, gIdx) => {
-          // Check role restrictions for group
-          if (group.roleRestrict && !group.roleRestrict.includes(currentRoleKey)) {
-            return null;
-          }
-
-          return (
-            <div key={gIdx} style={{ marginBottom: '20px' }}>
-              <div style={{
-                fontSize: '0.6875rem',
-                fontWeight: 700,
-                color: 'var(--sidebar-text-muted)',
-                letterSpacing: '0.08em',
-                padding: '0 12px',
-                marginBottom: '8px'
-              }}>
-                {group.title}
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                {group.items.map(item => {
-                  if (item.roleRestrict && !item.roleRestrict.includes(currentRoleKey)) {
-                    return null;
-                  }
-
-                  const isActive = activeTab === item.id;
-                  const Icon = item.icon;
-
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '9px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: isActive ? 'var(--sidebar-active)' : 'transparent',
-                        color: isActive ? '#FFFFFF' : 'var(--sidebar-text)',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '0.8125rem',
-                        fontWeight: isActive ? 600 : 500,
-                        transition: 'all 0.15s ease'
-                      }}
-                      onMouseEnter={e => {
-                        if (!isActive) e.currentTarget.style.backgroundColor = 'var(--sidebar-hover)';
-                      }}
-                      onMouseLeave={e => {
-                        if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Icon size={17} style={{ color: isActive ? '#FFFFFF' : 'var(--sidebar-text-muted)' }} />
-                        <span>{item.label}</span>
-                      </div>
-
-                      {item.badge !== undefined && item.badge > 0 && (
-                        <span style={{
-                          backgroundColor: item.badgeColor || 'var(--electric-blue)',
-                          color: '#FFFFFF',
-                          fontSize: '0.6875rem',
-                          fontWeight: 700,
-                          padding: '2px 7px',
-                          borderRadius: '10px',
-                          lineHeight: 1
-                        }}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Sidebar Footer */}
-      <div style={{
-        padding: '14px 16px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        fontSize: '0.6875rem',
-        color: 'var(--sidebar-text-muted)',
-        textAlign: 'center'
-      }}>
-        <span>BEE PROPERTY RWA v1.0</span>
-        <div style={{ color: 'var(--cyan-blue)', marginTop: '2px' }}>
-          Zivion Management System
-        </div>
+        {/* Dedicated Red Logout Button matching parallel application */}
+        <button
+          onClick={logout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            padding: '9px 12px',
+            borderRadius: '8px',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            backgroundColor: 'rgba(239, 68, 68, 0.08)',
+            color: '#F87171',
+            cursor: 'pointer',
+            fontSize: '0.8125rem',
+            fontWeight: 600,
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.18)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.08)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+          }}
+        >
+          <LogOut size={15} />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );

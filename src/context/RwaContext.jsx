@@ -11,12 +11,14 @@ import {
   INITIAL_MAINTENANCE_DUES,
   INITIAL_TRANSACTIONS,
   INITIAL_ANNOUNCEMENTS,
-  INITIAL_NOTIFICATIONS
+  INITIAL_NOTIFICATIONS,
+  INITIAL_EMPLOYEES,
+  INITIAL_AGENCIES
 } from '../data/initialData';
 
 const RwaContext = createContext();
 
-const STORAGE_KEY_PREFIX = 'BEE_RWA_V1_';
+const STORAGE_KEY_PREFIX = 'BEE_RWA_V2_';
 
 export const RwaProvider = ({ children }) => {
   // Safe localStorage helper
@@ -29,8 +31,20 @@ export const RwaProvider = ({ children }) => {
     }
   };
 
-  const [currentRoleKey, setCurrentRoleKey] = useState(() => loadStored('ROLE', 'president'));
-  const [selectedApartment, setSelectedApartment] = useState('All');
+  const [currentRoleKey, setCurrentRoleKey] = useState(() => {
+    const storedRole = loadStored('ROLE', 'president');
+    return Object.keys(INITIAL_ROLES).includes(storedRole) ? storedRole : 'president';
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const v2Auth = loadStored('IS_AUTH', null);
+    if (v2Auth !== null) return v2Auth;
+    try {
+      return localStorage.getItem('BEE_RWA_V1_IS_AUTH') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [selectedApartment, setSelectedApartment] = useState('Golden Apartment');
   const [activeTab, setActiveTab] = useState(() => loadStored('TAB', 'dashboard'));
   const [theme, setTheme] = useState(() => loadStored('THEME', 'light'));
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -47,6 +61,8 @@ export const RwaProvider = ({ children }) => {
   const [transactions, setTransactions] = useState(() => loadStored('TXNS', INITIAL_TRANSACTIONS));
   const [announcements, setAnnouncements] = useState(() => loadStored('ANNOUNCEMENTS', INITIAL_ANNOUNCEMENTS));
   const [notifications, setNotifications] = useState(() => loadStored('NOTIFICATIONS', INITIAL_NOTIFICATIONS));
+  const [employees, setEmployees] = useState(() => loadStored('EMPLOYEES', INITIAL_EMPLOYEES));
+  const [agencies, setAgencies] = useState(() => loadStored('AGENCIES', INITIAL_AGENCIES));
 
   // Toast / Banner state
   const [toast, setToast] = useState(null);
@@ -72,21 +88,71 @@ export const RwaProvider = ({ children }) => {
       localStorage.setItem(STORAGE_KEY_PREFIX + 'TXNS', JSON.stringify(transactions));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'ANNOUNCEMENTS', JSON.stringify(announcements));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'NOTIFICATIONS', JSON.stringify(notifications));
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'EMPLOYEES', JSON.stringify(employees));
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'AGENCIES', JSON.stringify(agencies));
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'IS_AUTH', JSON.stringify(isAuthenticated));
     } catch (e) {
       console.warn('Storage sync issue:', e);
     }
   }, [
-    currentRoleKey, activeTab, theme, residents, registrationRequests,
+    currentRoleKey, isAuthenticated, activeTab, theme, residents, registrationRequests,
     complaints, facilities, bookings, financeSummary, maintenanceDues,
-    transactions, announcements, notifications
+    transactions, announcements, notifications, employees, agencies
   ]);
+
+  // Agency assignment helper: assigns/updates towers for a complex
+  const assignAgencyTowers = (agencyId, complexName, newTowersList) => {
+    setAgencies(prev => prev.map(agy => {
+      if (agy.id !== agencyId) return agy;
+
+      const existingComp = agy.assignedComplexes.find(c => c.complex === complexName);
+      let updatedComplexes;
+
+      if (existingComp) {
+        if (newTowersList.length === 0) {
+          // Remove complex if no towers selected
+          updatedComplexes = agy.assignedComplexes.filter(c => c.complex !== complexName);
+        } else {
+          updatedComplexes = agy.assignedComplexes.map(c => 
+            c.complex === complexName ? { ...c, towers: newTowersList } : c
+          );
+        }
+      } else if (newTowersList.length > 0) {
+        updatedComplexes = [
+          ...agy.assignedComplexes,
+          {
+            complex: complexName,
+            towers: newTowersList,
+            unitsAssigned: `${newTowersList.length} Towers Assigned`,
+            isPrimary: agy.assignedComplexes.length === 0
+          }
+        ];
+      } else {
+        updatedComplexes = agy.assignedComplexes;
+      }
+
+      return {
+        ...agy,
+        assignedComplexes: updatedComplexes
+      };
+    }));
+
+    showToast(`Agency assignments updated for ${complexName}.`, 'success');
+  };
+
+  const updateAgencyStatus = (agencyId, newStatus) => {
+    setAgencies(prev => prev.map(agy => 
+      agy.id === agencyId ? { ...agy, status: newStatus } : agy
+    ));
+    showToast(`Agency status updated to ${newStatus}.`, 'info');
+  };
 
   // Current active user profile
   const currentUser = INITIAL_ROLES[currentRoleKey] || INITIAL_ROLES.president;
 
   // Role switching
   const switchRole = (newRoleKey) => {
-    if (INITIAL_ROLES[newRoleKey]) {
+    if (Object.keys(INITIAL_ROLES).includes(newRoleKey)) {
       setCurrentRoleKey(newRoleKey);
       showToast(`Switched active demo role to ${INITIAL_ROLES[newRoleKey].roleTitle}`, 'info');
     }
@@ -543,8 +609,54 @@ export const RwaProvider = ({ children }) => {
     setTransactions(INITIAL_TRANSACTIONS);
     setAnnouncements(INITIAL_ANNOUNCEMENTS);
     setNotifications(INITIAL_NOTIFICATIONS);
+    setEmployees(INITIAL_EMPLOYEES);
 
     showToast('All demo data reset to default successfully!', 'success');
+  };
+
+  // Add new employee
+  const addEmployee = (empData) => {
+    const newEmp = {
+      ...empData,
+      id: `EMP-${Math.floor(100 + Math.random() * 900)}`,
+      rating: 5.0,
+      avatar: (empData.name || 'EM').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase(),
+      policeVerified: true,
+      verificationCode: `BLR-PV-${Math.floor(10000 + Math.random() * 90000)}`
+    };
+    setEmployees(prev => [newEmp, ...prev]);
+    showToast(`Staff member "${newEmp.name}" added successfully!`, 'success');
+    return newEmp;
+  };
+
+  // Authentication handlers
+  const login = (username, password) => {
+    const u = (username || '').trim().toLowerCase();
+    const p = (password || '').trim();
+
+    if ((u === 'sujana' || u === 'p') && p === 'rwa123') {
+      setCurrentRoleKey('president');
+      setIsAuthenticated(true);
+      showToast('Welcome back, President Sujana!', 'success');
+      return { success: true, role: 'president', name: 'Sujana' };
+    }
+
+    if ((u === 'kavaya' || u === 'vp') && p === 'rwa123') {
+      setCurrentRoleKey('vice_president');
+      setIsAuthenticated(true);
+      showToast('Welcome back, Vice President Kavaya!', 'success');
+      return { success: true, role: 'vice_president', name: 'Kavaya' };
+    }
+
+    return { 
+      success: false, 
+      error: 'Invalid credentials. Please enter username (sujana or kavaya) and password (rwa123).' 
+    };
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    showToast('You have been logged out successfully.', 'info');
   };
 
   // DYNAMIC COMPUTATIONS
@@ -602,6 +714,17 @@ export const RwaProvider = ({ children }) => {
         notifications,
         markNotificationRead,
         markAllNotificationsRead,
+        employees,
+        setEmployees,
+        addEmployee,
+        agencies,
+        setAgencies,
+        assignAgencyTowers,
+        updateAgencyStatus,
+        isAuthenticated,
+        setIsAuthenticated,
+        login,
+        logout,
         toast,
         showToast,
         resetAllData,

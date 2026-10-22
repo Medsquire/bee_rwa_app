@@ -39,8 +39,8 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
     'Sunita Devi (CleanPro Housekeeping Supervisor)',
     'Vikram Singh (Security Chief)',
     'Mahendra Joshi (Sports Annex Caretaker)',
-    'Raghavan Pillai (Golden Tower Supervisor)',
-    'Suresh Nayak (Diamond Tower Supervisor)'
+    'Raghavan Pillai (Golden Tower 1 Supervisor)',
+    'Suresh Nayak (Golden Tower 3 Supervisor)'
   ];
 
   const allStatuses = [

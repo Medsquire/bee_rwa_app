@@ -269,11 +269,10 @@ export const Announcements = () => {
                 value={newAnn.apartmentScope}
                 onChange={e => setNewAnn({ ...newAnn, apartmentScope: e.target.value })}
               >
-                <option value="All Apartments">All Apartments (Enclave-wide)</option>
-                <option value="Golden Apartment">Golden Apartment Only</option>
-                <option value="Silver Apartment">Silver Apartment Only</option>
-                <option value="Diamond Apartment">Diamond Apartment Only</option>
-                <option value="Golden & Silver Apartments">Golden & Silver Apartments</option>
+                <option value="Golden Apartment (All Towers)">Golden Apartment (All Towers)</option>
+                <option value="Golden Tower 1">Golden Tower 1 Only</option>
+                <option value="Golden Tower 2">Golden Tower 2 Only</option>
+                <option value="Golden Tower 3">Golden Tower 3 Only</option>
               </select>
             </div>
 

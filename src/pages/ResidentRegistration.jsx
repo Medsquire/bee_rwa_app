@@ -131,7 +131,7 @@ export const ResidentRegistration = () => {
       <div>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Resident Access Registration</h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          Self-registration portal for new Flat Owners and Tenants in Golden, Silver, and Diamond Apartments
+          Self-registration portal for new Flat Owners and Tenants in Golden Apartment (Golden Tower 1, 2 & 3)
         </p>
       </div>
 
@@ -212,7 +212,7 @@ export const ResidentRegistration = () => {
               <label className="form-label required">Flat / Unit Number</label>
               <input 
                 type="text" 
-                placeholder="e.g. C-603 or A-205" 
+                placeholder="e.g. GT1-204 or GT2-604" 
                 className="form-control"
                 value={formData.flatNumber}
                 onChange={e => setFormData({ ...formData, flatNumber: e.target.value })}

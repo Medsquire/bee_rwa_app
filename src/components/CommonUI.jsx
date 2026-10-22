@@ -89,15 +89,15 @@ export const ApartmentBadge = ({ apartment }) => {
   let color = 'var(--electric-blue)';
   let bg = 'rgba(59, 130, 246, 0.12)';
   
-  if (apartment?.includes('Golden')) {
+  if (apartment?.includes('Tower 2')) {
+    color = '#2563EB';
+    bg = 'rgba(37, 99, 235, 0.12)';
+  } else if (apartment?.includes('Tower 3')) {
+    color = '#059669';
+    bg = 'rgba(16, 185, 129, 0.12)';
+  } else if (apartment?.includes('Golden') || apartment?.includes('Tower 1')) {
     color = '#D97706';
     bg = 'rgba(245, 158, 11, 0.12)';
-  } else if (apartment?.includes('Silver')) {
-    color = '#475569';
-    bg = 'rgba(148, 163, 184, 0.2)';
-  } else if (apartment?.includes('Diamond')) {
-    color = '#0891B2';
-    bg = 'rgba(34, 211, 238, 0.15)';
   }
 
   return (

@@ -151,7 +151,7 @@ export const FinanceDashboard = () => {
         <StatCard 
           title="Monthly Pool Target" 
           value="₹ 8,25,000" 
-          subtitle="Golden + Silver + Diamond"
+          subtitle="Golden Towers 1 + 2 + 3"
           icon={Building2} 
           color="indigo"
           onClick={() => setActiveTab('apartments')}

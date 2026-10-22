@@ -8,7 +8,7 @@ export const RoleBanner = () => {
   const roleDescriptions = {
     president: {
       role: 'President (Executive Head)',
-      summary: 'Highest executive authority with full oversight across Golden, Silver, and Diamond apartments.',
+      summary: 'Highest executive authority with full oversight across Golden Apartment (Golden Tower 1, 2, and 3).',
       capabilities: 'Approve/reject resident registrations, assign roles, monitor community complaints, inspect facility bookings, publish broadcasts, and oversee treasury accounts.',
       badgeBg: '#1E3A8A',
       accent: '#22D3EE'
@@ -20,27 +20,6 @@ export const RoleBanner = () => {
       badgeBg: '#065F46',
       accent: '#10B981'
     },
-    finance_manager: {
-      role: 'Finance Manager (Treasurer)',
-      summary: 'Custody of community financial health, maintenance dues collections, and vendor payment audit.',
-      capabilities: 'Track ₹28.4L collected funds, monitor ₹3.85L pending dues, log verified utility & maintenance expenses, and verify real-time available treasury balances.',
-      badgeBg: '#854D0E',
-      accent: '#F59E0B'
-    },
-    flat_owner: {
-      role: 'Flat Owner (Resident)',
-      summary: 'Registered property owner enjoying resident privileges and community governance access.',
-      capabilities: 'Log and track common area maintenance complaints, reserve sports & gym slots, monitor personal maintenance dues ledger, and access RWA AGM notices.',
-      badgeBg: '#3730A3',
-      accent: '#818CF8'
-    },
-    tenant: {
-      role: 'Tenant (Resident)',
-      summary: 'Verified resident occupying leased premises with access to shared amenities and service desk.',
-      capabilities: 'Submit common-area tickets (lifts, water, power), book gym and badminton sessions, view community broadcasts. Administrative & financial approvals restricted.',
-      badgeBg: '#1F2937',
-      accent: '#94A3B8'
-    }
   };
 
   const currentInfo = roleDescriptions[currentRoleKey] || roleDescriptions.president;
@@ -112,30 +91,6 @@ export const RoleBanner = () => {
           >
             Dispatch Complaints
           </button>
-        )}
-        {currentRoleKey === 'finance_manager' && (
-          <button 
-            className="btn btn-primary btn-sm"
-            onClick={() => setActiveTab('maintenance')}
-          >
-            Manage Dues
-          </button>
-        )}
-        {['flat_owner', 'tenant'].includes(currentRoleKey) && (
-          <>
-            <button 
-              className="btn btn-primary btn-sm"
-              onClick={() => setActiveTab('submit-complaint')}
-            >
-              Raise Complaint
-            </button>
-            <button 
-              className="btn btn-secondary btn-sm"
-              onClick={() => setActiveTab('book-facility')}
-            >
-              Book Sports / Gym
-            </button>
-          </>
         )}
       </div>
     </div>

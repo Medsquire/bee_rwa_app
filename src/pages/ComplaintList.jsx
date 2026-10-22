@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
-import { StatusPill, PriorityBadge, ApartmentBadge } from '../components/CommonUI';
 import { ComplaintDetailsModal } from './ComplaintDetailsModal';
 import { 
   AlertTriangle, 
@@ -9,10 +8,20 @@ import {
   Filter, 
   Clock, 
   CheckCircle2, 
-  MapPin, 
+  RefreshCw, 
+  Wrench, 
   User, 
-  Eye,
-  SlidersHorizontal
+  MapPin, 
+  ChevronRight, 
+  Layers, 
+  Droplets, 
+  Zap, 
+  Dumbbell, 
+  Trees, 
+  Sparkles, 
+  ShieldAlert,
+  Building2,
+  CalendarCheck
 } from 'lucide-react';
 
 export const ComplaintList = () => {
@@ -21,293 +30,344 @@ export const ComplaintList = () => {
     selectedApartment, 
     setSelectedApartment, 
     apartments, 
-    currentUser, 
-    currentRoleKey,
     setActiveTab 
   } = useRwa();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
-  const [categoryFilter, setCategoryFilter] = useState('All');
-  const [viewScope, setViewScope] = useState('All'); // 'All' or 'Mine'
+  const [activeCategory, setActiveCategory] = useState('All');
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   const categories = [
-    'All',
-    'Lift / Elevator',
-    'Water Supply',
-    'Plumbing',
-    'Electricity and Lighting',
-    'Park and Garden',
-    'Gym Equipment',
-    'Indoor Sports',
-    'Cleanliness',
-    'Security',
-    'Other'
+    { id: 'All', label: 'All Issues', icon: Wrench },
+    { id: 'Lift / Elevator', label: 'Lifts & Elevators', icon: Layers },
+    { id: 'Water Supply', label: 'Water & Pumps', icon: Droplets },
+    { id: 'Electricity and Lighting', label: 'Power & DG Backup', icon: Zap },
+    { id: 'Park and Garden', label: 'Parks & Grounds', icon: Trees },
+    { id: 'Gym Equipment', label: 'Gym & Sports', icon: Dumbbell },
+    { id: 'Cleanliness', label: 'Cleaning & STP', icon: Sparkles }
   ];
 
   const filteredComplaints = complaints.filter(cmp => {
     const matchesApt = selectedApartment === 'All' || cmp.apartment === selectedApartment;
     const matchesStatus = statusFilter === 'All' || cmp.status === statusFilter;
     const matchesPriority = priorityFilter === 'All' || cmp.priority === priorityFilter;
-    const matchesCategory = categoryFilter === 'All' || cmp.category === categoryFilter;
-
-    const matchesScope = viewScope === 'All' || 
-      (cmp.submittedBy.includes(currentUser.name) || cmp.submittedBy.includes(currentUser.flatNumber));
-
+    const matchesCategory = activeCategory === 'All' || cmp.category === activeCategory;
     const matchesSearch = 
       cmp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.submittedBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cmp.assignedTo.toLowerCase().includes(searchTerm.toLowerCase());
+      (cmp.assignedTo && cmp.assignedTo.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesApt && matchesStatus && matchesPriority && matchesCategory && matchesScope && matchesSearch;
+    return matchesApt && matchesStatus && matchesPriority && matchesCategory && matchesSearch;
   });
 
-  const openCount = complaints.filter(c => ['Submitted', 'Assigned', 'In Progress'].includes(c.status)).length;
-  const urgentCount = complaints.filter(c => c.priority === 'Urgent').length;
-  const resolvedCount = complaints.filter(c => ['Resolved', 'Closed'].includes(c.status)).length;
+  const getCategoryIcon = (cat) => {
+    const c = (cat || '').toLowerCase();
+    if (c.includes('lift') || c.includes('elevator')) return <Layers size={16} color="#3B82F6" />;
+    if (c.includes('water') || c.includes('plumb')) return <Droplets size={16} color="#06B6D4" />;
+    if (c.includes('light') || c.includes('elect')) return <Zap size={16} color="#F59E0B" />;
+    if (c.includes('gym') || c.includes('sport')) return <Dumbbell size={16} color="#8B5CF6" />;
+    if (c.includes('park') || c.includes('garden')) return <Trees size={16} color="#10B981" />;
+    return <Wrench size={16} color="#64748B" />;
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      {/* Page Title & Action */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Complaints & Maintenance Register</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Report, dispatch, and track common area issues across Golden, Silver, and Diamond apartments
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+            Issue Resolving & Maintenance
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
+            Work orders, elevator servicing, plumbing pumps, and common area maintenance
           </p>
         </div>
-        <button className="btn btn-primary btn-sm" onClick={() => setActiveTab('submit-complaint')}>
-          <PlusCircle size={16} /> Raise New Complaint
+
+        <button 
+          className="btn btn-primary btn-sm"
+          onClick={() => setActiveTab('submit-complaint')}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          <PlusCircle size={16} />
+          <span>Log Maintenance Issue</span>
         </button>
       </div>
 
-      {/* KPI Stats */}
-      <div className="grid-cols-4">
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--electric-blue)' }}>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>TOTAL LOGGED</div>
-          <div className="stat-value" style={{ marginTop: '4px' }}>{complaints.length}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>All-time service requests</div>
-        </div>
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--warning)' }}>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>ACTIVE IN PROGRESS</div>
-          <div className="stat-value" style={{ marginTop: '4px', color: 'var(--warning)' }}>{openCount}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Under technician inspection</div>
-        </div>
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--error)' }}>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>URGENT ESCALATIONS</div>
-          <div className="stat-value" style={{ marginTop: '4px', color: 'var(--error)' }}>{urgentCount}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>High impact on residents</div>
-        </div>
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--success)' }}>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>RESOLVED & CLOSED</div>
-          <div className="stat-value" style={{ marginTop: '4px', color: 'var(--success)' }}>{resolvedCount}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Work verified & completed</div>
-        </div>
+      {/* Horizontal Asset Category Selector (Icon-driven, less text) */}
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        overflowX: 'auto',
+        paddingBottom: '4px'
+      }}>
+        {categories.map(cat => {
+          const isSelected = activeCategory === cat.id;
+          const Icon = cat.icon;
+          const count = cat.id === 'All' 
+            ? complaints.length 
+            : complaints.filter(c => c.category === cat.id).length;
+
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: isSelected ? '1px solid #2563EB' : '1px solid #E2E8F0',
+                backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                color: isSelected ? '#2563EB' : '#475569',
+                fontWeight: isSelected ? 700 : 500,
+                fontSize: '0.8125rem',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Icon size={16} style={{ color: isSelected ? '#2563EB' : '#94A3B8' }} />
+              <span>{cat.label}</span>
+              <span style={{
+                backgroundColor: isSelected ? '#2563EB' : '#F1F5F9',
+                color: isSelected ? '#FFFFFF' : '#64748B',
+                fontSize: '0.6875rem',
+                fontWeight: 700,
+                padding: '1px 6px',
+                borderRadius: '10px'
+              }}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Filter and Search Bar Card */}
-      <div className="glass-card">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* Top Row: Search and Scope */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-            <div style={{ position: 'relative', width: '320px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
-              <input 
-                type="text" 
-                placeholder="Search ticket #, title, area, staff..."
-                className="form-control"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ paddingLeft: '36px' }}
-              />
-            </div>
-
-            {/* Scope Toggle for Residents */}
-            {['flat_owner', 'tenant'].includes(currentRoleKey) && (
-              <div style={{ display: 'flex', backgroundColor: 'var(--bg-hover)', borderRadius: 'var(--radius-md)', padding: '2px', border: '1px solid var(--border-color)' }}>
-                <button
-                  onClick={() => setViewScope('All')}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    background: viewScope === 'All' ? 'var(--electric-blue)' : 'transparent',
-                    color: viewScope === 'All' ? '#FFFFFF' : 'var(--text-secondary)'
-                  }}
-                >
-                  All Community Tickets
-                </button>
-                <button
-                  onClick={() => setViewScope('Mine')}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    background: viewScope === 'Mine' ? 'var(--electric-blue)' : 'transparent',
-                    color: viewScope === 'Mine' ? '#FFFFFF' : 'var(--text-secondary)'
-                  }}
-                >
-                  My Submitted Tickets
-                </button>
-              </div>
-            )}
+      {/* Filter and Search Bar */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        padding: '14px 18px',
+        border: '1px solid #E2E8F0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', flex: 1 }}>
+          {/* Search Input */}
+          <div style={{ position: 'relative', width: '260px' }}>
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94A3B8' }} />
+            <input 
+              type="text" 
+              placeholder="Search ticket ID, asset, person..." 
+              className="form-control"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ paddingLeft: '32px', height: '36px', fontSize: '0.8125rem', borderRadius: '6px' }}
+            />
           </div>
 
-          {/* Bottom Row: Detailed Dropdowns */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Status:</span>
-              <select 
-                className="form-control"
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-                style={{ width: 'auto', height: '34px', fontSize: '0.8125rem' }}
-              >
-                <option value="All">All Statuses</option>
-                <option value="Submitted">Submitted</option>
-                <option value="Acknowledged">Acknowledged</option>
-                <option value="Assigned">Assigned</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Closed">Closed</option>
-                <option value="Reopened">Reopened</option>
-              </select>
-            </div>
+          {/* Status Dropdown */}
+          <select 
+            className="form-control"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            style={{ width: 'auto', height: '36px', fontSize: '0.8125rem' }}
+          >
+            <option value="All">All Statuses</option>
+            <option value="Submitted">Pending Dispatch</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Priority:</span>
-              <select 
-                className="form-control"
-                value={priorityFilter}
-                onChange={e => setPriorityFilter(e.target.value)}
-                style={{ width: 'auto', height: '34px', fontSize: '0.8125rem' }}
-              >
-                <option value="All">All Priorities</option>
-                <option value="Urgent">Urgent</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Category:</span>
-              <select 
-                className="form-control"
-                value={categoryFilter}
-                onChange={e => setCategoryFilter(e.target.value)}
-                style={{ width: 'auto', height: '34px', fontSize: '0.8125rem' }}
-              >
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Apartment:</span>
-              <select 
-                className="form-control"
-                value={selectedApartment}
-                onChange={e => setSelectedApartment(e.target.value)}
-                style={{ width: 'auto', height: '34px', fontSize: '0.8125rem' }}
-              >
-                <option value="All">All Apartments</option>
-                {apartments.map(a => (
-                  <option key={a.id} value={a.name}>{a.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {(statusFilter !== 'All' || priorityFilter !== 'All' || categoryFilter !== 'All' || selectedApartment !== 'All') && (
-              <button 
-                onClick={() => {
-                  setStatusFilter('All');
-                  setPriorityFilter('All');
-                  setCategoryFilter('All');
-                  setSelectedApartment('All');
-                  setSearchTerm('');
-                }}
-                style={{ background: 'none', border: 'none', color: 'var(--electric-blue)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
-              >
-                Reset Filters
-              </button>
-            )}
-          </div>
+          {/* Apartment Dropdown */}
+          <select 
+            className="form-control"
+            value={selectedApartment}
+            onChange={e => setSelectedApartment(e.target.value)}
+            style={{ width: 'auto', height: '36px', fontSize: '0.8125rem' }}
+          >
+            <option value="All">All Apartments</option>
+            {apartments.map(a => (
+              <option key={a.id} value={a.name}>{a.name}</option>
+            ))}
+          </select>
         </div>
 
-        {/* Complaints Table */}
-        <div className="table-responsive" style={{ marginTop: '16px' }}>
-          <table className="table">
+        <span style={{ fontSize: '0.8125rem', color: '#64748B' }}>
+          Showing <strong>{filteredComplaints.length}</strong> of <strong>{complaints.length}</strong> work orders
+        </span>
+      </div>
+
+      {/* Classified Table matching parallel app */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        border: '1px solid #E2E8F0',
+        overflow: 'hidden',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
+      }}>
+        <div className="table-responsive">
+          <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr>
-                <th>Ticket ID</th>
-                <th>Issue Title</th>
-                <th>Category</th>
-                <th>Apartment & Area</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Assigned Technician</th>
-                <th>Logged At</th>
-                <th>Action</th>
+              <tr style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
+                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TICKET ID</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ISSUE & ASSET</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LOCATION</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ASSIGNED TECHNICIAN</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>STATUS</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>ACTION</th>
               </tr>
             </thead>
             <tbody>
-              {filteredComplaints.length === 0 ? (
-                <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: '36px', color: 'var(--text-secondary)' }}>
-                    No complaints match your criteria.
-                  </td>
-                </tr>
-              ) : (
-                filteredComplaints.map(cmp => (
-                  <tr key={cmp.id}>
-                    <td style={{ fontWeight: 800, color: 'var(--electric-blue)' }}>{cmp.id}</td>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{cmp.title}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>By: {cmp.submittedBy}</div>
+              {filteredComplaints.map(cmp => {
+                const isPending = cmp.status === 'Pending' || cmp.status === 'Submitted';
+                const isInProgress = cmp.status === 'In Progress' || cmp.status === 'Assigned';
+
+                return (
+                  <tr key={cmp.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                    {/* TICKET ID */}
+                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
+                      <span style={{
+                        backgroundColor: '#EFF6FF',
+                        border: '1px solid #BFDBFE',
+                        color: '#2563EB',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontWeight: 700,
+                        fontSize: '0.75rem'
+                      }}>
+                        {cmp.id}
+                      </span>
                     </td>
-                    <td>
-                      <span className="badge badge-indigo">{cmp.category}</span>
+
+                    {/* ISSUE & ASSET */}
+                    <td style={{ padding: '14px', minWidth: '240px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          backgroundColor: '#F1F5F9',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          {getCategoryIcon(cmp.category)}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '0.84rem', color: '#0F172A' }}>
+                            {cmp.title}
+                          </div>
+                          <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                            {cmp.category} • Priority: <strong style={{ color: cmp.priority === 'Urgent' ? '#EF4444' : '#F59E0B' }}>{cmp.priority}</strong>
+                          </div>
+                        </div>
+                      </div>
                     </td>
-                    <td>
-                      <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>{cmp.apartment}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{cmp.location}</div>
+
+                    {/* LOCATION */}
+                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#334155' }}>
+                        {cmp.apartment.split(' ')[0]}
+                      </div>
+                      <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                        {cmp.location}
+                      </div>
                     </td>
-                    <td><PriorityBadge priority={cmp.priority} /></td>
-                    <td><StatusPill status={cmp.status} /></td>
-                    <td style={{ fontSize: '0.8125rem', fontWeight: 500 }}>
-                      {cmp.assignedTo === 'Unassigned' ? (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Pending Dispatch</span>
+
+                    {/* ASSIGNED TECHNICIAN */}
+                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
+                      {cmp.assignedTo && cmp.assignedTo !== 'Unassigned' ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', fontWeight: 600, color: '#0F172A' }}>
+                          <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
+                          <span>{cmp.assignedTo.split('(')[0].trim()}</span>
+                        </div>
                       ) : (
-                        <span style={{ color: 'var(--text-primary)' }}>{cmp.assignedTo}</span>
+                        <span style={{ fontSize: '0.75rem', color: '#EA580C', fontWeight: 600, backgroundColor: '#FFF7ED', padding: '2px 6px', borderRadius: '4px' }}>
+                          Needs Dispatch
+                        </span>
                       )}
                     </td>
-                    <td style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                      {cmp.createdAt}
+
+                    {/* STATUS PILL */}
+                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        backgroundColor: isPending 
+                          ? '#FFF7ED' 
+                          : isInProgress 
+                            ? '#EFF6FF' 
+                            : '#F0FDF4',
+                        color: isPending 
+                          ? '#EA580C' 
+                          : isInProgress 
+                            ? '#2563EB' 
+                            : '#16A34A',
+                        border: isPending 
+                          ? '1px solid #FED7AA' 
+                          : isInProgress 
+                            ? '1px solid #BFDBFE' 
+                            : '1px solid #BBF7D0'
+                      }}>
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: isPending ? '#EA580C' : isInProgress ? '#2563EB' : '#16A34A'
+                        }} />
+                        {cmp.status}
+                      </span>
                     </td>
-                    <td>
-                      <button 
-                        className="btn btn-secondary btn-sm"
-                        style={{ padding: '4px 10px' }}
+
+                    {/* ACTION */}
+                    <td style={{ padding: '14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button
                         onClick={() => setSelectedComplaint(cmp)}
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #CBD5E1',
+                          color: '#2563EB',
+                          padding: '5px 12px',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.backgroundColor = '#EFF6FF';
+                          e.currentTarget.style.borderColor = '#2563EB';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.borderColor = '#CBD5E1';
+                        }}
                       >
-                        <Eye size={13} /> View
+                        <span>Dispatch / Manage</span>
+                        <ChevronRight size={13} />
                       </button>
                     </td>
                   </tr>
-                ))
-              )}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -315,7 +375,7 @@ export const ComplaintList = () => {
 
       {/* Details & Dispatch Modal */}
       {selectedComplaint && (
-        <ComplaintDetailsModal 
+        <ComplaintDetailsModal
           complaint={selectedComplaint}
           isOpen={!!selectedComplaint}
           onClose={() => setSelectedComplaint(null)}

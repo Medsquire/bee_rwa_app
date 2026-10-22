@@ -39,17 +39,14 @@ npm run preview
 
 ---
 
-## 👥 Five Role Personas & Demo Role Switcher
+## 👥 Demo Roles
 
-You can test the application from any perspective using the **Demo Role Switcher** located in the top navigation bar or settings:
+You can switch between the available management perspectives using the **Demo Role Switcher** in the top navigation bar:
 
 | Role | Persona | Permissions & Scope |
 | :--- | :--- | :--- |
 | **President** | Dr. Arvind Subramanian (C-801) | Highest authority; review & approve/reject resident applications; oversee complaints across all 3 towers; monitor facilities and treasury balances. |
 | **Vice President** | Priya Sundaram (A-604) | Operational commander; assign complaints to technicians; track field milestones; manage facility uptime and schedule maintenance closures. |
-| **Finance Manager** | Rajeshwar Rao (B-302) | Financial custodian; track maintenance dues collections; monitor ₹3.85L pending dues; log operational expenses; verify available treasury balance. |
-| **Flat Owner** | Ananya Deshmukh (C-402) | Resident owner; submit common-area maintenance tickets; reserve gym and sports slots; view personal dues receipts; access AGM notices. |
-| **Tenant** | Vikramaditya Sharma (A-205) | Resident tenant; report common-area issues; book amenities; view community circulars (restricted from financial reports & administrative approvals). |
 
 ---
 
@@ -58,11 +55,10 @@ You can test the application from any perspective using the **Demo Role Switcher
 1. **Dashboard (Role-Tailored)**:
    - **President View**: 3 complexes overview, occupancy metrics, approvals queue alert, complaint escalation tracker, available treasury.
    - **Vice President View**: Operations command, technician dispatch desk, facility operating uptime, booking traffic.
-   - **Finance Manager View**: Formula reconciliation card (`Available Balance = Opening Balance + Total Income − Total Expenses`), collections vs dues, monthly chart.
-   - **Resident View (Owner & Tenant)**: Personal flat specifications, active ticket tracking progress, upcoming reservations, notice board.
+   - **Finance Dashboard**: Formula reconciliation card (`Available Balance = Opening Balance + Total Income − Total Expenses`), collections vs dues, monthly chart, available to the President.
 2. **Resident Registration**: Public onboarding portal for flat owners and tenants with field validations, document upload simulation, and submission to the President's approval desk.
 3. **Registration Approvals**: President-only verification desk with applicant dossier, sale deed/lease proof audit, and Approve/Reject workflows with reviewer notes.
-4. **Apartment Management**: Detailed infrastructure breakdown of Golden, Silver, and Diamond apartments including tower heights, elevator banks, reservoir storage, and flat directories.
+4. **Apartment Management**: Infrastructure and flat directories for Golden, Silver, and Diamond apartments, with separate apartment-level and Block A/B/C President and Vice President listings.
 5. **Resident Directory**: Full enclave resident registry with search, apartment filters, resident type classification, contact info, parking bays, and vehicle numbers.
 6. **Complaints & Maintenance Register**:
    - 10 categories: Lift/Elevator, Water Supply, Plumbing, Electricity/Lighting, Park/Garden, Gym, Indoor Sports, Cleanliness, Security, Other.

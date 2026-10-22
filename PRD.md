@@ -64,45 +64,7 @@ Features:
 - View facility bookings and maintenance closures.
 - View announcements and operational notifications.
 
-### 3.3 Finance Manager
-
-The Finance Manager handles community financial information.
-
-Features:
-- View maintenance collections and pending dues.
-- View payment records.
-- View community expenses.
-- View income, expenses, and available balance.
-- Filter financial records by apartment and date.
-- View monthly and yearly financial summaries.
-- View individual resident dues and payment history.
-
-Financial actions must be reflected in frontend mock state. Do not represent mock transactions as real payments.
-
-### 3.4 Flat Owner
-
-Features:
-- View a resident dashboard.
-- View their apartment and flat information.
-- Submit complaints and track their status.
-- View announcements.
-- View personal maintenance dues and payment history.
-- View facility details and availability.
-- Create and view gym or indoor sports booking requests.
-- View notifications and their profile.
-
-### 3.5 Tenant
-
-Features:
-- View a resident dashboard.
-- View their apartment and flat information.
-- Submit and track common-area complaints.
-- View community announcements.
-- View facility details and availability.
-- Request gym or indoor sports bookings.
-- View notifications and manage their profile.
-
-Tenants must not have access to management-only financial reports or administrative controls.
+Resident records continue to distinguish flat owners and tenants, but they are not selectable demo roles. Financial management tools are available to the President.
 
 ## 4. Apartment Management
 
@@ -115,6 +77,8 @@ The application must support these three apartment complexes:
 Requirements:
 - Display apartment names and basic details.
 - Display flat numbers and occupancy information.
+- Show a separate President and Vice President for each apartment and for each of its Block A, Block B, and Block C.
+- Display leadership details without adding apartment or block leaders to the global demo role switcher.
 - Show flat owners and tenant information according to permissions.
 - Filter residents, complaints, and relevant reports by apartment.
 - Support an all-apartments view for authorized management users.
@@ -237,7 +201,7 @@ The frontend availability check is for demonstration only. Final conflict preven
 
 ## 8. Finance and Maintenance Management
 
-The Finance Manager dashboard must display:
+The President's finance dashboard must display:
 
 - Total maintenance collected
 - Pending maintenance dues
@@ -319,7 +283,7 @@ Display:
 - Facility maintenance status
 - Upcoming bookings
 
-### Finance Manager Dashboard
+### President Finance Dashboard
 Display:
 - Total collections
 - Outstanding dues
@@ -328,13 +292,6 @@ Display:
 - Recent transactions
 - Monthly income-versus-expense chart
 
-### Resident Dashboard
-Display:
-- Welcome message
-- Apartment and flat details
-- My complaints
-- Complaint status summary
-- Upcoming bookings
 - Latest announcements
 - Outstanding maintenance dues
 - Notifications
@@ -430,8 +387,8 @@ Use the supplied ZIVION-inspired color palette.
 
 The frontend MVP is complete when:
 
-1. All five roles can be previewed through a demo role selector.
-2. Each role has suitable navigation and dashboard content.
+1. The President and Vice President can be previewed through a demo role selector.
+2. Each management role has suitable navigation and dashboard content.
 3. The three apartment complexes are represented in the UI.
 4. The President can approve or reject mock registration requests.
 5. Residents can submit complaints and view their statuses.

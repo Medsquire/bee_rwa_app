@@ -315,7 +315,7 @@ export const MaintenanceDues = () => {
               <div style={{ textAlign: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '14px', marginBottom: '14px' }}>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>BEE PROPERTY RWA</h3>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  Golden • Silver • Diamond Residential Association (Reg No: RWA/BLR/2022/9912)
+                  Golden Apartment Residential Association (Reg No: RWA/BLR/2022/9912)
                 </p>
               </div>
 

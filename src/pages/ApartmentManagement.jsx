@@ -1,261 +1,349 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
-import { ApartmentBadge, StatusPill } from '../components/CommonUI';
 import { 
   Building2, 
   Layers, 
-  Users, 
-  Droplets, 
-  Zap, 
-  PhoneCall, 
   ShieldCheck, 
-  MapPin, 
-  Search,
-  Filter,
-  CheckCircle,
-  Home
+  Phone, 
+  Trees, 
+  CheckCircle2, 
+  AlertCircle, 
+  Clock, 
+  User, 
+  Wrench,
+  ChevronRight
 } from 'lucide-react';
 
 export const ApartmentManagement = () => {
-  const { 
-    apartments, 
-    residents, 
-    selectedApartment, 
-    setSelectedApartment,
-    currentUser,
-    setActiveTab
-  } = useRwa();
+  const { apartments, selectedApartment, setSelectedApartment, employees, complaints, setActiveTab } = useRwa();
 
-  const [activeAptTab, setActiveAptTab] = useState(
-    selectedApartment === 'All' ? apartments[0].name : selectedApartment
-  );
-  const [occupancyFilter, setOccupancyFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const currentApt = apartments[0] || {
+    id: 'apt-golden',
+    name: 'Golden Apartment',
+    towerCode: '3 Towers (GT-1, GT-2, GT-3)',
+    totalFlats: 136,
+    occupiedFlats: 128,
+    floors: 12,
+    lifts: 6,
+    reservoirCapacity: '100,000 Litres (88% Full)',
+    monthlyPool: 342000,
+    address: 'Bee Property Enclave, Outer Ring Road, Bangalore 560103',
+    amenities: ['Central Gymnasium', 'Rooftop Banquet Hall', 'EV Charging Bays', 'Children Play Zone', 'Otis Smart Elevators'],
+    leadership: { 
+      president: 'Sujana',
+      presidentTower: 'Golden Tower 1',
+      presidentFlat: 'GT1-801 (Penthouse)',
+      presidentPhone: '+91 98450 11223',
+      vicePresident: 'Kavaya',
+      vicePresidentTower: 'Golden Tower 2',
+      vicePresidentFlat: 'GT2-604',
+      vicePresidentPhone: '+91 98765 43210'
+    },
+    towers: [
+      { id: 'gt-1', name: 'Golden Tower 1', code: 'Golden Tower 1', shortCode: 'GT-1', prefix: 'GT1', floors: 12, unitsPerFloor: 4, flats: 48, occupied: 45, lifts: 2, head: 'Sujana (President)', color: '#F59E0B' },
+      { id: 'gt-2', name: 'Golden Tower 2', code: 'Golden Tower 2', shortCode: 'GT-2', prefix: 'GT2', floors: 12, unitsPerFloor: 4, flats: 48, occupied: 46, lifts: 2, head: 'Kavaya (Vice President)', color: '#EAB308' },
+      { id: 'gt-3', name: 'Golden Tower 3', code: 'Golden Tower 3', shortCode: 'GT-3', prefix: 'GT3', floors: 10, unitsPerFloor: 4, flats: 40, occupied: 37, lifts: 2, head: 'RWA Service Desk', color: '#D97706' }
+    ],
+    securityContact: '+91 80 4123 7701',
+    caretaker: 'Mr. Raghavan Pillai (+91 98451 22334)',
+    color: '#F59E0B'
+  };
 
-  const currentApt = apartments.find(a => a.name === activeAptTab) || apartments[0];
-  const aptResidents = residents.filter(r => r.apartment === currentApt.name);
-
-  // Filter residents
-  const filteredResidents = aptResidents.filter(r => {
-    const matchesSearch = 
-      r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.flat.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.phone.includes(searchTerm);
-    
-    if (occupancyFilter === 'owners') return matchesSearch && r.type === 'Flat Owner';
-    if (occupancyFilter === 'tenants') return matchesSearch && r.type === 'Tenant';
-    return matchesSearch;
-  });
+  const aptStaff = employees.filter(e => e.complex === currentApt.name || e.complex === 'All Complexes');
+  const aptComplaints = complaints.filter(c => c.apartment === currentApt.name);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Page Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Apartment Complexes Management</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Infrastructure specifications, occupancy rosters, and common asset metrics for the 3 towers
-          </p>
-        </div>
-        <button className="btn btn-primary btn-sm" onClick={() => setActiveTab('register')}>
-          + Register New Resident
-        </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      {/* Title */}
+      <div>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+          Property & Common Asset Monitoring
+        </h1>
+        
       </div>
 
-      {/* 3 Complex Navigation Tabs */}
+      {/* Leadership & Towers Banner */}
       <div style={{
-        display: 'flex',
-        gap: '12px',
-        borderBottom: '1px solid var(--border-color)',
-        paddingBottom: '12px',
-        overflowX: 'auto'
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        padding: '20px 24px',
+        border: '1px solid #E2E8F0',
+        borderLeft: '4px solid #F59E0B',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
       }}>
-        {apartments.map(apt => {
-          const isSelected = activeAptTab === apt.name;
-          return (
-            <button
-              key={apt.id}
-              onClick={() => {
-                setActiveAptTab(apt.name);
-                setSelectedApartment(apt.name);
-              }}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '16px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                {currentApt.name} — Infrastructure & Leadership
+              </h2>
+              {currentApt.name === 'Golden Apartment' && (
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  backgroundColor: '#FEF3C7',
+                  color: '#B45309',
+                  padding: '3px 10px',
+                  borderRadius: '12px'
+                }}>
+                  👑 President's Residence Complex
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: '0.8125rem', color: '#64748B', marginTop: '4px' }}>
+              {currentApt.address} • Security: {currentApt.securityContact}
+            </div>
+          </div>
+
+          {currentApt.leadership?.president && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 14px',
+                backgroundColor: '#FFFBEB',
+                border: '1px solid #FDE68A',
+                borderRadius: '8px'
+              }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  backgroundColor: '#F59E0B',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '0.75rem'
+                }}>
+                  SJ
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#B45309' }}>PRESIDENT</div>
+                  <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#0F172A' }}>
+                    {currentApt.leadership.president}
+                    <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginLeft: '6px' }}>
+                      ({currentApt.leadership.presidentFlat || 'GT1-801'})
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {currentApt.leadership?.vicePresident && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 14px',
+                  backgroundColor: '#EFF6FF',
+                  border: '1px solid #BFDBFE',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    backgroundColor: '#2563EB',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 800,
+                    fontSize: '0.75rem'
+                  }}>
+                    KV
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#1D4ED8' }}>VICE PRESIDENT</div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#0F172A' }}>
+                      {currentApt.leadership.vicePresident}
+                      <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginLeft: '6px' }}>
+                        ({currentApt.leadership.vicePresidentFlat || 'GT2-604'})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* 3 Towers Breakdown Cards */}
+        {currentApt.towers && currentApt.towers.length > 0 && (
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em', marginBottom: '10px' }}>
+              TOWER BREAKDOWN ({currentApt.towers.length} TOWERS)
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '12px'
+            }}>
+              {currentApt.towers.map(tow => (
+                <div
+                  key={tow.id}
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    borderTop: `3px solid ${tow.color || '#2563EB'}`,
+                    padding: '14px 16px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Building2 size={16} style={{ color: tow.color || '#2563EB' }} />
+                      <span style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>
+                        {tow.name}
+                      </span>
+                    </div>
+                    <span style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      backgroundColor: '#F0FDF4',
+                      color: '#16A34A',
+                      padding: '2px 6px',
+                      borderRadius: '6px'
+                    }}>
+                      ● Operational
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem', marginTop: '10px' }}>
+                    <div>
+                      <span style={{ color: '#64748B' }}>Floors: </span>
+                      <strong style={{ color: '#0F172A' }}>{tow.floors} Floors</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B' }}>Flats: </span>
+                      <strong style={{ color: '#0F172A' }}>{tow.flats} Units</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B' }}>Elevators: </span>
+                      <strong style={{ color: '#0F172A' }}>{tow.lifts || 2} Otis Lifts</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B' }}>Occupied: </span>
+                      <strong style={{ color: '#16A34A' }}>{tow.occupied || tow.flats} Units</strong>
+                    </div>
+                  </div>
+
+                  {tow.head && (
+                    <div style={{
+                      marginTop: '10px',
+                      paddingTop: '8px',
+                      borderTop: '1px solid #E2E8F0',
+                      fontSize: '0.6875rem',
+                      color: '#64748B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <span>Leadership:</span>
+                      <strong style={{ color: '#0F172A' }}>{tow.head}</strong>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+
+      {/* Assigned Staff & Maintenance Personnel for this Complex */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        padding: '20px 24px',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              Assigned Maintenance Team & Caretakers
+            </h2>
+            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+              On-duty personnel stationed at {currentApt.name}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => setActiveTab('agency')}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <ShieldCheck size={14} color="#2563EB" />
+              <span>Assigned Agencies</span>
+            </button>
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => setActiveTab('employee')}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <span>All Staff Directory</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '12px'
+        }}>
+          {aptStaff.map(emp => (
+            <div
+              key={emp.id}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                padding: '12px 20px',
-                borderRadius: 'var(--radius-lg)',
-                border: isSelected ? `2px solid ${apt.color}` : '1px solid var(--border-color)',
-                backgroundColor: isSelected ? 'var(--bg-elevated)' : 'var(--bg-card)',
-                color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontWeight: isSelected ? 700 : 500,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                boxShadow: isSelected ? 'var(--shadow-md)' : 'none'
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '10px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0'
               }}
             >
               <div style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                backgroundColor: apt.color
-              }} />
-              <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '0.9375rem', fontWeight: 700 }}>{apt.name}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  {apt.towerCode} • {apt.occupiedFlats}/{apt.totalFlats} Flats
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                backgroundColor: '#2563EB',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: '0.875rem',
+                flexShrink: 0
+              }}>
+                {emp.avatar}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.8125rem', color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {emp.name}
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: '#2563EB', fontWeight: 600 }}>
+                  {emp.designation}
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                  <Phone size={11} /> {emp.phone}
                 </div>
               </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Selected Apartment Hero Overview Card */}
-      <div className="glass-card" style={{ borderLeft: `6px solid ${currentApt.color}` }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="badge badge-neutral">{currentApt.towerCode}</span>
-              <span className="badge badge-success">Active & Habitable</span>
+              <span style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: emp.status === 'On Duty' ? '#10B981' : '#3B82F6',
+                flexShrink: 0
+              }} title={emp.status} />
             </div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '6px' }}>{currentApt.name}</h2>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <MapPin size={14} /> {currentApt.address}
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '16px', backgroundColor: 'var(--bg-hover)', padding: '12px 18px', borderRadius: 'var(--radius-md)' }}>
-            <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Monthly Maint. Pool</div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                ₹ {currentApt.monthlyPool.toLocaleString('en-IN')}
-              </div>
-            </div>
-            <div style={{ width: '1px', backgroundColor: 'var(--border-color)' }} />
-            <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Occupancy Rate</div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--success)' }}>
-                {Math.round((currentApt.occupiedFlats / currentApt.totalFlats) * 100)}%
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Technical Specs Grid */}
-        <div className="grid-cols-4" style={{ marginBottom: '20px' }}>
-          <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--bg-hover)' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>TOWER HEIGHT</span>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>{currentApt.floors} Floors</div>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Reinforced RCC Structure</span>
-          </div>
-          <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--bg-hover)' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>ELEVATOR BANK</span>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>{currentApt.lifts} Passenger Lifts</div>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Otis Automatic ARD System</span>
-          </div>
-          <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--bg-hover)' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>WATER STORAGE</span>
-            <div style={{ fontSize: '1.125rem', fontWeight: 700, marginTop: '2px' }}>{currentApt.reservoirCapacity.split(' ')[0]} L</div>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--success)', fontWeight: 600 }}>{currentApt.reservoirCapacity.split('(')[1]?.replace(')', '') || 'Normal'}</span>
-          </div>
-          <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--bg-hover)' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>SECURITY DESK</span>
-            <div style={{ fontSize: '0.9375rem', fontWeight: 700, marginTop: '2px' }}>{currentApt.securityContact}</div>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Intercom Line #001</span>
-          </div>
-        </div>
-
-        {/* Amenities & Wings */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-          <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>Dedicated Amenities & Enclave Wings:</div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {currentApt.amenities.map((am, i) => (
-              <span key={i} className="badge badge-cyan" style={{ padding: '5px 12px' }}>
-                ✨ {am}
-              </span>
-            ))}
-            {currentApt.blocks.map((bl, i) => (
-              <span key={i} className="badge badge-neutral" style={{ padding: '5px 12px' }}>
-                🏢 {bl}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Resident Flats Roster within this Apartment */}
-      <div className="glass-card">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-          <div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Residents & Flats Directory ({currentApt.name})</h3>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              Verified flat occupants, owners, and leaseholders
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            {/* Search */}
-            <div style={{ position: 'relative' }}>
-              <Search size={15} style={{ position: 'absolute', left: '10px', top: '10px', color: 'var(--text-muted)' }} />
-              <input 
-                type="text" 
-                placeholder="Search name, flat, phone..." 
-                className="form-control"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ paddingLeft: '32px', width: '220px', height: '36px' }}
-              />
-            </div>
-
-            {/* Filter */}
-            <select 
-              value={occupancyFilter} 
-              onChange={e => setOccupancyFilter(e.target.value)}
-              className="form-control"
-              style={{ width: 'auto', height: '36px' }}
-            >
-              <option value="all">All Residents</option>
-              <option value="owners">Flat Owners Only</option>
-              <option value="tenants">Tenants Only</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Resident Table */}
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Flat No</th>
-                <th>Resident Name</th>
-                <th>Resident Type</th>
-                <th>Contact Phone</th>
-                <th>Email Address</th>
-                <th>Allotted Parking</th>
-                <th>Registered Vehicle</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredResidents.map(res => (
-                <tr key={res.id}>
-                  <td style={{ fontWeight: 800, color: 'var(--electric-blue)' }}>{res.flat}</td>
-                  <td style={{ fontWeight: 600 }}>{res.name}</td>
-                  <td>
-                    <span className={`badge ${res.type === 'Flat Owner' ? 'badge-indigo' : 'badge-neutral'}`}>
-                      {res.type}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: '0.8125rem' }}>{res.phone}</td>
-                  <td style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{res.email}</td>
-                  <td style={{ fontSize: '0.8125rem', fontWeight: 600 }}>{res.parking}</td>
-                  <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{res.vehicles}</td>
-                  <td><StatusPill status={res.status} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          ))}
         </div>
       </div>
     </div>
