@@ -1,33 +1,33 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
 import { ApartmentBadge, StatusPill, StatCard, Modal } from '../components/CommonUI';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  Phone, 
-  Mail, 
-  ShieldCheck, 
-  Briefcase, 
-  Clock, 
-  Award, 
-  UserPlus, 
-  Building2, 
-  Wrench, 
-  CheckCircle2, 
+import {
+  Users,
+  Search,
+  Filter,
+  Phone,
+  Mail,
+  ShieldCheck,
+  Briefcase,
+  Clock,
+  Award,
+  UserPlus,
+  Building2,
+  Wrench,
+  CheckCircle2,
   Calendar,
   AlertCircle
 } from 'lucide-react';
 
-export const EmployeeDirectory = () => {
-  const { employees, addEmployee, apartments, selectedApartment, setSelectedApartment, setActiveTab, currentUser } = useRwa();
+export const UsersDirectory = () => {
+  const { userss, addusers, apartments, selectedApartment, setSelectedApartment, setActiveTab, currentUser } = useRwa();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Form state for new employee
+  // Form state for new users
   const [newStaff, setNewStaff] = useState({
     name: '',
     designation: '',
@@ -53,11 +53,11 @@ export const EmployeeDirectory = () => {
     'Parks & Landscaping'
   ];
 
-  const filteredEmployees = employees.filter(emp => {
+  const filtereduserss = userss.filter(emp => {
     const matchesApt = selectedApartment === 'All' || emp.complex === selectedApartment || emp.complex === 'All Complexes';
     const matchesDept = departmentFilter === 'All' || emp.department === departmentFilter;
     const matchesStatus = statusFilter === 'All' || emp.status === statusFilter;
-    const matchesSearch = 
+    const matchesSearch =
       emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,9 +67,9 @@ export const EmployeeDirectory = () => {
     return matchesApt && matchesDept && matchesStatus && matchesSearch;
   });
 
-  const onDutyCount = employees.filter(e => e.status === 'On Duty').length;
-  const availableCount = employees.filter(e => e.status === 'Available').length;
-  const verifiedCount = employees.filter(e => e.policeVerified).length;
+  const onDutyCount = userss.filter(e => e.status === 'On Duty').length;
+  const availableCount = userss.filter(e => e.status === 'Available').length;
+  const verifiedCount = userss.filter(e => e.policeVerified).length;
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
@@ -77,7 +77,7 @@ export const EmployeeDirectory = () => {
       alert('Please fill out Name, Designation, and Contact Phone.');
       return;
     }
-    addEmployee(newStaff);
+    addusers(newStaff);
     setIsAddModalOpen(false);
     setNewStaff({
       name: '',
@@ -112,7 +112,7 @@ export const EmployeeDirectory = () => {
               <Briefcase size={22} />
             </div>
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Employee & Staff Directory</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>users & Staff Directory</h1>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                 Maintenance contractors, security command, caretakers, and facility engineers for BEE PROPERTY
               </p>
@@ -127,33 +127,33 @@ export const EmployeeDirectory = () => {
 
       {/* Metrics Row */}
       <div className="grid-cols-4">
-        <StatCard 
-          title="TOTAL STAFF" 
-          value={employees.length} 
-          subtitle="Enclave operations team" 
-          icon={Users} 
-          color="blue" 
+        <StatCard
+          title="TOTAL STAFF"
+          value={userss.length}
+          subtitle="Enclave operations team"
+          icon={Users}
+          color="blue"
         />
-        <StatCard 
-          title="ON DUTY" 
-          value={onDutyCount} 
-          subtitle="Active on campus now" 
-          icon={Clock} 
-          color="green" 
+        <StatCard
+          title="ON DUTY"
+          value={onDutyCount}
+          subtitle="Active on campus now"
+          icon={Clock}
+          color="green"
         />
-        <StatCard 
-          title="STANDBY / AVAILABLE" 
-          value={availableCount} 
-          subtitle="Ready for dispatch" 
-          icon={CheckCircle2} 
-          color="cyan" 
+        <StatCard
+          title="STANDBY / AVAILABLE"
+          value={availableCount}
+          subtitle="Ready for dispatch"
+          icon={CheckCircle2}
+          color="cyan"
         />
-        <StatCard 
-          title="POLICE VERIFIED" 
-          value={`${verifiedCount} / ${employees.length}`} 
-          subtitle="100% Background checked" 
-          icon={ShieldCheck} 
-          color="indigo" 
+        <StatCard
+          title="POLICE VERIFIED"
+          value={`${verifiedCount} / ${userss.length}`}
+          subtitle="100% Background checked"
+          icon={ShieldCheck}
+          color="indigo"
         />
       </div>
 
@@ -164,9 +164,9 @@ export const EmployeeDirectory = () => {
             {/* Search Input */}
             <div style={{ position: 'relative', width: '280px' }}>
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
-              <input 
-                type="text" 
-                placeholder="Search staff, role, ID, phone..." 
+              <input
+                type="text"
+                placeholder="Search staff, role, ID, phone..."
                 className="form-control"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
@@ -175,7 +175,7 @@ export const EmployeeDirectory = () => {
             </div>
 
             {/* Department Dropdown */}
-            <select 
+            <select
               className="form-control"
               value={departmentFilter}
               onChange={e => setDepartmentFilter(e.target.value)}
@@ -187,7 +187,7 @@ export const EmployeeDirectory = () => {
             </select>
 
             {/* Complex Dropdown */}
-            <select 
+            <select
               className="form-control"
               value={selectedApartment}
               onChange={e => setSelectedApartment(e.target.value)}
@@ -200,7 +200,7 @@ export const EmployeeDirectory = () => {
             </select>
 
             {/* Status Dropdown */}
-            <select 
+            <select
               className="form-control"
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
@@ -213,7 +213,7 @@ export const EmployeeDirectory = () => {
           </div>
 
           <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-            Showing <strong>{filteredEmployees.length}</strong> of <strong>{employees.length}</strong> personnel
+            Showing <strong>{filtereduserss.length}</strong> of <strong>{userss.length}</strong> personnel
           </span>
         </div>
       </div>
@@ -224,13 +224,13 @@ export const EmployeeDirectory = () => {
         gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
         gap: '20px'
       }}>
-        {filteredEmployees.map(emp => (
-          <div 
-            key={emp.id} 
+        {filtereduserss.map(emp => (
+          <div
+            key={emp.id}
             className="glass-card"
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
               justifyContent: 'space-between',
               position: 'relative',
               transition: 'transform 0.15s ease, box-shadow 0.15s ease',
@@ -319,15 +319,15 @@ export const EmployeeDirectory = () => {
 
               {/* Phone & Email */}
               <div style={{ fontSize: '0.8125rem', display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
-                <a 
+                <a
                   href={`tel:${emp.phone}`}
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
                     color: 'var(--text-primary)',
                     textDecoration: 'none',
-                    fontWeight: 600 
+                    fontWeight: 600
                   }}
                 >
                   <div style={{
@@ -355,14 +355,14 @@ export const EmployeeDirectory = () => {
 
             {/* Action buttons */}
             <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
-              <button 
-                className="btn btn-secondary btn-sm" 
+              <button
+                className="btn btn-secondary btn-sm"
                 style={{ flex: 1 }}
                 onClick={() => setSelectedStaff(emp)}
               >
                 Full Profile
               </button>
-              <button 
+              <button
                 className="btn btn-primary btn-sm"
                 onClick={() => {
                   setActiveTab('complaints');
@@ -455,15 +455,15 @@ export const EmployeeDirectory = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         title="Register New Staff Member"
-        subtitle="Add a new employee, maintenance technician, or security personnel to the roster"
+        subtitle="Add a new users, maintenance technician, or security personnel to the roster"
       >
         <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="form-group">
             <label className="form-label">Full Name *</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              placeholder="e.g. Anand Kumar" 
+            <input
+              type="text"
+              className="form-control"
+              placeholder="e.g. Anand Kumar"
               required
               value={newStaff.name}
               onChange={e => setNewStaff({ ...newStaff, name: e.target.value })}
@@ -473,10 +473,10 @@ export const EmployeeDirectory = () => {
           <div className="grid-cols-2" style={{ gap: '12px' }}>
             <div className="form-group">
               <label className="form-label">Designation *</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="e.g. Electrician / Gate Guard" 
+              <input
+                type="text"
+                className="form-control"
+                placeholder="e.g. Electrician / Gate Guard"
                 required
                 value={newStaff.designation}
                 onChange={e => setNewStaff({ ...newStaff, designation: e.target.value })}
@@ -484,7 +484,7 @@ export const EmployeeDirectory = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Department *</label>
-              <select 
+              <select
                 className="form-control"
                 value={newStaff.department}
                 onChange={e => setNewStaff({ ...newStaff, department: e.target.value })}
@@ -499,7 +499,7 @@ export const EmployeeDirectory = () => {
           <div className="grid-cols-2" style={{ gap: '12px' }}>
             <div className="form-group">
               <label className="form-label">Assigned Complex *</label>
-              <select 
+              <select
                 className="form-control"
                 value={newStaff.complex}
                 onChange={e => setNewStaff({ ...newStaff, complex: e.target.value })}
@@ -509,10 +509,10 @@ export const EmployeeDirectory = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Station / Tower Area</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="e.g. Golden Tower 1 / Security Gate" 
+              <input
+                type="text"
+                className="form-control"
+                placeholder="e.g. Golden Tower 1 / Security Gate"
                 value={newStaff.tower}
                 onChange={e => setNewStaff({ ...newStaff, tower: e.target.value })}
               />
@@ -522,10 +522,10 @@ export const EmployeeDirectory = () => {
           <div className="grid-cols-2" style={{ gap: '12px' }}>
             <div className="form-group">
               <label className="form-label">Contact Phone *</label>
-              <input 
-                type="tel" 
-                className="form-control" 
-                placeholder="+91 98450 00000" 
+              <input
+                type="tel"
+                className="form-control"
+                placeholder="+91 98450 00000"
                 required
                 value={newStaff.phone}
                 onChange={e => setNewStaff({ ...newStaff, phone: e.target.value })}
@@ -533,10 +533,10 @@ export const EmployeeDirectory = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Email (Optional)</label>
-              <input 
-                type="email" 
-                className="form-control" 
-                placeholder="staff@beeproperty.org" 
+              <input
+                type="email"
+                className="form-control"
+                placeholder="staff@beeproperty.org"
                 value={newStaff.email}
                 onChange={e => setNewStaff({ ...newStaff, email: e.target.value })}
               />
@@ -546,7 +546,7 @@ export const EmployeeDirectory = () => {
           <div className="grid-cols-2" style={{ gap: '12px' }}>
             <div className="form-group">
               <label className="form-label">Shift Timing</label>
-              <select 
+              <select
                 className="form-control"
                 value={newStaff.shift}
                 onChange={e => setNewStaff({ ...newStaff, shift: e.target.value })}
@@ -560,10 +560,10 @@ export const EmployeeDirectory = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Experience</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="e.g. 5 Years" 
+              <input
+                type="text"
+                className="form-control"
+                placeholder="e.g. 5 Years"
                 value={newStaff.experience}
                 onChange={e => setNewStaff({ ...newStaff, experience: e.target.value })}
               />
@@ -583,3 +583,7 @@ export const EmployeeDirectory = () => {
     </div>
   );
 };
+
+export const usersDirectory = UsersDirectory;
+export const EmployeeDirectory = UsersDirectory;
+export default UsersDirectory;

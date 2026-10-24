@@ -70,9 +70,6 @@ export const RegistrationApprovals = () => {
             <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Resident Registration Approvals</h1>
             <span className="badge badge-warning">President Sign-off Desk</span>
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Verify sale deeds, rental agreements, police verifications, and grant community access
-          </p>
         </div>
 
         {/* Status Counters */}

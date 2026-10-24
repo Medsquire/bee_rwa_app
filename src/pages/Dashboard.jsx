@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
 import { ComplaintDetailsModal } from './ComplaintDetailsModal';
-import { 
-  Building2, 
-  Users, 
-  AlertTriangle, 
-  Dumbbell, 
-  CheckCircle2, 
-  Clock, 
-  RefreshCw, 
-  Wrench, 
-  Search, 
-  Filter, 
-  ShieldCheck, 
-  Zap, 
-  Droplets, 
+import {
+  Building2,
+  Users,
+  AlertTriangle,
+  Dumbbell,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  Wrench,
+  Search,
+  Filter,
+  ShieldCheck,
+  Zap,
+  Droplets,
   Sparkles,
   ArrowRight,
   Eye,
@@ -25,16 +25,16 @@ import {
 } from 'lucide-react';
 
 export const Dashboard = () => {
-  const { 
-    currentUser, 
-    apartments, 
-    selectedApartment, 
+  const {
+    currentUser,
+    apartments,
+    selectedApartment,
     setSelectedApartment,
-    complaints, 
-    employees,
-    facilities, 
-    bookings, 
-    setActiveTab 
+    complaints,
+    userss,
+    facilities,
+    bookings,
+    setActiveTab
   } = useRwa();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,7 +43,7 @@ export const Dashboard = () => {
   // Filter complaints by selected apartment
   const filteredComplaints = complaints.filter(cmp => {
     const matchesApt = selectedApartment === 'All' || cmp.apartment === selectedApartment;
-    const matchesSearch = 
+    const matchesSearch =
       cmp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -57,8 +57,9 @@ export const Dashboard = () => {
   const pendingCount = complaints.filter(c => ['Submitted', 'Pending'].includes(c.status)).length;
   const inProgressCount = complaints.filter(c => ['Assigned', 'In Progress'].includes(c.status)).length;
   const completedCount = complaints.filter(c => ['Resolved', 'Closed'].includes(c.status)).length;
-  const onDutyEmployees = employees.filter(e => e.status === 'On Duty');
-  const availableEmployees = employees.filter(e => e.status === 'Available');
+  const staffList = userss || [];
+  const onDutyuserss = staffList.filter(e => e.status === 'On Duty');
+  const availableuserss = staffList.filter(e => e.status === 'Available');
 
   // Asset counts
   const totalLifts = apartments.reduce((sum, a) => sum + (a.lifts || 0), 0);
@@ -81,9 +82,6 @@ export const Dashboard = () => {
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
           Welcome back, {currentUser.name}
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
-          RWA Operations & Common Area Property Maintenance Portal
-        </p>
       </div>
 
       {/* 2. Top Classified Metric Cards Row (Matching Parallel App Template) */}
@@ -93,7 +91,7 @@ export const Dashboard = () => {
         gap: '14px'
       }}>
         {/* Card 1: Pending Requests */}
-        <div 
+        <div
           onClick={() => setActiveTab('complaints')}
           style={{
             backgroundColor: '#FFFFFF',
@@ -135,7 +133,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Card 2: In Progress Requests */}
-        <div 
+        <div
           onClick={() => setActiveTab('complaints')}
           style={{
             backgroundColor: '#FFFFFF',
@@ -177,7 +175,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Card 3: Completed Requests */}
-        <div 
+        <div
           onClick={() => setActiveTab('complaints')}
           style={{
             backgroundColor: '#FFFFFF',
@@ -219,8 +217,8 @@ export const Dashboard = () => {
         </div>
 
         {/* Card 4: Technicians / Staff */}
-        <div 
-          onClick={() => setActiveTab('employee')}
+        <div
+          onClick={() => setActiveTab('users')}
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '12px',
@@ -252,7 +250,7 @@ export const Dashboard = () => {
             </div>
           </div>
           <div style={{ fontSize: '1.875rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>
-            {onDutyEmployees.length}
+            {onDutyuserss.length}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#64748B', marginTop: '8px', fontWeight: 600 }}>
             <span>View details</span>
@@ -261,7 +259,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Card 5: Common Area Assets */}
-        <div 
+        <div
           onClick={() => setActiveTab('property')}
           style={{
             backgroundColor: '#FFFFFF',
@@ -303,7 +301,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Card 6: Amenities & Permissions */}
-        <div 
+        <div
           onClick={() => setActiveTab('property')}
           style={{
             backgroundColor: '#FFFFFF',
@@ -345,166 +343,6 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* 3. Apartment Overview Card with Mini Metric Chips (Matching Parallel App Template) */}
-      <div style={{
-        backgroundColor: '#FFFFFF',
-        borderRadius: '12px',
-        padding: '20px 24px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
-      }}>
-        {/* Card Header & Filter */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '18px' }}>
-          <div>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-              Apartment Overview
-            </h2>
-            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
-              Real-time asset telemetry, maintenance readiness, and department allocations
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>Filter by apartment</span>
-            <select
-              value={selectedApartment}
-              onChange={(e) => setSelectedApartment(e.target.value)}
-              className="form-control"
-              style={{
-                width: 'auto',
-                minWidth: '180px',
-                padding: '7px 12px',
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                borderRadius: '8px',
-                borderColor: '#CBD5E1',
-                backgroundColor: '#F8FAFC'
-              }}
-            >
-              <option value="All">All Apartments</option>
-              {apartments.map(a => (
-                <option key={a.id} value={a.name}>{a.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Horizontal Mini Metric Chips matching screenshot */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
-          gap: '12px'
-        }}>
-          {/* Active Technicians */}
-          <div style={{
-            backgroundColor: '#F0FDF4',
-            border: '1px solid #BBF7D0',
-            borderRadius: '10px',
-            padding: '12px 14px'
-          }}>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#166534', letterSpacing: '0.04em' }}>
-              ACTIVE TECHNICIANS
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#15803D', marginTop: '4px' }}>
-              {onDutyEmployees.length}
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: '#16A34A', marginTop: '4px' }}>
-              Available & assigned to service
-            </div>
-          </div>
-
-          {/* Inactive Technicians */}
-          <div style={{
-            backgroundColor: '#EFF6FF',
-            border: '1px solid #BFDBFE',
-            borderRadius: '10px',
-            padding: '12px 14px'
-          }}>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#1E40AF', letterSpacing: '0.04em' }}>
-              STANDBY STAFF
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#2563EB', marginTop: '4px' }}>
-              {availableEmployees.length}
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: '#3B82F6', marginTop: '4px' }}>
-              On-call for emergency callout
-            </div>
-          </div>
-
-          {/* Pending Requests */}
-          <div style={{
-            backgroundColor: '#FFF7ED',
-            border: '1px solid #FED7AA',
-            borderRadius: '10px',
-            padding: '12px 14px'
-          }}>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#9A3412', letterSpacing: '0.04em' }}>
-              PENDING COMPLAINTS
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#EA580C', marginTop: '4px' }}>
-              {pendingCount}
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: '#F97316', marginTop: '4px' }}>
-              Awaiting specialist dispatch
-            </div>
-          </div>
-
-          {/* In Progress */}
-          <div style={{
-            backgroundColor: '#F0F9FF',
-            border: '1px solid #BAE6FD',
-            borderRadius: '10px',
-            padding: '12px 14px'
-          }}>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#075985', letterSpacing: '0.04em' }}>
-              IN PROGRESS
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0284C7', marginTop: '4px' }}>
-              {inProgressCount}
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: '#0EA5E9', marginTop: '4px' }}>
-              Currently being handled on campus
-            </div>
-          </div>
-
-          {/* Departments */}
-          <div style={{
-            backgroundColor: '#FAF5FF',
-            border: '1px solid #E9D5FF',
-            borderRadius: '10px',
-            padding: '12px 14px'
-          }}>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#6B21A8', letterSpacing: '0.04em' }}>
-              DEPARTMENTS
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#7E22CE', marginTop: '4px' }}>
-              7
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: '#9333EA', marginTop: '4px' }}>
-              Lifts, Plumbing, Power, STP, Clean
-            </div>
-          </div>
-
-          {/* Common Facilities */}
-          <div style={{
-            backgroundColor: '#FDF2F8',
-            border: '1px solid #FBCFE8',
-            borderRadius: '10px',
-            padding: '12px 14px'
-          }}>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#9D174D', letterSpacing: '0.04em' }}>
-              COMMON AMENITIES
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#BE185D', marginTop: '4px' }}>
-              {facilities.length}
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: '#DB2777', marginTop: '4px' }}>
-              Gym, Park, Banquet Hall, Sports
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 4. Recent Service Requests & Common Area Issue Resolving Table */}
       <div style={{
         backgroundColor: '#FFFFFF',
@@ -519,9 +357,6 @@ export const Dashboard = () => {
             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
               Recent Service Requests
             </h2>
-            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
-              Common area issues, elevator faults, and maintenance work orders
-            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -689,20 +524,20 @@ export const Dashboard = () => {
                         borderRadius: '9999px',
                         fontSize: '0.75rem',
                         fontWeight: 700,
-                        backgroundColor: isPending 
-                          ? '#FFF7ED' 
-                          : isInProgress 
-                            ? '#EFF6FF' 
+                        backgroundColor: isPending
+                          ? '#FFF7ED'
+                          : isInProgress
+                            ? '#EFF6FF'
                             : '#F0FDF4',
-                        color: isPending 
-                          ? '#EA580C' 
-                          : isInProgress 
-                            ? '#2563EB' 
+                        color: isPending
+                          ? '#EA580C'
+                          : isInProgress
+                            ? '#2563EB'
                             : '#16A34A',
-                        border: isPending 
-                          ? '1px solid #FED7AA' 
-                          : isInProgress 
-                            ? '1px solid #BFDBFE' 
+                        border: isPending
+                          ? '1px solid #FED7AA'
+                          : isInProgress
+                            ? '1px solid #BFDBFE'
                             : '1px solid #BBF7D0'
                       }}>
                         <span style={{

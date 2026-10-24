@@ -110,7 +110,7 @@ export const ApartmentBadge = ({ apartment }) => {
   );
 };
 
-export const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'blue', onClick }) => {
+export const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'blue', onClick, style, compact }) => {
   const colorMap = {
     blue: { iconBg: 'rgba(59, 130, 246, 0.12)', iconColor: '#3B82F6', borderLeft: '#3B82F6' },
     cyan: { iconBg: 'rgba(34, 211, 238, 0.15)', iconColor: '#0891B2', borderLeft: '#22D3EE' },
@@ -125,35 +125,40 @@ export const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'b
   return (
     <div 
       className={`glass-card stat-card ${onClick ? 'glass-card-interactive' : ''}`}
-      style={{ borderLeft: `4px solid ${scheme.borderLeft}` }}
+      style={{ 
+        borderLeft: `4px solid ${scheme.borderLeft}`,
+        ...(compact ? { padding: '12px 16px' } : {}),
+        ...style 
+      }}
       onClick={onClick}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: compact ? '0' : '12px' }}>
         <div>
-          <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <p style={{ fontSize: compact ? '0.6875rem' : '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
             {title}
           </p>
-          <div className="stat-value" style={{ marginTop: '4px' }}>
+          <div className="stat-value" style={{ marginTop: compact ? '2px' : '4px', fontSize: compact ? '1.4rem' : undefined }}>
             {value}
           </div>
         </div>
         {Icon && (
           <div style={{ 
-            width: '46px', 
-            height: '46px', 
-            borderRadius: '12px', 
+            width: compact ? '36px' : '46px', 
+            height: compact ? '36px' : '46px', 
+            borderRadius: compact ? '8px' : '12px', 
             backgroundColor: scheme.iconBg, 
             color: scheme.iconColor,
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'center' 
+            justifyContent: 'center',
+            flexShrink: 0
           }}>
-            <Icon size={22} />
+            <Icon size={compact ? 18 : 22} />
           </div>
         )}
       </div>
       {subtitle && (
-        <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ fontSize: compact ? '0.75rem' : '0.8125rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', marginTop: compact ? '4px' : '0' }}>
           {trend && <span style={{ fontWeight: 600, color: trend.startsWith('+') ? 'var(--success)' : 'var(--error)' }}>{trend}</span>}
           <span>{subtitle}</span>
         </div>

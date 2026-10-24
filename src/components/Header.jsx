@@ -3,12 +3,12 @@ import { useRwa } from '../context/RwaContext';
 import { Moon, Sun } from 'lucide-react';
 
 export const Header = () => {
-  const { 
-    currentUser, 
-    activeTab, 
-    setActiveTab, 
-    theme, 
-    toggleTheme 
+  const {
+    currentUser,
+    activeTab,
+    setActiveTab,
+    theme,
+    toggleTheme
   } = useRwa();
 
   const tabTitles = {
@@ -22,10 +22,11 @@ export const Header = () => {
     'residents': 'Residence (Tower & Floor & Flat)',
     'announcements': 'Announcements',
     'annouments': 'Announcements',
-    'employee': 'Employee',
-    'employees': 'Employee',
-    'agency': 'Agency & Assigned Contractors',
-    'agencies': 'Agency & Assigned Contractors',
+    'users': 'users',
+    'userss': 'users',
+    'approvals': 'Registration Approvals',
+    'agency': 'Agencies & Assigned Contractors',
+    'agencies': 'Agencies & Assigned Contractors',
     'profile': 'My Profile'
   };
 

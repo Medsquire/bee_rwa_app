@@ -138,9 +138,7 @@ export const AgencyManagement = () => {
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
             Agency & Assigned Contractors
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
-            AMC vendor contracts, tower assignments, lead engineer dispatch, and SLA monitoring
-          </p>
+          
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -691,7 +689,7 @@ export const AgencyManagement = () => {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px' }}>
                   {['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'].map(towerName => {
                     const isChecked = (selectedTowersByComplex['Golden Apartment'] || []).includes(towerName);
                     return (

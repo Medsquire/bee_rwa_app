@@ -1,54 +1,61 @@
 import React from 'react';
 import { useRwa } from '../context/RwaContext';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  AlertTriangle, 
-  Megaphone, 
-  Home, 
+import {
+  LayoutDashboard,
+  Building2,
+  AlertTriangle,
+  Megaphone,
+  Home,
   Briefcase,
   ShieldCheck,
+  UserCheck,
   LogOut
 } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { 
-    activeTab, 
-    setActiveTab, 
-    currentUser, 
+  const {
+    activeTab,
+    setActiveTab,
+    currentUser,
     complaints,
+    registrationRequests,
     logout
   } = useRwa();
 
-  const openComplaintsCount = complaints.filter(c => ['Submitted', 'Assigned', 'In Progress'].includes(c.status)).length;
+  const openComplaintsCount = (complaints || []).filter(c => ['Submitted', 'Assigned', 'In Progress'].includes(c.status)).length;
+  const pendingApprovalsCount = (registrationRequests || []).filter(r => r.status === 'Pending').length;
 
   const isTabActive = (itemId) => {
     if (activeTab === itemId) return true;
-    if (itemId === 'property' && (activeTab === 'apartments' || activeTab === 'property')) return true;
-    if (itemId === 'apartments' && (activeTab === 'apartments' || activeTab === 'property')) return true;
     if (itemId === 'residence' && (activeTab === 'residents' || activeTab === 'residence')) return true;
-    if (itemId === 'residents' && (activeTab === 'residents' || activeTab === 'residence')) return true;
     if (itemId === 'complaints' && (activeTab === 'complaint' || activeTab === 'complaints')) return true;
-    if (itemId === 'employee' && (activeTab === 'employees' || activeTab === 'employee')) return true;
+    if (itemId === 'approvals' && (activeTab === 'approvals' || activeTab === 'approval')) return true;
     if (itemId === 'agency' && (activeTab === 'agency' || activeTab === 'agencies')) return true;
+    if ((itemId === 'users' || itemId === 'employee') && (activeTab === 'userss' || activeTab === 'users' || activeTab === 'employee' || activeTab === 'employees')) return true;
     if (itemId === 'announcements' && (activeTab === 'annouments' || activeTab === 'announcements')) return true;
     return false;
   };
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'property', label: 'Property', icon: Building2 },
-    { 
-      id: 'complaints', 
-      label: 'Complaint', 
-      icon: AlertTriangle, 
-      badge: openComplaintsCount, 
-      badgeColor: '#2563EB' 
+    { id: 'residence', label: 'Residence', icon: Home },
+    {
+      id: 'complaints',
+      label: 'Complaints',
+      icon: AlertTriangle,
+      badge: openComplaintsCount,
+      badgeColor: '#2563EB'
     },
-    { id: 'residence', label: 'Residence (Tower & Floor & Flat)', icon: Home },
-    { id: 'announcements', label: 'Announcements', icon: Megaphone },
-    { id: 'employee', label: 'Employee', icon: Briefcase },
-    { id: 'agency', label: 'Agency', icon: ShieldCheck }
+    {
+      id: 'approvals',
+      label: 'Approvals',
+      icon: UserCheck,
+      badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
+      badgeColor: '#F59E0B'
+    },
+    { id: 'agency', label: 'Agencies', icon: ShieldCheck },
+    { id: 'users', label: 'Users', icon: Briefcase },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone }
   ];
 
   return (
@@ -223,22 +230,22 @@ export const Sidebar = () => {
           </div>
 
           <div style={{ flex: 1, minWidth: 0, lineHeight: 1.2 }}>
-            <div style={{ 
-              fontWeight: 700, 
-              fontSize: '0.8125rem', 
-              color: '#FFFFFF', 
-              overflow: 'hidden', 
-              textOverflow: 'ellipsis', 
-              whiteSpace: 'nowrap' 
+            <div style={{
+              fontWeight: 700,
+              fontSize: '0.8125rem',
+              color: '#FFFFFF',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
             }}>
               {currentUser.name}
             </div>
-            <div style={{ 
-              fontSize: '0.6875rem', 
-              color: '#94A3B8', 
-              overflow: 'hidden', 
-              textOverflow: 'ellipsis', 
-              whiteSpace: 'nowrap' 
+            <div style={{
+              fontSize: '0.6875rem',
+              color: '#94A3B8',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
             }}>
               {currentUser.email}
             </div>

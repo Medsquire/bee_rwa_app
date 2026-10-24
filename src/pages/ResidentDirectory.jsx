@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useRwa } from '../context/RwaContext';
 import { ApartmentBadge, StatusPill, StatCard, Modal } from '../components/CommonUI';
 import { 
@@ -20,7 +20,12 @@ import {
   List,
   Eye,
   Key,
-  ShieldAlert
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  X
 } from 'lucide-react';
 
 export const ResidentDirectory = () => {
@@ -33,17 +38,85 @@ export const ResidentDirectory = () => {
   const [selectedComplex, setSelectedComplex] = useState('Golden Apartment');
   const [selectedTower, setSelectedTower] = useState('Golden Tower 1');
   const [selectedFloor, setSelectedFloor] = useState('All');
+  const [occupancyFilter, setOccupancyFilter] = useState('All');
   const [selectedResidentModal, setSelectedResidentModal] = useState(null);
+  const [currentFloorPage, setCurrentFloorPage] = useState(1);
+  const FLOORS_PER_PAGE = 3;
+  const topTableRef = useRef(null);
+
+  const scrollToTop = () => {
+    const mainWrapper = document.querySelector('.main-wrapper') || document.querySelector('main');
+    if (mainWrapper) {
+      mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (topTableRef.current) {
+      topTableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentFloorPage(newPage);
+    scrollToTop();
+  };
 
   // Tower mapping for Golden Apartment (3 Towers: Golden Tower 1, Golden Tower 2, Golden Tower 3)
+  // Each tower has 30 to 40 floors, and each floor has 6 to 10 flats
   const allTowers = [
-    { code: 'Golden Tower 1', name: 'Golden Tower 1', complex: 'Golden Apartment', prefix: 'GT1', altPrefix: 'A', floors: 12, unitsPerFloor: 4, isPresident: true, leadershipTag: 'President Sujana', color: '#F59E0B' },
-    { code: 'Golden Tower 2', name: 'Golden Tower 2', complex: 'Golden Apartment', prefix: 'GT2', altPrefix: 'A', floors: 12, unitsPerFloor: 4, isVP: true, leadershipTag: 'VP Kavaya', color: '#EAB308' },
-    { code: 'Golden Tower 3', name: 'Golden Tower 3', complex: 'Golden Apartment', prefix: 'GT3', altPrefix: 'A', floors: 10, unitsPerFloor: 4, leadershipTag: 'Service Desk', color: '#D97706' }
+    { 
+      code: 'Golden Tower 1', 
+      name: 'Golden Tower 1', 
+      complex: 'Golden Apartment', 
+      prefix: 'GT1', 
+      altPrefix: 'A', 
+      floors: 38, 
+      unitsPerFloor: 8, 
+      getUnitsForFloor: (f) => (f >= 35 ? 6 : 8), // 38 floors, 6 to 8 flats per floor
+      isPresident: true, 
+      leadershipTag: 'President Sujana', 
+      color: '#F59E0B' 
+    },
+    { 
+      code: 'Golden Tower 2', 
+      name: 'Golden Tower 2', 
+      complex: 'Golden Apartment', 
+      prefix: 'GT2', 
+      altPrefix: 'A', 
+      floors: 35, 
+      unitsPerFloor: 8, 
+      getUnitsForFloor: (f) => (f >= 32 ? 6 : 8), // 35 floors, 6 to 8 flats per floor
+      isVP: true, 
+      leadershipTag: 'VP Kavaya', 
+      color: '#EAB308' 
+    },
+    { 
+      code: 'Golden Tower 3', 
+      name: 'Golden Tower 3', 
+      complex: 'Golden Apartment', 
+      prefix: 'GT3', 
+      altPrefix: 'A', 
+      floors: 32, 
+      unitsPerFloor: 8, 
+      getUnitsForFloor: (f) => (f <= 4 ? 10 : f >= 28 ? 6 : 8), // 32 floors, 6 to 10 flats per floor
+      leadershipTag: 'Service Desk', 
+      color: '#D97706' 
+    }
   ];
 
   const currentComplexTowers = allTowers;
   const currentTowerObj = allTowers.find(t => t.code === selectedTower) || allTowers[0];
+
+  // Overall flats count across all towers
+  const totalFlatsCount = useMemo(() => {
+    return allTowers.reduce((sum, tow) => {
+      let towerFlats = 0;
+      for (let f = 1; f <= tow.floors; f++) {
+        const units = tow.getUnitsForFloor ? tow.getUnitsForFloor(f) : tow.unitsPerFloor;
+        towerFlats += units;
+      }
+      return sum + towerFlats;
+    }, 0);
+  }, []);
 
   // Helper to get tower and floor for a resident
   const getResidentLocation = (res) => {
@@ -60,12 +133,16 @@ export const ResidentDirectory = () => {
       }
     }
 
-    let floor = 1;
-    const match = res.flat?.match(/[A-Za-z0-9]+-?(\d+)/);
-    if (match) {
-      const num = parseInt(match[1], 10);
-      floor = Math.floor(num / 100);
-      if (floor === 0) floor = 1;
+    let floor = res.floor;
+    if (!floor) {
+      const match = res.flat?.match(/[A-Za-z0-9]+-?(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        floor = Math.floor(num / 100);
+        if (floor === 0) floor = 1;
+      } else {
+        floor = 1;
+      }
     }
     return { tower, floor };
   };
@@ -82,6 +159,53 @@ export const ResidentDirectory = () => {
     });
   }, [residents]);
 
+  // Helper to check if a flat or resident matches search term
+  const isFlatMatching = (flatItem, rawTerm) => {
+    if (!rawTerm || !rawTerm.trim()) return true;
+    const term = rawTerm.trim().toLowerCase();
+    const cleanTerm = term.replace(/[-\s]/g, '');
+
+    // 1. Direct and normalized flat number match (e.g. "801", "GT1-801", "gt1801")
+    const flatNoLower = (flatItem.flatNo || '').toLowerCase();
+    const cleanFlatNo = flatNoLower.replace(/[-\s]/g, '');
+    if (flatNoLower.includes(term) || cleanFlatNo.includes(cleanTerm)) return true;
+
+    // 2. Unit/floor number match (e.g. flat "GT1-801", user typed "801" or "0801")
+    const parts = flatItem.flatNo.split('-');
+    if (parts.length > 1) {
+      const unitPart = parts[1].toLowerCase();
+      if (unitPart.includes(term) || unitPart.replace(/^0+/, '').includes(term)) {
+        return true;
+      }
+    }
+
+    // 3. Resident attributes match
+    const res = flatItem.resident;
+    if (res) {
+      if (res.name && res.name.toLowerCase().includes(term)) return true;
+      if (res.flat && (res.flat.toLowerCase().includes(term) || res.flat.replace(/[-\s]/g, '').toLowerCase().includes(cleanTerm))) return true;
+      if (res.phone && res.phone.replace(/[\s-]/g, '').includes(cleanTerm)) return true;
+      if (res.email && res.email.toLowerCase().includes(term)) return true;
+      if (res.designation && res.designation.toLowerCase().includes(term)) return true;
+      if (res.parking && res.parking.toLowerCase().includes(term)) return true;
+      if (res.vehicles && res.vehicles.toLowerCase().includes(term)) return true;
+      if (res.type && res.type.toLowerCase().includes(term)) return true;
+    }
+    return false;
+  };
+
+  // Automatically switch tower if user searches for another tower prefix
+  useEffect(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (term.startsWith('gt2') || term.includes('golden tower 2') || term.startsWith('tower 2')) {
+      if (selectedTower !== 'Golden Tower 2') setSelectedTower('Golden Tower 2');
+    } else if (term.startsWith('gt3') || term.includes('golden tower 3') || term.startsWith('tower 3')) {
+      if (selectedTower !== 'Golden Tower 3') setSelectedTower('Golden Tower 3');
+    } else if (term.startsWith('gt1') || term.includes('golden tower 1') || term.startsWith('tower 1')) {
+      if (selectedTower !== 'Golden Tower 1') setSelectedTower('Golden Tower 1');
+    }
+  }, [searchTerm, selectedTower]);
+
   // Filtered residents for list view
   const filteredResidents = useMemo(() => {
     return enrichedResidents.filter(r => {
@@ -89,14 +213,9 @@ export const ResidentDirectory = () => {
       const matchesType = typeFilter === 'All' || r.type === typeFilter;
       const matchesTower = selectedTower === 'All' || r.tower === selectedTower;
       const matchesFloor = selectedFloor === 'All' || r.floor === Number(selectedFloor);
-      const matchesSearch = 
-        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.flat.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.phone.includes(searchTerm) ||
-        r.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (r.designation && r.designation.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (r.parking && r.parking.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (r.vehicles && r.vehicles.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const fakeFlatItem = { flatNo: r.flat, resident: r, occupied: true };
+      const matchesSearch = isFlatMatching(fakeFlatItem, searchTerm);
 
       return matchesComplex && matchesType && matchesSearch && (viewMode === 'list' ? true : matchesTower && matchesFloor);
     });
@@ -115,7 +234,11 @@ export const ResidentDirectory = () => {
       const prefix = currentTowerObj.prefix;
       const flatsOnFloor = [];
 
-      for (let u = 1; u <= currentTowerObj.unitsPerFloor; u++) {
+      const unitsCount = currentTowerObj.getUnitsForFloor 
+        ? currentTowerObj.getUnitsForFloor(f) 
+        : currentTowerObj.unitsPerFloor;
+
+      for (let u = 1; u <= unitsCount; u++) {
         const flatNo = `${prefix}-${f}${u < 10 ? '0' + u : u}`;
         const altNo = currentTowerObj.altPrefix ? `${currentTowerObj.altPrefix}-${f}${u < 10 ? '0' + u : u}` : null;
 
@@ -142,8 +265,89 @@ export const ResidentDirectory = () => {
     return floorsArray;
   }, [currentTowerObj, enrichedResidents]);
 
+  // Filtered floors based on floor selection, occupancy filter, and search query
+  const visibleFloorsList = useMemo(() => {
+    const hasSearch = searchTerm.trim().length > 0;
+    
+    return floorHierarchy
+      .filter(f => selectedFloor === 'All' || f.floorNumber === Number(selectedFloor))
+      .map(floor => {
+        const filteredFlats = floor.flats.filter(flatItem => {
+          if (occupancyFilter === 'Occupied' && !flatItem.occupied) return false;
+          if (occupancyFilter === 'Unoccupied' && flatItem.occupied) return false;
+          if (hasSearch && !isFlatMatching(flatItem, searchTerm)) return false;
+          return true;
+        });
+
+        return {
+          ...floor,
+          flats: filteredFlats
+        };
+      })
+      .filter(floor => {
+        // When searching or filtering by occupancy, only show floors that contain matching flats!
+        if (hasSearch || occupancyFilter !== 'All') {
+          return floor.flats.length > 0;
+        }
+        return true;
+      });
+  }, [floorHierarchy, selectedFloor, occupancyFilter, searchTerm]);
+
+  // Check if search query matches residents in other towers
+  const otherTowerMatches = useMemo(() => {
+    if (!searchTerm.trim()) return [];
+    const cleanTerm = searchTerm.trim().toLowerCase().replace(/[-\s]/g, '');
+    const term = searchTerm.trim().toLowerCase();
+
+    return allTowers
+      .filter(t => t.code !== selectedTower)
+      .map(tow => {
+        const matches = enrichedResidents.filter(r => {
+          if (r.tower !== tow.code) return false;
+          const flatClean = (r.flat || '').toLowerCase().replace(/[-\s]/g, '');
+          const nameLower = (r.name || '').toLowerCase();
+          const phoneClean = (r.phone || '').replace(/[\s-]/g, '');
+          const emailLower = (r.email || '').toLowerCase();
+          return (
+            flatClean.includes(cleanTerm) ||
+            nameLower.includes(term) ||
+            phoneClean.includes(cleanTerm) ||
+            emailLower.includes(term)
+          );
+        });
+        return { tower: tow, matches };
+      })
+      .filter(item => item.matches.length > 0);
+  }, [searchTerm, selectedTower, allTowers, enrichedResidents]);
+
+  const totalFloorPages = Math.ceil(visibleFloorsList.length / FLOORS_PER_PAGE);
+
+  // Reset to page 1 whenever tower, floor filter, occupancy, or search term changes
+  useEffect(() => {
+    setCurrentFloorPage(1);
+  }, [selectedTower, selectedFloor, occupancyFilter, searchTerm]);
+
+  // Paginated slice: 3 floors per page
+  const paginatedFloors = useMemo(() => {
+    const startIndex = (currentFloorPage - 1) * FLOORS_PER_PAGE;
+    return visibleFloorsList.slice(startIndex, startIndex + FLOORS_PER_PAGE);
+  }, [visibleFloorsList, currentFloorPage]);
+
   const ownersCount = residents.filter(r => r.type === 'Flat Owner').length;
   const tenantsCount = residents.filter(r => r.type === 'Tenant').length;
+
+  // Tower level occupancy stats
+  const currentTowerStats = useMemo(() => {
+    let flats = 0;
+    for (let f = 1; f <= currentTowerObj.floors; f++) {
+      const u = currentTowerObj.getUnitsForFloor ? currentTowerObj.getUnitsForFloor(f) : currentTowerObj.unitsPerFloor;
+      flats += u;
+    }
+    const occupied = enrichedResidents.filter(r => r.tower === currentTowerObj.code).length;
+    const unoccupied = Math.max(0, flats - occupied);
+    const rate = flats > 0 ? ((occupied / flats) * 100).toFixed(1) : 0;
+    return { flats, occupied, unoccupied, rate };
+  }, [currentTowerObj, enrichedResidents]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -164,7 +368,7 @@ export const ResidentDirectory = () => {
               <Home size={22} />
             </div>
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Residence & Directory</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Residence</h1>
              
             </div>
           </div>
@@ -224,35 +428,68 @@ export const ResidentDirectory = () => {
       </div>
 
       {/* Directory Metrics */}
-      <div className="grid-cols-4">
+      <div className="grid-cols-4" style={{ gap: '14px' }}>
         <StatCard 
           title="TOTAL RESIDENTS" 
           value={residents.length} 
-          subtitle="Registered in directory" 
           icon={Users} 
           color="blue" 
+          compact
         />
         <StatCard 
           title="FLAT OWNERS" 
-          value={ownersCount} 
-          subtitle="Primary deed holders" 
+          value={ownersCount}  
           icon={Key} 
           color="indigo" 
+          compact
         />
         <StatCard 
           title="TENANTS" 
           value={tenantsCount} 
-          subtitle="Registered NOC holders" 
           icon={CheckCircle2} 
           color="cyan" 
+          compact
         />
-        <StatCard 
-          title="ACTIVE TOWERS" 
-          value="3 Golden Towers" 
-          subtitle="GT-1, GT-2, GT-3 (President: Sujana)" 
-          icon={Building2} 
-          color="amber" 
-        />
+        <div 
+          className="glass-card stat-card"
+          style={{ borderLeft: '4px solid #F59E0B', padding: '12px 16px' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    TOTAL TOWERS
+                  </div>
+                  <div className="stat-value" style={{ marginTop: '2px', fontSize: '1.4rem' }}>
+                    {allTowers.length}
+                  </div>
+                </div>
+                <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '14px' }}>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    TOTAL FLATS
+                  </div>
+                  <div className="stat-value" style={{ marginTop: '2px', fontSize: '1.4rem', color: '#F59E0B' }}>
+                    {totalFlatsCount}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ 
+              width: '36px', 
+              height: '36px', 
+              borderRadius: '8px', 
+              backgroundColor: 'rgba(245, 158, 11, 0.15)', 
+              color: '#F59E0B',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Building2 size={18} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* COMPLEX & TOWER SELECTOR BAR */}
@@ -296,77 +533,136 @@ export const ResidentDirectory = () => {
               className="form-control"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              style={{ paddingLeft: '36px' }}
+              style={{ paddingLeft: '36px', paddingRight: searchTerm ? '32px' : '12px' }}
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '8px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%'
+                }}
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Middle: Towers of Selected Complex (e.g. Golden Tower 1, Golden Tower 2, Golden Tower 3) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginTop: '14px' }}>
-          <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-secondary)', marginRight: '4px' }}>
+        {/* Middle: Towers of Selected Complex (Golden Tower 1, Golden Tower 2, Golden Tower 3) - Same line side by side */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '14px', width: '100%' }}>
+          <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-secondary)', whiteSpace: 'nowrap', flexShrink: 0 }}>
             SELECT TOWER:
           </span>
-          {currentComplexTowers.map(tow => {
-            const isSelected = selectedTower === tow.code;
-            return (
-              <button
-                key={tow.code}
-                onClick={() => {
-                  setSelectedTower(tow.code);
-                  setSelectedFloor('All');
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '9px 16px',
-                  borderRadius: '8px',
-                  border: isSelected ? `2px solid ${tow.color}` : '1px solid var(--border-color)',
-                  backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.12)' : 'var(--bg-hover)',
-                  color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: isSelected ? 800 : 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                <Building2 size={16} style={{ color: tow.color }} />
-                <span>{tow.name}</span>
-                {tow.isPresident && (
-                  <span style={{
-                    fontSize: '0.6875rem',
-                    backgroundColor: '#FEF3C7',
-                    color: '#B45309',
-                    padding: '2px 7px',
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            gap: '10px',
+            flex: 1,
+            width: '100%'
+          }}>
+            {currentComplexTowers.map(tow => {
+              const isSelected = selectedTower === tow.code;
+              const towOccupied = enrichedResidents.filter(r => r.tower === tow.code).length;
+              let towFlats = 0;
+              for (let f = 1; f <= tow.floors; f++) {
+                towFlats += (tow.getUnitsForFloor ? tow.getUnitsForFloor(f) : tow.unitsPerFloor);
+              }
+              const towVacant = Math.max(0, towFlats - towOccupied);
+
+              return (
+                <button
+                  key={tow.code}
+                  onClick={() => {
+                    setSelectedTower(tow.code);
+                    setSelectedFloor('All');
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '6px',
+                    padding: '8px 12px',
                     borderRadius: '8px',
-                    fontWeight: 800
-                  }}>
-                    👑 Sujana
-                  </span>
-                )}
-                {tow.isVP && (
-                  <span style={{
-                    fontSize: '0.6875rem',
-                    backgroundColor: '#EFF6FF',
-                    color: '#1D4ED8',
-                    padding: '2px 7px',
-                    borderRadius: '8px',
-                    fontWeight: 800
-                  }}>
-                    🛡️ Kavaya
-                  </span>
-                )}
-                <span style={{ 
-                  fontSize: '0.75rem', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                  padding: '2px 6px', 
-                  borderRadius: '10px' 
-                }}>
-                  {tow.floors} Floors
-                </span>
-              </button>
-            );
-          })}
+                    border: isSelected ? `2px solid ${tow.color}` : '1px solid var(--border-color)',
+                    backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.12)' : 'var(--bg-hover)',
+                    color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontWeight: isSelected ? 800 : 600,
+                    fontSize: '0.8125rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                    <Building2 size={16} style={{ color: tow.color, flexShrink: 0 }} />
+                    <span style={{ fontWeight: 800, textOverflow: 'ellipsis', overflow: 'hidden' }}>{tow.name}</span>
+                    {tow.isPresident && (
+                      <span style={{
+                        fontSize: '0.625rem',
+                        backgroundColor: '#FEF3C7',
+                        color: '#B45309',
+                        padding: '1px 5px',
+                        borderRadius: '6px',
+                        fontWeight: 800,
+                        flexShrink: 0
+                      }}>
+                        👑 Sujana
+                      </span>
+                    )}
+                    {tow.isVP && (
+                      <span style={{
+                        fontSize: '0.625rem',
+                        backgroundColor: '#EFF6FF',
+                        color: '#1D4ED8',
+                        padding: '1px 5px',
+                        borderRadius: '6px',
+                        fontWeight: 800,
+                        flexShrink: 0
+                      }}>
+                        🛡️ Kavaya
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
+                    <span style={{ 
+                      fontSize: '0.6875rem', 
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+                      padding: '2px 5px', 
+                      borderRadius: '8px',
+                      color: 'var(--text-secondary)'
+                    }}>
+                      {tow.floors}F
+                    </span>
+                    <span style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      color: '#92400E',
+                      backgroundColor: '#FEF3C7',
+                      border: '1px solid #FDE68A',
+                      padding: '1px 5px',
+                      borderRadius: '5px'
+                    }}>
+                      {towVacant} Vacant
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Floor Quick Filter Ladder */}
@@ -383,6 +679,43 @@ export const ResidentDirectory = () => {
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
             FLOOR FILTER:
           </span>
+          <select
+            value={selectedFloor}
+            onChange={(e) => setSelectedFloor(e.target.value)}
+            className="form-control"
+            style={{
+              width: 'auto',
+              minWidth: '140px',
+              height: '30px',
+              padding: '2px 8px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              borderRadius: '6px'
+            }}
+          >
+            <option value="All">All {currentTowerObj.floors} Floors</option>
+            {Array.from({ length: currentTowerObj.floors }, (_, i) => currentTowerObj.floors - i).map(fl => (
+              <option key={fl} value={fl.toString()}>Floor {fl}</option>
+            ))}
+          </select>
+          <select
+            value={occupancyFilter}
+            onChange={(e) => setOccupancyFilter(e.target.value)}
+            className="form-control"
+            style={{
+              width: 'auto',
+              minWidth: '160px',
+              height: '30px',
+              padding: '2px 8px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              borderRadius: '6px'
+            }}
+          >
+            <option value="All">All Flats (Occupied & Vacant)</option>
+            <option value="Occupied">Occupied Flats Only</option>
+            <option value="Unoccupied">Unoccupied Flats Only</option>
+          </select>
           <button
             onClick={() => setSelectedFloor('All')}
             className={`btn btn-xs ${selectedFloor === 'All' ? 'btn-primary' : 'btn-secondary'}`}
@@ -429,17 +762,41 @@ export const ResidentDirectory = () => {
 
       {/* VIEW MODE 1: TOWER & FLOOR & FLAT WISE HIERARCHICAL VIEW */}
       {viewMode === 'tower-floor-flat' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Layers size={18} style={{ color: currentTowerObj.color }} />
-              {currentTowerObj.code} — {currentTowerObj.name}
+        <div ref={topTableRef} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                <Layers size={18} style={{ color: currentTowerObj.color }} />
+                {currentTowerObj.code} — {currentTowerObj.name}
+              </h2>
               <span style={{ fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
-                ({selectedFloor === 'All' ? `All ${currentTowerObj.floors} Floors` : `Floor ${selectedFloor} View`})
+                ({selectedFloor === 'All' ? `All ${currentTowerObj.floors} Floors • 3 Floors per page (Page ${currentFloorPage} of ${totalFloorPages || 1})` : `Floor ${selectedFloor} View`})
               </span>
-            </h2>
+              <span style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                backgroundColor: '#DCFCE7',
+                color: '#16A34A',
+                border: '1px solid #BBF7D0',
+                padding: '2px 8px',
+                borderRadius: '8px'
+              }}>
+                {currentTowerStats.rate}% Occupied ({currentTowerStats.occupied} Flats)
+              </span>
+              <span style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                backgroundColor: '#FEF3C7',
+                color: '#B45309',
+                border: '1px solid #FDE68A',
+                padding: '2px 8px',
+                borderRadius: '8px'
+              }}>
+                {currentTowerStats.unoccupied} Unoccupied (Vacant)
+              </span>
+            </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.75rem', flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: 'var(--indigo)' }} />
                 Occupied by Owner
@@ -449,16 +806,151 @@ export const ResidentDirectory = () => {
                 Occupied by Tenant
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: 'var(--border-color)' }} />
-                Unoccupied / Pending Registry
+                <span style={{ width: '12px', height: '10px', borderRadius: '3px', backgroundColor: '#FFFBEB', border: '1px solid #FCD34D' }} />
+                <span style={{ color: '#92400E', fontWeight: 600 }}>Unoccupied / Vacant (Light Amber)</span>
               </span>
             </div>
           </div>
 
-          {/* Floor-by-Floor Hierarchy Rendering */}
-          {floorHierarchy
-            .filter(f => selectedFloor === 'All' || f.floorNumber === Number(selectedFloor))
-            .map(floor => (
+          {/* Search Result Banner (when active search) */}
+          {searchTerm.trim() && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              backgroundColor: '#EFF6FF',
+              border: '1px solid #BFDBFE',
+              padding: '12px 18px',
+              borderRadius: '10px',
+              color: '#1E40AF'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Search size={18} style={{ color: '#2563EB', flexShrink: 0 }} />
+                <div>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>
+                    Search Results for <span style={{ color: '#1D4ED8', textDecoration: 'underline' }}>"{searchTerm}"</span>
+                  </span>
+                  <span style={{ fontSize: '0.8125rem', color: '#3B82F6', marginLeft: '8px' }}>
+                    ({visibleFloorsList.reduce((sum, f) => sum + f.flats.length, 0)} matching flat(s) on {visibleFloorsList.length} floor(s) in {currentTowerObj.name})
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="btn btn-secondary btn-xs"
+                  style={{ borderRadius: '6px' }}
+                >
+                  <X size={12} /> Clear Filter
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cross Tower Match Notification Banner */}
+          {searchTerm.trim() && otherTowerMatches.length > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              backgroundColor: '#FFFBEB',
+              border: '1px solid #FDE68A',
+              padding: '12px 18px',
+              borderRadius: '10px',
+              color: '#92400E'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Building2 size={18} style={{ color: '#D97706', flexShrink: 0 }} />
+                <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+                  Also found matches in other towers:
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {otherTowerMatches.map(({ tower, matches }) => (
+                  <button
+                    key={tower.code}
+                    onClick={() => setSelectedTower(tower.code)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '5px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #F59E0B',
+                      backgroundColor: '#FFFFFF',
+                      color: '#B45309',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <span>View {matches.length} in {tower.name}</span>
+                    <span>→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty Search State */}
+          {visibleFloorsList.length === 0 && (
+            <div className="glass-card" style={{ padding: '48px 24px', textAlign: 'center', borderRadius: '12px' }}>
+              <div style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#EF4444',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <Search size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                No flats found matching "{searchTerm}" in {currentTowerObj.name}
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', maxWidth: '460px', margin: '0 auto 20px' }}>
+                No matching flat number, resident name, or phone number found on {selectedFloor === 'All' ? `any of the ${currentTowerObj.floors} floors` : `Floor ${selectedFloor}`}.
+              </p>
+
+              {otherTowerMatches.length > 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                  {otherTowerMatches.map(({ tower, matches }) => (
+                    <button
+                      key={tower.code}
+                      onClick={() => setSelectedTower(tower.code)}
+                      className="btn btn-primary btn-sm"
+                    >
+                      Switch to {tower.name} ({matches.length} match{matches.length > 1 ? 'es' : ''})
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Floor-by-Floor Hierarchy Rendering (Paginated 3 floors per page) */}
+          {paginatedFloors.map(floor => (
               <div 
                 key={floor.floorNumber} 
                 className="glass-card" 
@@ -491,145 +983,358 @@ export const ResidentDirectory = () => {
                     <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
                       Level {floor.floorNumber} of {currentTowerObj.floors} • {currentTowerObj.name}
                     </span>
+                    {searchTerm.trim() && (
+                      <span style={{
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        backgroundColor: '#DCFCE7',
+                        color: '#16A34A',
+                        padding: '2px 8px',
+                        borderRadius: '6px'
+                      }}>
+                        {floor.flats.length} Matching Flat(s)
+                      </span>
+                    )}
                   </div>
 
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {floor.residents.length} of {floor.flats.length} flats registered
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#16A34A', fontWeight: 700, backgroundColor: '#DCFCE7', padding: '2px 8px', borderRadius: '10px' }}>
+                      {floor.flats.filter(f => f.occupied).length} Occupied
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#B45309', fontWeight: 700, backgroundColor: '#FEF3C7', padding: '2px 8px', borderRadius: '10px' }}>
+                      {floor.flats.filter(f => !f.occupied).length} Unoccupied
+                    </span>
+                  </div>
                 </div>
 
-                {/* Flat Cards Grid for this Floor */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                  gap: '14px'
-                }}>
-                  {floor.flats.map(flatItem => {
-                    const res = flatItem.resident;
-                    const isOccupied = !!res;
+                {/* Flat Table for this Floor */}
+                <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8125rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-hover)' }}>
+                        <th style={{ padding: '10px 14px', fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Flat No</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Resident / Allottee</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact Phone</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Parking Slot</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 800, color: 'var(--text-secondary)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {floor.flats.map((flatItem) => {
+                        const res = flatItem.resident;
+                        const isOccupied = !!res;
 
-                    return (
-                      <div
-                        key={flatItem.flatNo}
-                        style={{
-                          backgroundColor: isOccupied ? 'var(--card-bg)' : 'var(--bg-hover)',
-                          borderRadius: '10px',
-                          border: isOccupied 
-                            ? res.type === 'Flat Owner' 
-                              ? '1px solid rgba(99, 102, 241, 0.4)' 
-                              : '1px solid rgba(34, 211, 238, 0.4)' 
-                            : '1px dashed var(--border-color)',
-                          padding: '14px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          gap: '10px',
-                          position: 'relative',
-                          boxShadow: isOccupied ? '0 2px 8px rgba(0, 0, 0, 0.04)' : 'none'
-                        }}
-                      >
-                        {/* Top: Flat number & Occupancy tag */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{
-                            fontSize: '1.125rem',
-                            fontWeight: 800,
-                            color: isOccupied ? 'var(--text-primary)' : 'var(--text-muted)'
-                          }}>
-                            {flatItem.flatNo}
-                          </span>
-
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {res?.designation && (
-                              <span style={{
-                                fontSize: '0.6875rem',
-                                fontWeight: 800,
-                                backgroundColor: res.designation.includes('President') && !res.designation.includes('Vice') ? '#FEF3C7' : '#EFF6FF',
-                                color: res.designation.includes('President') && !res.designation.includes('Vice') ? '#B45309' : '#1D4ED8',
-                                border: `1px solid ${res.designation.includes('President') && !res.designation.includes('Vice') ? '#FDE68A' : '#BFDBFE'}`,
-                                padding: '1px 6px',
-                                borderRadius: '6px'
-                              }}>
-                                {res.designation.includes('President') && !res.designation.includes('Vice') ? '👑 Pres' : '🛡️ VP'}
-                              </span>
-                            )}
-                            {isOccupied ? (
-                              <span className={`badge ${res.type === 'Flat Owner' ? 'badge-indigo' : 'badge-neutral'}`} style={{ fontSize: '0.6875rem' }}>
-                                {res.type}
-                              </span>
-                            ) : (
-                              <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                                Unregistered
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Resident Info or Empty State */}
-                        {isOccupied ? (
-                          <>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div style={{
-                                width: '34px',
-                                height: '34px',
-                                borderRadius: '50%',
-                                backgroundColor: res.designation?.includes('President') && !res.designation?.includes('Vice') ? '#F59E0B' : res.type === 'Flat Owner' ? 'var(--indigo)' : 'var(--electric-blue)',
-                                color: '#FFFFFF',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontWeight: 800,
-                                fontSize: '0.8125rem',
-                                flexShrink: 0
-                              }}>
-                                {res.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                        return (
+                          <tr 
+                            key={flatItem.flatNo}
+                            style={{ 
+                              borderBottom: '1px solid var(--border-color)',
+                              backgroundColor: isOccupied ? 'transparent' : '#FFFBEB',
+                              borderLeft: isOccupied ? '4px solid #3B82F6' : '4px solid #F59E0B',
+                              transition: 'background-color 0.15s ease'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = isOccupied ? 'var(--bg-hover)' : '#FEF3C7'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isOccupied ? 'transparent' : '#FFFBEB'}
+                          >
+                            {/* Flat No */}
+                            <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ 
+                                  fontWeight: 800, 
+                                  fontSize: '0.875rem',
+                                  color: isOccupied ? 'var(--text-primary)' : '#92400E',
+                                  backgroundColor: searchTerm.trim() ? '#FEF9C3' : 'transparent',
+                                  border: searchTerm.trim() ? '1px solid #FDE047' : 'none',
+                                  padding: searchTerm.trim() ? '2px 6px' : '0',
+                                  borderRadius: '4px'
+                                }}>
+                                  {flatItem.flatNo}
+                                </span>
+                                {res?.designation && (
+                                  <span style={{
+                                    fontSize: '0.625rem',
+                                    fontWeight: 800,
+                                    backgroundColor: res.designation.includes('President') && !res.designation.includes('Vice') ? '#FEF3C7' : '#EFF6FF',
+                                    color: res.designation.includes('President') && !res.designation.includes('Vice') ? '#B45309' : '#1D4ED8',
+                                    border: `1px solid ${res.designation.includes('President') && !res.designation.includes('Vice') ? '#FDE68A' : '#BFDBFE'}`,
+                                    padding: '1px 6px',
+                                    borderRadius: '6px'
+                                  }}>
+                                    {res.designation.includes('President') && !res.designation.includes('Vice') ? '👑 Pres' : '🛡️ VP'}
+                                  </span>
+                                )}
                               </div>
-                              <div style={{ overflow: 'hidden' }}>
-                                <div style={{ fontWeight: 800, fontSize: '0.875rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <span>{res.name}</span>
+                            </td>
+
+                            {/* Status */}
+                            <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                              {isOccupied ? (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px',
+                                  padding: '3px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 700,
+                                  backgroundColor: res.type === 'Flat Owner' ? 'rgba(99, 102, 241, 0.12)' : 'rgba(34, 211, 238, 0.15)',
+                                  color: res.type === 'Flat Owner' ? '#4F46E5' : '#0891B2',
+                                  border: res.type === 'Flat Owner' ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(34, 211, 238, 0.3)'
+                                }}>
+                                  <span style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    borderRadius: '50%',
+                                    backgroundColor: res.type === 'Flat Owner' ? '#4F46E5' : '#0891B2'
+                                  }} />
+                                  {res.type}
+                                </span>
+                              ) : (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px',
+                                  padding: '3px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 700,
+                                  backgroundColor: '#FEF3C7',
+                                  color: '#92400E',
+                                  border: '1px solid #FDE68A'
+                                }}>
+                                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D97706' }} />
+                                  Unoccupied / Vacant
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Resident / Allottee */}
+                            <td style={{ padding: '10px 14px' }}>
+                              {isOccupied ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '50%',
+                                    backgroundColor: res.designation?.includes('President') && !res.designation?.includes('Vice') ? '#F59E0B' : res.type === 'Flat Owner' ? '#6366F1' : '#0EA5E9',
+                                    color: '#FFFFFF',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontWeight: 800,
+                                    fontSize: '0.6875rem',
+                                    flexShrink: 0
+                                  }}>
+                                    {res.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                                  </div>
+                                  <div>
+                                    <div style={{ fontWeight: 700, fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                                      {res.name}
+                                    </div>
+                                    {res.email && (
+                                      <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+                                        {res.email}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                                <div style={{ fontSize: '0.75rem', color: res.designation ? 'var(--electric-blue)' : 'var(--text-muted)', fontWeight: res.designation ? 700 : 400 }}>
-                                  {res.designation || `ID: ${res.id}`}
-                                </div>
-                              </div>
-                            </div>
+                              ) : (
+                                <span style={{ fontSize: '0.75rem', color: '#92400E', fontWeight: 500, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <Home size={12} style={{ color: '#D97706' }} />
+                                  Available for occupancy or title verification
+                                </span>
+                              )}
+                            </td>
 
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                <Phone size={11} style={{ color: 'var(--text-muted)' }} /> {res.phone}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                <Car size={11} style={{ color: 'var(--text-muted)' }} /> Slot: {res.parking || 'Unassigned'}
-                              </div>
-                            </div>
+                            {/* Contact Phone */}
+                            <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                              {isOccupied ? (
+                                <a 
+                                  href={`tel:${res.phone}`}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600, fontSize: '0.8125rem' }}
+                                >
+                                  <Phone size={12} style={{ color: 'var(--electric-blue)' }} />
+                                  <span>{res.phone}</span>
+                                </a>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>—</span>
+                              )}
+                            </td>
 
-                            <button
-                              className="btn btn-secondary btn-xs"
-                              style={{ width: '100%', marginTop: '4px', justifyContent: 'center' }}
-                              onClick={() => setSelectedResidentModal(res)}
-                            >
-                              <Eye size={12} /> View Flat Profile
-                            </button>
-                          </>
-                        ) : (
-                          <div style={{ padding: '8px 0', textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '4px 0 8px' }}>
-                              Available for occupancy or title verification
-                            </p>
-                            <button 
-                              className="btn btn-secondary btn-xs"
-                              style={{ width: '100%', justifyContent: 'center' }}
-                              onClick={() => setActiveTab('register')}
-                            >
-                              + Assign Resident
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                            {/* Parking Slot */}
+                            <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                              {isOccupied ? (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                                  <Car size={12} style={{ color: 'var(--text-muted)' }} />
+                                  {res.parking || 'Unassigned'}
+                                </span>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>—</span>
+                              )}
+                            </td>
+
+                            {/* Action */}
+                            <td style={{ padding: '10px 14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                              {isOccupied ? (
+                                <button
+                                  className="btn btn-secondary btn-xs"
+                                  onClick={() => setSelectedResidentModal(res)}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px' }}
+                                >
+                                  <Eye size={12} />
+                                  <span>View Profile</span>
+                                </button>
+                              ) : (
+                                <button
+                                  className="btn btn-xs"
+                                  onClick={() => setActiveTab('register')}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '4px 10px',
+                                    backgroundColor: '#FEF3C7',
+                                    color: '#92400E',
+                                    border: '1px solid #FCD34D',
+                                    fontWeight: 700,
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.15s ease'
+                                  }}
+                                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#FDE68A'}
+                                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#FEF3C7'}
+                                >
+                                  <UserPlus size={12} />
+                                  <span>+ Assign Resident</span>
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             ))}
+
+          {/* Floor Pagination Controls (Every 3 Floors) */}
+          {totalFloorPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              backgroundColor: 'var(--card-bg, #FFFFFF)',
+              padding: '14px 20px',
+              borderRadius: '12px',
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+              marginTop: '6px'
+            }}>
+              <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                Showing floors <strong style={{ color: 'var(--text-primary)' }}>{paginatedFloors[0]?.floorNumber}</strong> to <strong style={{ color: 'var(--text-primary)' }}>{paginatedFloors[paginatedFloors.length - 1]?.floorNumber}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{visibleFloorsList.length}</strong> total floors (Page {currentFloorPage} of {totalFloorPages})
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {/* Previous Page Arrow */}
+                <button
+                  onClick={() => handlePageChange(Math.max(1, currentFloorPage - 1))}
+                  disabled={currentFloorPage === 1}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-hover)',
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: currentFloorPage === 1 ? 0.35 : 1,
+                    cursor: currentFloorPage === 1 ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title="Previous Page"
+                  aria-label="Previous Page"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {/* Page number buttons */}
+                {Array.from({ length: totalFloorPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalFloorPages <= 7) return true;
+                    if (page === 1 || page === totalFloorPages) return true;
+                    return Math.abs(page - currentFloorPage) <= 1;
+                  })
+                  .reduce((acc, page, idx, arr) => {
+                    if (idx > 0 && page - arr[idx - 1] > 1) {
+                      acc.push('ellipsis-' + page);
+                    }
+                    acc.push(page);
+                    return acc;
+                  }, [])
+                  .map((item) => {
+                    if (typeof item === 'string' && item.startsWith('ellipsis')) {
+                      return (
+                        <span key={item} style={{ padding: '0 4px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                          …
+                        </span>
+                      );
+                    }
+                    const pageNum = item;
+                    const isCurrent = pageNum === currentFloorPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '6px',
+                          border: isCurrent ? '1px solid var(--electric-blue)' : '1px solid var(--border-color)',
+                          backgroundColor: isCurrent ? 'var(--electric-blue)' : 'var(--bg-hover)',
+                          color: isCurrent ? '#FFFFFF' : 'var(--text-primary)',
+                          fontWeight: isCurrent ? 800 : 600,
+                          fontSize: '0.8125rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                {/* Next Page Arrow */}
+                <button
+                  onClick={() => handlePageChange(Math.min(totalFloorPages, currentFloorPage + 1))}
+                  disabled={currentFloorPage === totalFloorPages}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-hover)',
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: currentFloorPage === totalFloorPages ? 0.35 : 1,
+                    cursor: currentFloorPage === totalFloorPages ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title="Next Page"
+                  aria-label="Next Page"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

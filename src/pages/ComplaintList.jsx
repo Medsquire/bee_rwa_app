@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
 import { ComplaintDetailsModal } from './ComplaintDetailsModal';
+import { StatCard } from '../components/CommonUI';
 import { 
   AlertTriangle, 
   PlusCircle, 
@@ -37,6 +38,7 @@ export const ComplaintList = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [selectedScope, setSelectedScope] = useState('All');
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   const categories = [
@@ -49,11 +51,46 @@ export const ComplaintList = () => {
     { id: 'Cleanliness', label: 'Cleaning & STP', icon: Sparkles }
   ];
 
+  const getComplaintScope = (cmp) => {
+    const loc = (cmp.location || '').toLowerCase();
+    const sub = (cmp.submittedBy || '').toLowerCase();
+
+    if (cmp.tower) {
+      if (cmp.tower.includes('1')) return 'Golden Tower 1';
+      if (cmp.tower.includes('2')) return 'Golden Tower 2';
+      if (cmp.tower.includes('3')) return 'Golden Tower 3';
+      return 'Common Area';
+    }
+
+    if (
+      loc.includes('main entry gate') ||
+      loc.includes('central park') ||
+      loc.includes('gymnasium') ||
+      loc.includes('clubhouse') ||
+      loc.includes('swimming pool') ||
+      loc.includes('common')
+    ) {
+      return 'Common Area';
+    }
+
+    if (loc.includes('tower 1') || loc.includes('gt1') || sub.includes('gt1-') || loc.includes('gt-1')) return 'Golden Tower 1';
+    if (loc.includes('tower 2') || loc.includes('gt2') || sub.includes('gt2-') || loc.includes('gt-2')) return 'Golden Tower 2';
+    if (loc.includes('tower 3') || loc.includes('gt3') || sub.includes('gt3-') || loc.includes('gt-3')) return 'Golden Tower 3';
+
+    return 'Common Area';
+  };
+
+  const tower1Complaints = complaints.filter(c => getComplaintScope(c) === 'Golden Tower 1');
+  const tower2Complaints = complaints.filter(c => getComplaintScope(c) === 'Golden Tower 2');
+  const tower3Complaints = complaints.filter(c => getComplaintScope(c) === 'Golden Tower 3');
+  const commonAreaComplaints = complaints.filter(c => getComplaintScope(c) === 'Common Area');
+
   const filteredComplaints = complaints.filter(cmp => {
     const matchesApt = selectedApartment === 'All' || cmp.apartment === selectedApartment;
     const matchesStatus = statusFilter === 'All' || cmp.status === statusFilter;
     const matchesPriority = priorityFilter === 'All' || cmp.priority === priorityFilter;
     const matchesCategory = activeCategory === 'All' || cmp.category === activeCategory;
+    const matchesScope = selectedScope === 'All' || getComplaintScope(cmp) === selectedScope;
     const matchesSearch = 
       cmp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -61,7 +98,7 @@ export const ComplaintList = () => {
       cmp.submittedBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (cmp.assignedTo && cmp.assignedTo.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesApt && matchesStatus && matchesPriority && matchesCategory && matchesSearch;
+    return matchesApt && matchesStatus && matchesPriority && matchesCategory && matchesScope && matchesSearch;
   });
 
   const getCategoryIcon = (cat) => {
@@ -82,9 +119,6 @@ export const ComplaintList = () => {
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
             Issue Resolving & Maintenance
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '4px' }}>
-            Work orders, elevator servicing, plumbing pumps, and common area maintenance
-          </p>
         </div>
 
         <button 
@@ -96,6 +130,108 @@ export const ComplaintList = () => {
           <span>Log Maintenance Issue</span>
         </button>
       </div>
+
+      {/* 4 Cards: Golden Tower 1, Golden Tower 2, Golden Tower 3, Common Area Complaints */}
+      <div className="grid-cols-4" style={{ gap: '14px' }}>
+        <StatCard 
+          title="GOLDEN TOWER 1 COMPLAINT"
+          value={tower1Complaints.length}
+          subtitle={`${tower1Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${tower1Complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          icon={Building2}
+          color="amber"
+          compact
+          onClick={() => setSelectedScope(prev => prev === 'Golden Tower 1' ? 'All' : 'Golden Tower 1')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            transform: selectedScope === 'Golden Tower 1' ? 'translateY(-2px)' : 'none',
+            boxShadow: selectedScope === 'Golden Tower 1' ? '0 0 0 2px #F59E0B, 0 4px 12px rgba(245, 158, 11, 0.25)' : undefined,
+            backgroundColor: selectedScope === 'Golden Tower 1' ? 'rgba(245, 158, 11, 0.08)' : undefined
+          }}
+        />
+        <StatCard 
+          title="GOLDEN TOWER 2 COMPLAINT"
+          value={tower2Complaints.length}
+          subtitle={`${tower2Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${tower2Complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          icon={Building2}
+          color="blue"
+          compact
+          onClick={() => setSelectedScope(prev => prev === 'Golden Tower 2' ? 'All' : 'Golden Tower 2')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            transform: selectedScope === 'Golden Tower 2' ? 'translateY(-2px)' : 'none',
+            boxShadow: selectedScope === 'Golden Tower 2' ? '0 0 0 2px #3B82F6, 0 4px 12px rgba(59, 130, 246, 0.25)' : undefined,
+            backgroundColor: selectedScope === 'Golden Tower 2' ? 'rgba(59, 130, 246, 0.08)' : undefined
+          }}
+        />
+        <StatCard 
+          title="GOLDEN TOWER 3 COMPLAINT"
+          value={tower3Complaints.length}
+          subtitle={`${tower3Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${tower3Complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          icon={Building2}
+          color="indigo"
+          compact
+          onClick={() => setSelectedScope(prev => prev === 'Golden Tower 3' ? 'All' : 'Golden Tower 3')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            transform: selectedScope === 'Golden Tower 3' ? 'translateY(-2px)' : 'none',
+            boxShadow: selectedScope === 'Golden Tower 3' ? '0 0 0 2px #6366F1, 0 4px 12px rgba(99, 102, 241, 0.25)' : undefined,
+            backgroundColor: selectedScope === 'Golden Tower 3' ? 'rgba(99, 102, 241, 0.08)' : undefined
+          }}
+        />
+        <StatCard 
+          title="COMMON AREA COMPLAINTS"
+          value={commonAreaComplaints.length}
+          subtitle={`${commonAreaComplaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${commonAreaComplaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          icon={Trees}
+          color="green"
+          compact
+          onClick={() => setSelectedScope(prev => prev === 'Common Area' ? 'All' : 'Common Area')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            transform: selectedScope === 'Common Area' ? 'translateY(-2px)' : 'none',
+            boxShadow: selectedScope === 'Common Area' ? '0 0 0 2px #10B981, 0 4px 12px rgba(16, 185, 129, 0.25)' : undefined,
+            backgroundColor: selectedScope === 'Common Area' ? 'rgba(16, 185, 129, 0.08)' : undefined
+          }}
+        />
+      </div>
+
+      {/* Scope Filter Indicator (if a card is clicked) */}
+      {selectedScope !== 'All' && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: '#EFF6FF',
+          border: '1px solid #BFDBFE',
+          padding: '8px 16px',
+          borderRadius: '8px',
+          fontSize: '0.8125rem',
+          color: '#1D4ED8',
+          fontWeight: 600
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Filtered by: <strong>{selectedScope}</strong> ({filteredComplaints.length} issue{filteredComplaints.length !== 1 ? 's' : ''})</span>
+          </div>
+          <button
+            onClick={() => setSelectedScope('All')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#1D4ED8',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.75rem'
+            }}
+          >
+            Show All Complaints
+          </button>
+        </div>
+      )}
 
       {/* Horizontal Asset Category Selector (Icon-driven, less text) */}
       <div style={{

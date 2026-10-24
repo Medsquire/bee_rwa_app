@@ -22,7 +22,7 @@ import { Announcements } from './pages/Announcements';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { UserProfile } from './pages/UserProfile';
 import { SettingsPage } from './pages/SettingsPage';
-import { EmployeeDirectory } from './pages/EmployeeDirectory';
+import { UsersDirectory } from './pages/usersDirectory';
 import { AgencyManagement } from './pages/AgencyManagement';
 import { LoginPage } from './pages/LoginPage';
 
@@ -56,9 +56,11 @@ const AppContent = () => {
         return <ComplaintList />;
       case 'submit-complaint':
         return <SubmitComplaint />;
+      case 'users':
+      case 'userss':
       case 'employee':
       case 'employees':
-        return <EmployeeDirectory />;
+        return <UsersDirectory />;
       case 'agency':
       case 'agencies':
         return <AgencyManagement />;

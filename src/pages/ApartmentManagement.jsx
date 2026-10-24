@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
-import { 
-  Building2, 
-  Layers, 
-  ShieldCheck, 
-  Phone, 
-  Trees, 
-  CheckCircle2, 
-  AlertCircle, 
-  Clock, 
-  User, 
+import {
+  Building2,
+  Layers,
+  ShieldCheck,
+  Phone,
+  Trees,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  User,
   Wrench,
   ChevronRight
 } from 'lucide-react';
 
 export const ApartmentManagement = () => {
-  const { apartments, selectedApartment, setSelectedApartment, employees, complaints, setActiveTab } = useRwa();
+  const { apartments, selectedApartment, setSelectedApartment, userss, complaints, setActiveTab } = useRwa();
 
   const currentApt = apartments[0] || {
     id: 'apt-golden',
@@ -29,7 +29,7 @@ export const ApartmentManagement = () => {
     monthlyPool: 342000,
     address: 'Bee Property Enclave, Outer Ring Road, Bangalore 560103',
     amenities: ['Central Gymnasium', 'Rooftop Banquet Hall', 'EV Charging Bays', 'Children Play Zone', 'Otis Smart Elevators'],
-    leadership: { 
+    leadership: {
       president: 'Sujana',
       presidentTower: 'Golden Tower 1',
       presidentFlat: 'GT1-801 (Penthouse)',
@@ -40,16 +40,16 @@ export const ApartmentManagement = () => {
       vicePresidentPhone: '+91 98765 43210'
     },
     towers: [
-      { id: 'gt-1', name: 'Golden Tower 1', code: 'Golden Tower 1', shortCode: 'GT-1', prefix: 'GT1', floors: 12, unitsPerFloor: 4, flats: 48, occupied: 45, lifts: 2, head: 'Sujana (President)', color: '#F59E0B' },
-      { id: 'gt-2', name: 'Golden Tower 2', code: 'Golden Tower 2', shortCode: 'GT-2', prefix: 'GT2', floors: 12, unitsPerFloor: 4, flats: 48, occupied: 46, lifts: 2, head: 'Kavaya (Vice President)', color: '#EAB308' },
-      { id: 'gt-3', name: 'Golden Tower 3', code: 'Golden Tower 3', shortCode: 'GT-3', prefix: 'GT3', floors: 10, unitsPerFloor: 4, flats: 40, occupied: 37, lifts: 2, head: 'RWA Service Desk', color: '#D97706' }
+      { id: 'gt-1', name: 'Golden Tower 1', code: 'Golden Tower 1', shortCode: 'GT-1', prefix: 'GT1', floors: 38, unitsPerFloor: 8, flats: 296, occupied: 275, lifts: 4, head: 'Sujana (President)', color: '#F59E0B' },
+      { id: 'gt-2', name: 'Golden Tower 2', code: 'Golden Tower 2', shortCode: 'GT-2', prefix: 'GT2', floors: 35, unitsPerFloor: 8, flats: 270, occupied: 250, lifts: 4, head: 'Kavaya (Vice President)', color: '#EAB308' },
+      { id: 'gt-3', name: 'Golden Tower 3', code: 'Golden Tower 3', shortCode: 'GT-3', prefix: 'GT3', floors: 32, unitsPerFloor: 8, flats: 256, occupied: 238, lifts: 4, head: 'RWA Service Desk', color: '#D97706' }
     ],
     securityContact: '+91 80 4123 7701',
     caretaker: 'Mr. Raghavan Pillai (+91 98451 22334)',
     color: '#F59E0B'
   };
 
-  const aptStaff = employees.filter(e => e.complex === currentApt.name || e.complex === 'All Complexes');
+  const aptStaff = userss.filter(e => e.complex === currentApt.name || e.complex === 'All Complexes');
   const aptComplaints = complaints.filter(c => c.apartment === currentApt.name);
 
   return (
@@ -59,7 +59,7 @@ export const ApartmentManagement = () => {
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
           Property & Common Asset Monitoring
         </h1>
-        
+
       </div>
 
       {/* Leadership & Towers Banner */}
@@ -178,7 +178,7 @@ export const ApartmentManagement = () => {
             </div>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
               gap: '12px'
             }}>
               {currentApt.towers.map(tow => (
@@ -272,7 +272,7 @@ export const ApartmentManagement = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button 
+            <button
               className="btn btn-secondary btn-sm"
               onClick={() => setActiveTab('agency')}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -280,9 +280,9 @@ export const ApartmentManagement = () => {
               <ShieldCheck size={14} color="#2563EB" />
               <span>Assigned Agencies</span>
             </button>
-            <button 
+            <button
               className="btn btn-secondary btn-sm"
-              onClick={() => setActiveTab('employee')}
+              onClick={() => setActiveTab('users')}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <span>All Staff Directory</span>

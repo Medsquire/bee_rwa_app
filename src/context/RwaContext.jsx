@@ -12,7 +12,7 @@ import {
   INITIAL_TRANSACTIONS,
   INITIAL_ANNOUNCEMENTS,
   INITIAL_NOTIFICATIONS,
-  INITIAL_EMPLOYEES,
+  INITIAL_usersS,
   INITIAL_AGENCIES
 } from '../data/initialData';
 
@@ -51,7 +51,13 @@ export const RwaProvider = ({ children }) => {
 
   // Core Data States
   const [apartments] = useState(INITIAL_APARTMENTS);
-  const [residents, setResidents] = useState(() => loadStored('RESIDENTS', INITIAL_RESIDENTS_DIRECTORY));
+  const [residents, setResidents] = useState(() => {
+    const stored = loadStored('RESIDENTS', null);
+    if (stored && Array.isArray(stored) && stored.length > 50) {
+      return stored;
+    }
+    return INITIAL_RESIDENTS_DIRECTORY;
+  });
   const [registrationRequests, setRegistrationRequests] = useState(() => loadStored('REQUESTS', INITIAL_REGISTRATION_REQUESTS));
   const [complaints, setComplaints] = useState(() => loadStored('COMPLAINTS', INITIAL_COMPLAINTS));
   const [facilities, setFacilities] = useState(() => loadStored('FACILITIES', INITIAL_FACILITIES));
@@ -61,7 +67,7 @@ export const RwaProvider = ({ children }) => {
   const [transactions, setTransactions] = useState(() => loadStored('TXNS', INITIAL_TRANSACTIONS));
   const [announcements, setAnnouncements] = useState(() => loadStored('ANNOUNCEMENTS', INITIAL_ANNOUNCEMENTS));
   const [notifications, setNotifications] = useState(() => loadStored('NOTIFICATIONS', INITIAL_NOTIFICATIONS));
-  const [employees, setEmployees] = useState(() => loadStored('EMPLOYEES', INITIAL_EMPLOYEES));
+  const [userss, setuserss] = useState(() => loadStored('usersS', INITIAL_usersS));
   const [agencies, setAgencies] = useState(() => loadStored('AGENCIES', INITIAL_AGENCIES));
 
   // Toast / Banner state
@@ -88,7 +94,7 @@ export const RwaProvider = ({ children }) => {
       localStorage.setItem(STORAGE_KEY_PREFIX + 'TXNS', JSON.stringify(transactions));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'ANNOUNCEMENTS', JSON.stringify(announcements));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'NOTIFICATIONS', JSON.stringify(notifications));
-      localStorage.setItem(STORAGE_KEY_PREFIX + 'EMPLOYEES', JSON.stringify(employees));
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'usersS', JSON.stringify(userss));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'AGENCIES', JSON.stringify(agencies));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'IS_AUTH', JSON.stringify(isAuthenticated));
     } catch (e) {
@@ -97,7 +103,7 @@ export const RwaProvider = ({ children }) => {
   }, [
     currentRoleKey, isAuthenticated, activeTab, theme, residents, registrationRequests,
     complaints, facilities, bookings, financeSummary, maintenanceDues,
-    transactions, announcements, notifications, employees, agencies
+    transactions, announcements, notifications, userss, agencies
   ]);
 
   // Agency assignment helper: assigns/updates towers for a complex
@@ -113,7 +119,7 @@ export const RwaProvider = ({ children }) => {
           // Remove complex if no towers selected
           updatedComplexes = agy.assignedComplexes.filter(c => c.complex !== complexName);
         } else {
-          updatedComplexes = agy.assignedComplexes.map(c => 
+          updatedComplexes = agy.assignedComplexes.map(c =>
             c.complex === complexName ? { ...c, towers: newTowersList } : c
           );
         }
@@ -141,7 +147,7 @@ export const RwaProvider = ({ children }) => {
   };
 
   const updateAgencyStatus = (agencyId, newStatus) => {
-    setAgencies(prev => prev.map(agy => 
+    setAgencies(prev => prev.map(agy =>
       agy.id === agencyId ? { ...agy, status: newStatus } : agy
     ));
     showToast(`Agency status updated to ${newStatus}.`, 'info');
@@ -391,7 +397,7 @@ export const RwaProvider = ({ children }) => {
     }
 
     // CHECK CONFLICT: Overlapping confirmed booking for the same facility on the same date and slot
-    const hasConflict = bookings.some(b => 
+    const hasConflict = bookings.some(b =>
       b.facilityId === facilityId &&
       b.date === date &&
       b.timeSlot === timeSlot &&
@@ -609,13 +615,13 @@ export const RwaProvider = ({ children }) => {
     setTransactions(INITIAL_TRANSACTIONS);
     setAnnouncements(INITIAL_ANNOUNCEMENTS);
     setNotifications(INITIAL_NOTIFICATIONS);
-    setEmployees(INITIAL_EMPLOYEES);
+    setuserss(INITIAL_usersS);
 
     showToast('All demo data reset to default successfully!', 'success');
   };
 
-  // Add new employee
-  const addEmployee = (empData) => {
+  // Add new users
+  const addusers = (empData) => {
     const newEmp = {
       ...empData,
       id: `EMP-${Math.floor(100 + Math.random() * 900)}`,
@@ -624,7 +630,7 @@ export const RwaProvider = ({ children }) => {
       policeVerified: true,
       verificationCode: `BLR-PV-${Math.floor(10000 + Math.random() * 90000)}`
     };
-    setEmployees(prev => [newEmp, ...prev]);
+    setuserss(prev => [newEmp, ...prev]);
     showToast(`Staff member "${newEmp.name}" added successfully!`, 'success');
     return newEmp;
   };
@@ -648,9 +654,9 @@ export const RwaProvider = ({ children }) => {
       return { success: true, role: 'vice_president', name: 'Kavaya' };
     }
 
-    return { 
-      success: false, 
-      error: 'Invalid credentials. Please enter username (sujana or kavaya) and password (rwa123).' 
+    return {
+      success: false,
+      error: 'Invalid credentials. Please enter username (sujana or kavaya) and password (rwa123).'
     };
   };
 
@@ -714,9 +720,15 @@ export const RwaProvider = ({ children }) => {
         notifications,
         markNotificationRead,
         markAllNotificationsRead,
-        employees,
-        setEmployees,
-        addEmployee,
+        userss,
+        users: userss,
+        employees: userss,
+        setuserss,
+        setUsers: setuserss,
+        setEmployees: setuserss,
+        addusers,
+        addUser: addusers,
+        addEmployee: addusers,
         agencies,
         setAgencies,
         assignAgencyTowers,

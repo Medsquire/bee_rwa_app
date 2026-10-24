@@ -15,7 +15,7 @@ export const INITIAL_APARTMENTS = [
     monthlyPool: 342000,
     address: 'Bee Property Enclave, Outer Ring Road, Bangalore 560103',
     amenities: ['Central Gymnasium', 'Rooftop Banquet Hall', 'EV Charging Bays', 'Children Play Zone', 'Otis Smart Elevators'],
-    leadership: { 
+    leadership: {
       president: 'Sujana',
       presidentTower: 'Golden Tower 1',
       presidentFlat: 'GT1-801 (Penthouse)',
@@ -26,9 +26,9 @@ export const INITIAL_APARTMENTS = [
       vicePresidentPhone: '+91 98765 43210'
     },
     towers: [
-      { id: 'gt-1', name: 'Golden Tower 1', code: 'Golden Tower 1', shortCode: 'GT-1', prefix: 'GT1', floors: 12, unitsPerFloor: 4, flats: 48, occupied: 45, lifts: 2, head: 'Sujana (President)', color: '#F59E0B' },
-      { id: 'gt-2', name: 'Golden Tower 2', code: 'Golden Tower 2', shortCode: 'GT-2', prefix: 'GT2', floors: 12, unitsPerFloor: 4, flats: 48, occupied: 46, lifts: 2, head: 'Kavaya (Vice President)', color: '#EAB308' },
-      { id: 'gt-3', name: 'Golden Tower 3', code: 'Golden Tower 3', shortCode: 'GT-3', prefix: 'GT3', floors: 10, unitsPerFloor: 4, flats: 40, occupied: 37, lifts: 2, head: 'RWA Service Desk', color: '#D97706' }
+      { id: 'gt-1', name: 'Golden Tower 1', code: 'Golden Tower 1', shortCode: 'GT-1', prefix: 'GT1', floors: 38, unitsPerFloor: 8, flats: 296, occupied: 275, lifts: 4, head: 'Sujana (President)', color: '#F59E0B' },
+      { id: 'gt-2', name: 'Golden Tower 2', code: 'Golden Tower 2', shortCode: 'GT-2', prefix: 'GT2', floors: 35, unitsPerFloor: 8, flats: 270, occupied: 250, lifts: 4, head: 'Kavaya (Vice President)', color: '#EAB308' },
+      { id: 'gt-3', name: 'Golden Tower 3', code: 'Golden Tower 3', shortCode: 'GT-3', prefix: 'GT3', floors: 32, unitsPerFloor: 8, flats: 256, occupied: 238, lifts: 4, head: 'RWA Service Desk', color: '#D97706' }
     ],
     blocks: [
       { id: 'golden-t1', name: 'Golden Tower 1', president: 'Sujana', flats: 48, lifts: 2 },
@@ -159,22 +159,136 @@ export const INITIAL_REGISTRATION_REQUESTS = [
   }
 ];
 
-export const INITIAL_RESIDENTS_DIRECTORY = [
-  { id: 'res-pres', name: 'Sujana', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-801', type: 'Flat Owner', designation: 'President (RWA Executive)', phone: '+91 98450 11223', email: 'sujana.president@beeproperty.org', status: 'Active', vehicles: 'KA-01-MJ-2020 (BMW 330i)', parking: 'P1-01' },
-  { id: 'res-vp', name: 'Kavaya', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-604', type: 'Flat Owner', designation: 'Vice President (Operations)', phone: '+91 98765 43210', email: 'kavaya.vp@beeproperty.org', status: 'Active', vehicles: 'KA-03-NB-4512 (Honda City)', parking: 'P2-12' },
-  { id: 'res-1', name: 'Priya Sundaram', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-604', type: 'Flat Owner', phone: '+91 98765 43211', email: 'priya.sundaram@gmail.com', status: 'Active', vehicles: 'KA-03-NB-9900 (Hyundai i20)', parking: 'P1-42' },
-  { id: 'res-2', name: 'Vikramaditya Sharma', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-205', type: 'Tenant', phone: '+91 99223 44556', email: 'vikram.sharma@techcorp.in', status: 'Active', vehicles: 'KA-51-EF-3321 (Kia Seltos)', parking: 'P1-19' },
-  { id: 'res-3', name: 'Neha Singhania', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-803', type: 'Tenant', phone: '+91 98455 77665', email: 'neha.singhania@designhub.co', status: 'Active', vehicles: 'KA-03-XX-1122 (Vespa Scooter)', parking: 'P2-08' },
-  { id: 'res-4', name: 'Deepa & Senthil Nathan', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-1001', type: 'Flat Owner', phone: '+91 98401 88990', email: 'senthil.nathan@biopharma.org', status: 'Active', vehicles: 'KA-05-PQ-5544 (MG ZS EV)', parking: 'P3-50' },
-  { id: 'res-5', name: 'Gaurav Khandelwal', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-402', type: 'Flat Owner', phone: '+91 99001 22334', email: 'gaurav.k@yahoo.com', status: 'Active', vehicles: 'KA-04-AB-1234 (Tata Harrier)', parking: 'P3-15' },
-  { id: 'res-6', name: 'Rajeshwar Rao', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-302', type: 'Flat Owner', phone: '+91 97654 32109', email: 'rajeshwar.rao@finance.com', status: 'Active', vehicles: 'KA-04-MK-8877 (Hyundai Creta)', parking: 'P2-18' },
-  { id: 'res-7', name: 'Amitabh & Jaya Roy', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-501', type: 'Flat Owner', phone: '+91 98201 66778', email: 'amitabh.roy@royconsulting.com', status: 'Active', vehicles: 'KA-01-AA-9900 (Audi A4)', parking: 'P2-22' },
-  { id: 'res-8', name: 'Harpreet Singh Chadha', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-802', type: 'Flat Owner', phone: '+91 98102 55443', email: 'harpreet.chadha@logistics.in', status: 'Active', vehicles: 'KA-04-MM-6677 (Mahindra XUV700)', parking: 'P3-35' },
-  { id: 'res-9', name: 'Karthik Narayanan', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-704', type: 'Tenant', phone: '+91 97410 99882', email: 'karthik.n@infonet.com', status: 'Active', vehicles: 'KA-03-JJ-9988 (Swift)', parking: 'P3-14' },
-  { id: 'res-10', name: 'Dr. Arvind Subramanian', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-901', type: 'Flat Owner', phone: '+91 98450 99999', email: 'arvind.subramanian@univ.org', status: 'Active', vehicles: 'KA-01-MJ-5566 (Mercedes C200)', parking: 'P1-05' },
-  { id: 'res-11', name: 'Ananya Deshmukh', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-402', type: 'Flat Owner', phone: '+91 98112 33445', email: 'ananya.deshmukh@gmail.com', status: 'Active', vehicles: 'KA-05-NN-1090 (Tata Nexon EV)', parking: 'P1-44' },
-  { id: 'res-12', name: 'Col. Ranjit Verma (Retd.)', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-201', type: 'Flat Owner', phone: '+91 94480 33221', email: 'col.ranjit@gmail.com', status: 'Active', vehicles: 'KA-02-ZZ-4400 (Toyota Fortuner)', parking: 'P1-09' }
+// Base seed residents (including leadership and existing key entries)
+const SEED_RESIDENTS = [
+  { id: 'res-pres', name: 'Sujana', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-801', type: 'Flat Owner', designation: 'President (RWA Executive)', phone: '+91 98450 11223', email: 'sujana.president@beeproperty.org', status: 'Active', vehicles: 'KA-01-MJ-2020 (BMW 330i)', parking: 'P1-0801' },
+  { id: 'res-vp', name: 'Kavaya', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-604', type: 'Flat Owner', designation: 'Vice President (Operations)', phone: '+91 98765 43210', email: 'kavaya.vp@beeproperty.org', status: 'Active', vehicles: 'KA-03-NB-4512 (Honda City)', parking: 'P2-0604' },
+  { id: 'res-sec', name: 'Dr. Arvind Subramanian', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-901', type: 'Flat Owner', designation: 'General Secretary', phone: '+91 98450 99999', email: 'arvind.subramanian@univ.org', status: 'Active', vehicles: 'KA-01-MJ-5566 (Mercedes C200)', parking: 'P1-0901' },
+  { id: 'res-treas', name: 'Rajeshwar Rao', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-302', type: 'Flat Owner', designation: 'Joint Treasurer', phone: '+91 97654 32109', email: 'rajeshwar.rao@finance.com', status: 'Active', vehicles: 'KA-04-MK-8877 (Hyundai Creta)', parking: 'P2-0302' },
+  { id: 'res-cult', name: 'Monika Banerjee', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-3001', type: 'Flat Owner', designation: 'Cultural Committee Head', phone: '+91 98311 22445', email: 'monika.b@iimr.ac.in', status: 'Active', vehicles: 'KA-02-MN-8844 (BMW X1)', parking: 'P3-3001' },
+  { id: 'res-maint', name: 'Priya Sundaram', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-604', type: 'Flat Owner', designation: 'Maintenance Committee', phone: '+91 98765 43211', email: 'priya.sundaram@gmail.com', status: 'Active', vehicles: 'KA-03-NB-9900 (Hyundai i20)', parking: 'P1-0604' },
+  { id: 'res-secu', name: 'Col. Ranjit Verma (Retd.)', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-201', type: 'Flat Owner', designation: 'Security Liaison', phone: '+91 94480 33221', email: 'col.ranjit@gmail.com', status: 'Active', vehicles: 'KA-02-ZZ-4400 (Toyota Fortuner)', parking: 'P1-0201' },
+  { id: 'res-2', name: 'Vikramaditya Sharma', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-205', type: 'Tenant', phone: '+91 99223 44556', email: 'vikram.sharma@techcorp.in', status: 'Active', vehicles: 'KA-51-EF-3321 (Kia Seltos)', parking: 'P1-0205' },
+  { id: 'res-3', name: 'Neha Singhania', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-803', type: 'Tenant', phone: '+91 98455 77665', email: 'neha.singhania@designhub.co', status: 'Active', vehicles: 'KA-03-XX-1122 (Vespa Scooter)', parking: 'P2-0803' },
+  { id: 'res-4', name: 'Deepa & Senthil Nathan', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-1001', type: 'Flat Owner', phone: '+91 98401 88990', email: 'senthil.nathan@biopharma.org', status: 'Active', vehicles: 'KA-05-PQ-5544 (MG ZS EV)', parking: 'P3-1001' },
+  { id: 'res-5', name: 'Gaurav Khandelwal', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-402', type: 'Flat Owner', phone: '+91 99001 22334', email: 'gaurav.k@yahoo.com', status: 'Active', vehicles: 'KA-04-AB-1234 (Tata Harrier)', parking: 'P3-0402' },
+  { id: 'res-7', name: 'Amitabh & Jaya Roy', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-501', type: 'Flat Owner', phone: '+91 98201 66778', email: 'amitabh.roy@royconsulting.com', status: 'Active', vehicles: 'KA-01-AA-9900 (Audi A4)', parking: 'P2-0501' },
+  { id: 'res-8', name: 'Harpreet Singh Chadha', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-802', type: 'Flat Owner', phone: '+91 98102 55443', email: 'harpreet.chadha@logistics.in', status: 'Active', vehicles: 'KA-04-MM-6677 (Mahindra XUV700)', parking: 'P3-0802' },
+  { id: 'res-9', name: 'Karthik Narayanan', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-704', type: 'Tenant', phone: '+91 97410 99882', email: 'karthik.n@infonet.com', status: 'Active', vehicles: 'KA-03-JJ-9988 (Swift)', parking: 'P3-0704' },
+  { id: 'res-11', name: 'Ananya Deshmukh', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-402', type: 'Flat Owner', phone: '+91 98112 33445', email: 'ananya.deshmukh@gmail.com', status: 'Active', vehicles: 'KA-05-NN-1090 (Tata Nexon EV)', parking: 'P1-0402' },
+  { id: 'res-13', name: 'Vivek & Shalini Agrawal', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-1504', type: 'Flat Owner', phone: '+91 98451 33442', email: 'vivek.agrawal@gmail.com', status: 'Active', vehicles: 'KA-01-EQ-1829 (Skoda Octavia)', parking: 'P1-1504' },
+  { id: 'res-14', name: 'Naveen Chandran', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-2202', type: 'Tenant', phone: '+91 98862 44551', email: 'naveen.c@fintech.io', status: 'Active', vehicles: 'KA-03-PL-7721 (Volkswagen Taigun)', parking: 'P1-2202' },
+  { id: 'res-15', name: 'Rashmi Nambiar', apartment: 'Golden Apartment', tower: 'Golden Tower 1', flat: 'GT1-3505', type: 'Flat Owner', phone: '+91 97415 88992', email: 'rashmi.n@skyline.org', status: 'Active', vehicles: 'KA-04-MK-1100 (Volvo XC60)', parking: 'P1-3505' },
+  { id: 'res-16', name: 'Rohan & Dia Sen', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-1803', type: 'Flat Owner', phone: '+91 98205 99001', email: 'rohan.sen@cloudscale.com', status: 'Active', vehicles: 'KA-05-AB-4455 (Tesla Model 3)', parking: 'P2-1803' },
+  { id: 'res-17', name: 'Sameer Sheikh', apartment: 'Golden Apartment', tower: 'Golden Tower 2', flat: 'GT2-3204', type: 'Tenant', phone: '+91 99009 11224', email: 'sameer.sheikh@aerospace.in', status: 'Active', vehicles: 'KA-01-ZZ-9911 (Audi Q3)', parking: 'P2-3204' },
+  { id: 'res-18', name: 'Suresh & Preeti Namboodiri', apartment: 'Golden Apartment', tower: 'Golden Tower 3', flat: 'GT3-2005', type: 'Flat Owner', phone: '+91 98402 77112', email: 'suresh.namboodiri@biogen.com', status: 'Active', vehicles: 'KA-03-JK-6677 (Hyundai Tucson)', parking: 'P3-2005' }
 ];
+
+// Unoccupied flats set (only 7 to 8 flats per tower, matching the 5-10 unoccupied criteria with 90%+ occupancy)
+export const UN_OCCUPIED_FLATS_SET = new Set([
+  // Golden Tower 1 (8 unoccupied flats out of 296 = 97.3% occupied)
+  'GT1-204', 'GT1-605', 'GT1-1103', 'GT1-1706', 'GT1-2302', 'GT1-2805', 'GT1-3302', 'GT1-3704',
+  // Golden Tower 2 (7 unoccupied flats out of 272 = 97.4% occupied)
+  'GT2-304', 'GT2-806', 'GT2-1403', 'GT2-2005', 'GT2-2602', 'GT2-3004', 'GT2-3402',
+  // Golden Tower 3 (8 unoccupied flats out of 254 = 96.9% occupied)
+  'GT3-206', 'GT3-605', 'GT3-1204', 'GT3-1802', 'GT3-2206', 'GT3-2703', 'GT3-3004', 'GT3-3205'
+]);
+
+const FIRST_NAMES = [
+  'Aarav', 'Priya', 'Rohan', 'Ananya', 'Vikram', 'Sneha', 'Aditya', 'Pooja',
+  'Karthik', 'Divya', 'Sanjay', 'Meera', 'Rajesh', 'Neha', 'Arun', 'Swati',
+  'Gaurav', 'Kavita', 'Naveen', 'Deepika', 'Manish', 'Shalini', 'Ashish', 'Radhika',
+  'Amit', 'Sunita', 'Nitin', 'Rashmi', 'Pradeep', 'Tanvi', 'Abhishek', 'Shruti',
+  'Chetan', 'Geetha', 'Dinesh', 'Lavanya', 'Venkatesh', 'Aparna', 'Sachin', 'Usha',
+  'Santosh', 'Anjali', 'Kishore', 'Bhavna', 'Girish', 'Pallavi', 'Hemant', 'Sarita',
+  'Tarun', 'Madhavi', 'Varun', 'Sandhya', 'Alok', 'Namrata', 'Raghav', 'Meenakshi'
+];
+
+const LAST_NAMES = [
+  'Sharma', 'Verma', 'Patel', 'Iyer', 'Reddy', 'Nair', 'Kulkarni', 'Joshi',
+  'Gupta', 'Chatterjee', 'Mukherjee', 'Menon', 'Bhatt', 'Deshmukh', 'Singhania',
+  'Chopra', 'Malhotra', 'Agarwal', 'Saxena', 'Mehta', 'Pillai', 'Rao', 'Shetty',
+  'Bansal', 'Thakur', 'Kapoor', 'Mishra', 'Pandey', 'Nambiar', 'Bose', 'Das',
+  'Roy', 'Hegde', 'Gowda', 'Chavan', 'Kaur', 'Sethi', 'Garg', 'Choudhury', 'Sen'
+];
+
+const VEHICLE_MODELS = [
+  'Hyundai Creta', 'Honda City', 'Kia Seltos', 'Tata Nexon EV', 'Maruti Baleno',
+  'Toyota Hyryder', 'Skoda Kushaq', 'Volkswagen Taigun', 'Mahindra XUV700', 'MG Hector',
+  'BMW X1', 'Audi A4', 'Toyota Innova Crysta', 'Tata Safari', 'Mercedes GLA',
+  'Ather 450X', 'Ola S1 Pro', 'Royal Enfield Classic 350', 'TVS iQube', 'Honda Activa 6G',
+  'Maruti Grand Vitara', 'Skoda Slavia', 'Hyundai Verna', 'Kia Carens', 'MG ZS EV'
+];
+
+const EMAIL_DOMAINS = ['gmail.com', 'outlook.com', 'yahoo.com', 'techcorp.in', 'infonet.com', 'cloudscale.com'];
+
+// Helper to deterministically generate realistic residents for all occupied flats across all 3 towers
+const generateFullResidentsDirectory = () => {
+  const seedMap = new Map();
+  SEED_RESIDENTS.forEach(r => seedMap.set(r.flat, r));
+
+  const list = [];
+  const towersConfig = [
+    { code: 'Golden Tower 1', prefix: 'GT1', floors: 38, unitsPerFloor: 8, getUnits: (f) => (f >= 35 ? 6 : 8), towerNum: 1 },
+    { code: 'Golden Tower 2', prefix: 'GT2', floors: 35, unitsPerFloor: 8, getUnits: (f) => (f >= 32 ? 6 : 8), towerNum: 2 },
+    { code: 'Golden Tower 3', prefix: 'GT3', floors: 32, unitsPerFloor: 8, getUnits: (f) => (f <= 4 ? 10 : f >= 28 ? 6 : 8), towerNum: 3 }
+  ];
+
+  let counter = 100;
+  towersConfig.forEach(tow => {
+    for (let f = 1; f <= tow.floors; f++) {
+      const unitsCount = tow.getUnits ? tow.getUnits(f) : tow.unitsPerFloor;
+      for (let u = 1; u <= unitsCount; u++) {
+        const flatNo = `${tow.prefix}-${f}${u < 10 ? '0' + u : u}`;
+
+        // Skip unoccupied flats (only 5-10 per tower)
+        if (UN_OCCUPIED_FLATS_SET.has(flatNo)) {
+          continue;
+        }
+
+        // If seeded, use seed
+        if (seedMap.has(flatNo)) {
+          list.push(seedMap.get(flatNo));
+          continue;
+        }
+
+        // Deterministic generation
+        counter++;
+        const hash = (tow.towerNum * 10000) + (f * 100) + u;
+        const firstName = FIRST_NAMES[(hash + f * 3) % FIRST_NAMES.length];
+        const lastName = LAST_NAMES[(hash * 7 + u) % LAST_NAMES.length];
+        const isTenant = (hash % 3 === 0); // ~33% tenants, ~67% flat owners
+        const model = VEHICLE_MODELS[(hash + u) % VEHICLE_MODELS.length];
+        const rtoNum = (hash % 5 === 0) ? '01' : (hash % 5 === 1) ? '03' : (hash % 5 === 2) ? '04' : (hash % 5 === 3) ? '05' : '51';
+        const series = String.fromCharCode(65 + (hash % 26)) + String.fromCharCode(65 + ((hash * 3) % 26));
+        const plateNum = 1000 + (hash * 13) % 9000;
+        const domain = EMAIL_DOMAINS[hash % EMAIL_DOMAINS.length];
+        const phoneMiddle = 98000 + (hash % 1900);
+        const phoneLast = 10000 + ((hash * 31) % 89999);
+        const parkingSlot = `P${tow.towerNum}-${f < 10 ? '0' + f : f}${u < 10 ? '0' + u : u}`;
+
+        list.push({
+          id: `res-${tow.prefix}-${f}-${u}`,
+          name: `${firstName} ${lastName}`,
+          apartment: 'Golden Apartment',
+          tower: tow.code,
+          floor: f,
+          flat: flatNo,
+          type: isTenant ? 'Tenant' : 'Flat Owner',
+          phone: `+91 ${phoneMiddle} ${phoneLast}`,
+          email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${domain}`,
+          status: 'Active',
+          vehicles: `KA-${rtoNum}-${series}-${plateNum} (${model})`,
+          parking: parkingSlot
+        });
+      }
+    }
+  });
+
+  return list;
+};
+
+export const INITIAL_RESIDENTS_DIRECTORY = generateFullResidentsDirectory();
 
 export const INITIAL_COMPLAINTS = [
   {
@@ -348,6 +462,47 @@ export const INITIAL_COMPLAINTS = [
     history: [
       { timestamp: '2026-10-20 17:00', text: 'Complaint submitted by President Sujana', author: 'President' },
       { timestamp: '2026-10-20 18:00', text: 'Assigned to Security Chief for RFID scanner lens recalibration.', author: 'Vice President' }
+    ]
+  },
+  {
+    id: 'CMP-2026-089',
+    title: 'Fire Hose Reel Pressure Valve Weeping on 14th Floor',
+    category: 'Water Supply',
+    apartment: 'Golden Apartment',
+    location: 'Golden Tower 3 - 14th Floor Fire Hose Cabinet',
+    description: 'Slow drip observed from the brass isolation valve behind the hose reel drum. Minor water pooling in the fire shaft.',
+    priority: 'High',
+    status: 'In Progress',
+    submittedBy: 'Harpreet Singh Chadha (GT3-802)',
+    submittedByRole: 'Flat Owner',
+    assignedTo: 'Ramesh Babu (Plumbing Lead)',
+    assignedDate: '2026-10-22 10:15',
+    createdAt: '2026-10-22 09:30',
+    updatedAt: '2026-10-22 11:00',
+    hasAttachment: true,
+    history: [
+      { timestamp: '2026-10-22 09:30', text: 'Complaint submitted by Harpreet Singh Chadha (GT3-802)', author: 'Resident' },
+      { timestamp: '2026-10-22 10:15', text: 'Assigned to Ramesh Babu to replace high-pressure gasket.', author: 'Operations' }
+    ]
+  },
+  {
+    id: 'CMP-2026-090',
+    title: 'Corridor Casement Window Latch Broken Causing Wind Vibration',
+    category: 'Cleanliness',
+    apartment: 'Golden Apartment',
+    location: 'Golden Tower 3 - 20th Floor East Lobby',
+    description: 'Aluminum friction stay arm sheared off during gusty winds. Window sash vibrates against the frame.',
+    priority: 'Low',
+    status: 'Submitted',
+    submittedBy: 'Suresh Namboodiri (GT3-2005)',
+    submittedByRole: 'Flat Owner',
+    assignedTo: 'Unassigned',
+    assignedDate: '',
+    createdAt: '2026-10-23 14:20',
+    updatedAt: '2026-10-23 14:20',
+    hasAttachment: false,
+    history: [
+      { timestamp: '2026-10-23 14:20', text: 'Complaint registered by Suresh Namboodiri (GT3-2005)', author: 'Resident' }
     ]
   }
 ];
@@ -658,7 +813,7 @@ export const INITIAL_NOTIFICATIONS = [
   }
 ];
 
-export const INITIAL_EMPLOYEES = [
+export const INITIAL_usersS = [
   {
     id: 'EMP-101',
     name: 'Sanjay Kumar',
