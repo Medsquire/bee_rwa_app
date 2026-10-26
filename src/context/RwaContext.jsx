@@ -217,6 +217,17 @@ export const RwaProvider = ({ children }) => {
     showToast(`Approved registration for ${target.applicantName} (${target.flatNumber})`, 'success');
   };
 
+  // Update resident details
+  const updateResident = (residentId, updatedData) => {
+    setResidents(prev => prev.map(res => {
+      if (res.id === residentId) {
+        return { ...res, ...updatedData };
+      }
+      return res;
+    }));
+    showToast(`Resident information updated successfully!`, 'success');
+  };
+
   const rejectRequest = (requestId, reason) => {
     const target = registrationRequests.find(r => r.id === requestId);
     if (!target) return;
@@ -278,25 +289,58 @@ export const RwaProvider = ({ children }) => {
   const submitComplaint = (data) => {
     const newId = `CMP-2026-0${Math.floor(90 + Math.random() * 900)}`;
     const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+    
+    const isRwaUser = ['president', 'vice_president', 'admin'].includes(currentUser?.roleKey);
+    const isCommonArea = data.complaintScope === 'Common Area' || !data.complaintScope;
+    
+    // If resident raises common area complaint -> requires RWA approval before moving to Agent app
+    let initialStatus = 'Pending Approval';
+    let requiresApproval = false;
+    let dispatchedToAgentApp = false;
+
+    if (!isRwaUser && isCommonArea) {
+      initialStatus = 'Pending Approval';
+      requiresApproval = true;
+    } else if (isRwaUser && (data.directToAgentApp !== false)) {
+      // RWA users can directly send complaint to agent app without approvals
+      initialStatus = 'Approved';
+      dispatchedToAgentApp = true;
+    }
 
     const newComplaint = {
       id: newId,
       title: data.title,
       category: data.category,
+      issueType: data.issueType || data.category,
       apartment: data.apartment || currentUser.apartment,
       location: data.location,
+      placeName: data.placeName || '',
+      floor: data.floor || '',
+      asset: data.asset || '',
       description: data.description,
       priority: data.priority || 'Medium',
-      status: 'Submitted',
-      submittedBy: `${currentUser.name} (${currentUser.flatNumber})`,
+      status: initialStatus,
+      complaintScope: data.complaintScope || 'Common Area',
+      requiresApproval,
+      dispatchedToAgentApp,
+      submittedBy: `${currentUser.name} (${currentUser.flatNumber || 'RWA Office'})`,
       submittedByRole: currentUser.roleTitle,
-      assignedTo: 'Unassigned',
-      assignedDate: '',
+      assignedTo: data.assignedTo || (dispatchedToAgentApp ? 'Sanjay Kumar (Otis AMC Lead Engineer)' : 'Unassigned'),
+      assignedDate: dispatchedToAgentApp ? nowStr : '',
       createdAt: nowStr,
       updatedAt: nowStr,
-      hasAttachment: !!data.hasAttachment,
+      hasAttachment: !!data.hasAttachment || !!data.photoUrl,
+      photoUrl: data.photoUrl || null,
       history: [
-        { timestamp: nowStr, text: `Complaint registered by ${currentUser.name}`, author: currentUser.roleTitle }
+        { 
+          timestamp: nowStr, 
+          text: requiresApproval 
+            ? `Common Area complaint registered by ${currentUser.name}. Requires RWA approval before moving to Agent App.` 
+            : dispatchedToAgentApp 
+              ? `Complaint registered by RWA (${currentUser.name}) and directly dispatched to Agent App.` 
+              : `Complaint registered by ${currentUser.name}`, 
+          author: currentUser.roleTitle 
+        }
       ]
     };
 
@@ -306,7 +350,9 @@ export const RwaProvider = ({ children }) => {
     const newNotif = {
       id: `notif-${Date.now()}`,
       roleTarget: 'vice_president',
-      title: `New Complaint: ${data.title.substring(0, 35)}...`,
+      title: requiresApproval 
+        ? `Approval Needed: ${data.title.substring(0, 30)}...` 
+        : `New Complaint: ${data.title.substring(0, 30)}...`,
       message: `Priority: ${data.priority} | ${data.apartment} - ${data.location}`,
       timestamp: 'Just now',
       read: false,
@@ -315,8 +361,71 @@ export const RwaProvider = ({ children }) => {
     };
     setNotifications(prev => [newNotif, ...prev]);
 
-    showToast(`Complaint #${newId} submitted successfully!`, 'success');
+    showToast(
+      requiresApproval 
+        ? `Common Area Complaint #${newId} submitted! Awaiting RWA Approval.` 
+        : `Complaint #${newId} submitted & dispatched to Agent App!`, 
+      'success'
+    );
     return newId;
+  };
+
+  // RWA Approval for Common Area Complaints -> Moves to Agent App
+  const approveAndDispatchToAgentApp = (complaintId, technicianOrAgency = '', noteText = '') => {
+    const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+    setComplaints(prev => prev.map(cmp => {
+      if (cmp.id === complaintId) {
+        const historyEntry = {
+          timestamp: nowStr,
+          text: noteText || `Common Area complaint approved by RWA (${currentUser.name}) and dispatched to Agent App.`,
+          author: `${currentUser.name} (${currentUser.roleTitle})`
+        };
+        return {
+          ...cmp,
+          status: 'Approved',
+          assignedTo: technicianOrAgency || (cmp.assignedTo !== 'Unassigned' ? cmp.assignedTo : 'Sanjay Kumar (Otis AMC Lead Engineer)'),
+          assignedDate: nowStr,
+          approvedByRwa: true,
+          rwaApprovedBy: currentUser.name,
+          dispatchedToAgentApp: true,
+          requiresApproval: false,
+          updatedAt: nowStr,
+          history: [...(cmp.history || []), historyEntry]
+        };
+      }
+      return cmp;
+    }));
+
+    showToast(`Complaint #${complaintId} approved and moved to Agent App!`, 'success');
+  };
+
+  // RWA Users directly send to Agent App without approvals
+  const sendDirectlyToAgentApp = (complaintId, technicianOrAgency = '', noteText = '') => {
+    const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+    setComplaints(prev => prev.map(cmp => {
+      if (cmp.id === complaintId) {
+        const historyEntry = {
+          timestamp: nowStr,
+          text: noteText || `Directly sent to Agent App by RWA User (${currentUser.name}) with zero approvals required.`,
+          author: `${currentUser.name} (${currentUser.roleTitle})`
+        };
+        return {
+          ...cmp,
+          status: 'Approved',
+          assignedTo: technicianOrAgency || (cmp.assignedTo !== 'Unassigned' ? cmp.assignedTo : 'Sanjay Kumar (Otis AMC Lead Engineer)'),
+          assignedDate: nowStr,
+          dispatchedToAgentApp: true,
+          requiresApproval: false,
+          updatedAt: nowStr,
+          history: [...(cmp.history || []), historyEntry]
+        };
+      }
+      return cmp;
+    }));
+
+    showToast(`Complaint #${complaintId} directly sent to Agent App!`, 'success');
   };
 
   const updateComplaintStatus = (complaintId, newStatus, updateNote = '') => {
@@ -365,6 +474,30 @@ export const RwaProvider = ({ children }) => {
     }));
 
     showToast(`Assigned complaint #${complaintId} to ${technicianName}`, 'success');
+  };
+
+  const updateComplaintDetails = (complaintId, updates, updateNote = '') => {
+    const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+    setComplaints(prev => prev.map(cmp => {
+      if (cmp.id === complaintId) {
+        const historyEntry = updateNote ? {
+          timestamp: nowStr,
+          text: updateNote,
+          author: currentUser.roleTitle
+        } : null;
+
+        return {
+          ...cmp,
+          ...updates,
+          updatedAt: nowStr,
+          history: historyEntry ? [...cmp.history, historyEntry] : cmp.history
+        };
+      }
+      return cmp;
+    }));
+
+    showToast(`Complaint #${complaintId} updated successfully`, 'success');
   };
 
   // 3. FACILITY & BOOKING ACTIONS
@@ -693,6 +826,8 @@ export const RwaProvider = ({ children }) => {
         setIsSidebarOpen,
         apartments,
         residents,
+        setResidents,
+        updateResident,
         registrationRequests,
         approveRequest,
         rejectRequest,
@@ -701,6 +836,9 @@ export const RwaProvider = ({ children }) => {
         submitComplaint,
         updateComplaintStatus,
         assignComplaint,
+        updateComplaintDetails,
+        approveAndDispatchToAgentApp,
+        sendDirectlyToAgentApp,
         facilities,
         toggleFacilityStatus,
         bookings,

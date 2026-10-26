@@ -13,36 +13,44 @@ import {
 } from 'lucide-react';
 
 export const StatusPill = ({ status }) => {
-  const s = (status || '').toLowerCase();
+  const s = (status || '').toLowerCase().trim();
   
-  if (['approved', 'resolved', 'closed', 'confirmed', 'paid', 'active', 'available'].includes(s)) {
+  if (['approved', 'assigned', 'acknowledged'].includes(s)) {
     return (
-      <span className="badge badge-success">
-        <CheckCircle2 size={12} /> {status}
+      <span className="badge badge-success" style={{ backgroundColor: '#ECFDF5', color: '#065F46', borderColor: '#A7F3D0' }}>
+        <CheckCircle2 size={12} /> Approved
       </span>
     );
   }
   
-  if (['pending', 'in progress', 'assigned', 'partial', 'due soon'].includes(s)) {
+  if (['in progress', 'reopened'].includes(s)) {
     return (
-      <span className="badge badge-warning">
-        <Clock size={12} /> {status}
+      <span className="badge badge-info" style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', borderColor: '#BFDBFE' }}>
+        <Clock size={12} /> In Progress
       </span>
     );
   }
-  
-  if (['rejected', 'overdue', 'cancelled', 'closed for maintenance', 'maintenance'].includes(s)) {
+
+  if (s === 'resolved') {
     return (
-      <span className="badge badge-error">
-        <AlertCircle size={12} /> {status}
+      <span className="badge badge-success" style={{ backgroundColor: '#F0FDF4', color: '#15803D', borderColor: '#BBF7D0' }}>
+        <CheckCircle2 size={12} /> Resolved
       </span>
     );
   }
-  
-  if (['submitted', 'acknowledged'].includes(s)) {
+
+  if (s === 'closed') {
     return (
-      <span className="badge badge-info">
-        <Layers size={12} /> {status}
+      <span className="badge badge-neutral" style={{ backgroundColor: '#F1F5F9', color: '#475569', borderColor: '#CBD5E1' }}>
+        <CheckCircle2 size={12} /> Closed
+      </span>
+    );
+  }
+
+  if (['pending approval', 'submitted', 'pending'].includes(s)) {
+    return (
+      <span className="badge badge-warning" style={{ backgroundColor: '#FEF3C7', color: '#92400E', borderColor: '#FCD34D' }}>
+        <Clock size={12} /> Pending Approval
       </span>
     );
   }
@@ -167,7 +175,7 @@ export const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'b
   );
 };
 
-export const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = '620px' }) => {
+export const Modal = ({ isOpen, onClose, title, subtitle, headerExtra, children, maxWidth = '620px' }) => {
   if (!isOpen) return null;
 
   return (
@@ -177,15 +185,31 @@ export const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = '
         style={{ maxWidth }} 
         onClick={e => e.stopPropagation()}
       >
-        <div className="modal-header">
-          <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{title}</h3>
-            {subtitle && <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{subtitle}</p>}
+        <div className="modal-header" style={{ alignItems: 'flex-start', gap: '12px' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {typeof title === 'string' ? (
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{title}</h3>
+            ) : (
+              title
+            )}
+            {subtitle && (
+              typeof subtitle === 'string' ? (
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '4px', margin: 0 }}>{subtitle}</p>
+              ) : (
+                <div style={{ marginTop: '4px' }}>{subtitle}</div>
+              )
+            )}
           </div>
+          {headerExtra && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+              {headerExtra}
+            </div>
+          )}
           <button 
             className="btn btn-secondary btn-icon" 
             onClick={onClose}
             aria-label="Close modal"
+            style={{ flexShrink: 0 }}
           >
             <X size={18} />
           </button>

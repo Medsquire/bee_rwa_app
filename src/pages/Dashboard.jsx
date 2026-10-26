@@ -216,7 +216,7 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card 4: Technicians / Staff */}
+        {/* Card 4: Executive Users */}
         <div
           onClick={() => setActiveTab('users')}
           style={{
@@ -234,7 +234,7 @@ export const Dashboard = () => {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.04em' }}>
-              ON-DUTY STAFF
+              EXECUTIVE USERS
             </span>
             <div style={{
               width: '28px',
@@ -250,10 +250,10 @@ export const Dashboard = () => {
             </div>
           </div>
           <div style={{ fontSize: '1.875rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>
-            {onDutyuserss.length}
+            2
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#64748B', marginTop: '8px', fontWeight: 600 }}>
-            <span>View details</span>
+            <span>President & VP</span>
             <ArrowRight size={12} />
           </div>
         </div>
