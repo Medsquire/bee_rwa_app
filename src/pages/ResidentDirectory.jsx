@@ -25,15 +25,11 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Edit3,
-  Save,
-  X,
-  ChevronDown,
-  SlidersHorizontal
+  X
 } from 'lucide-react';
 
 export const ResidentDirectory = () => {
-  const { residents, selectedApartment, setSelectedApartment, apartments, setActiveTab, updateResident } = useRwa();
+  const { residents, selectedApartment, setSelectedApartment, apartments, setActiveTab } = useRwa();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [viewMode, setViewMode] = useState('tower-floor-flat'); // 'tower-floor-flat' or 'list'
@@ -43,52 +39,7 @@ export const ResidentDirectory = () => {
   const [selectedTower, setSelectedTower] = useState('Golden Tower 1');
   const [selectedFloor, setSelectedFloor] = useState('All');
   const [occupancyFilter, setOccupancyFilter] = useState('All');
-  const [showTowerFloorFilters, setShowTowerFloorFilters] = useState(false);
   const [selectedResidentModal, setSelectedResidentModal] = useState(null);
-  const [isEditingModal, setIsEditingModal] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    type: 'Flat Owner',
-    parking: '',
-    vehicles: ''
-  });
-
-  const handleStartEdit = (resident) => {
-    if (!resident) return;
-    setEditForm({
-      name: resident.name || '',
-      phone: resident.phone || '',
-      email: resident.email || '',
-      type: resident.type || 'Flat Owner',
-      parking: resident.parking || '',
-      vehicles: resident.vehicles || ''
-    });
-    setIsEditingModal(true);
-  };
-
-  const handleSaveEdit = (e) => {
-    if (e) e.preventDefault();
-    if (!selectedResidentModal) return;
-
-    if (!editForm.name.trim() || !editForm.phone.trim()) {
-      alert('Please provide Name and Contact Phone.');
-      return;
-    }
-
-    if (updateResident) {
-      updateResident(selectedResidentModal.id, editForm);
-    }
-
-    setSelectedResidentModal(prev => ({
-      ...prev,
-      ...editForm
-    }));
-
-    setIsEditingModal(false);
-  };
-
   const [currentFloorPage, setCurrentFloorPage] = useState(1);
   const FLOORS_PER_PAGE = 3;
   const topTableRef = useRef(null);
@@ -544,15 +495,7 @@ export const ResidentDirectory = () => {
       {/* COMPLEX & TOWER SELECTOR BAR */}
       <div className="glass-card" style={{ padding: '18px 20px' }}>
         {/* Top: Apartment Indicator & Search Bar */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-          paddingBottom: showTowerFloorFilters ? '14px' : '0',
-          borderBottom: showTowerFloorFilters ? '1px solid var(--border-color)' : 'none'
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', paddingBottom: '14px', borderBottom: '1px solid var(--border-color)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{
               display: 'inline-flex',
@@ -581,93 +524,45 @@ export const ResidentDirectory = () => {
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            {/* Toggle Button for Tower & Floor Filters */}
-            <button
-              type="button"
-              onClick={() => setShowTowerFloorFilters(prev => !prev)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                fontSize: '0.8125rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                border: showTowerFloorFilters ? '1.5px solid #2563EB' : '1px solid var(--border-color)',
-                backgroundColor: showTowerFloorFilters ? '#EFF6FF' : '#FFFFFF',
-                color: showTowerFloorFilters ? '#1D4ED8' : 'var(--text-secondary)',
-                transition: 'all 0.15s ease',
-                boxShadow: showTowerFloorFilters ? '0 1px 3px rgba(37, 99, 235, 0.15)' : 'none'
-              }}
-              title={showTowerFloorFilters ? 'Click to hide tower & floor filters' : 'Click to show tower & floor filters'}
-            >
-              <SlidersHorizontal size={14} style={{ color: showTowerFloorFilters ? '#2563EB' : 'var(--text-muted)' }} />
-              <span>{showTowerFloorFilters ? 'Hide Filters' : 'Tower & Floor Filters'}</span>
-              <span style={{
-                fontSize: '0.6875rem',
-                backgroundColor: showTowerFloorFilters ? '#2563EB' : '#F1F5F9',
-                color: showTowerFloorFilters ? '#FFFFFF' : '#475569',
-                padding: '1px 6px',
-                borderRadius: '5px',
-                fontWeight: 700
-              }}>
-                {selectedTower}
-              </span>
-              <ChevronDown 
-                size={14} 
-                style={{ 
-                  transform: showTowerFloorFilters ? 'rotate(180deg)' : 'none', 
-                  transition: 'transform 0.2s ease',
-                  color: showTowerFloorFilters ? '#2563EB' : 'var(--text-muted)'
-                }} 
-              />
-            </button>
-
-            {/* Search bar */}
-            <div style={{ position: 'relative', width: '280px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
-              <input 
-                type="text" 
-                placeholder="Search resident, flat, phone..." 
-                className="form-control"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ paddingLeft: '36px', paddingRight: searchTerm ? '32px' : '12px' }}
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '8px',
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                    padding: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '50%'
-                  }}
-                  title="Clear search"
-                  aria-label="Clear search"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+          {/* Search bar */}
+          <div style={{ position: 'relative', width: '280px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
+            <input 
+              type="text" 
+              placeholder="Search resident, flat, phone..." 
+              className="form-control"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ paddingLeft: '36px', paddingRight: searchTerm ? '32px' : '12px' }}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '8px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%'
+                }}
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Info in the red box: Only show when toggle button is clicked */}
-        {showTowerFloorFilters && (
-          <>
-            {/* Middle: Towers of Selected Complex (Golden Tower 1, Golden Tower 2, Golden Tower 3) - Same line side by side */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '14px', width: '100%' }}>
+        {/* Middle: Towers of Selected Complex (Golden Tower 1, Golden Tower 2, Golden Tower 3) - Same line side by side */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '14px', width: '100%' }}>
           <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-secondary)', whiteSpace: 'nowrap', flexShrink: 0 }}>
             SELECT TOWER:
           </span>
@@ -863,18 +758,58 @@ export const ResidentDirectory = () => {
             );
           })}
         </div>
-          </>
-        )}
       </div>
 
       {/* VIEW MODE 1: TOWER & FLOOR & FLAT WISE HIERARCHICAL VIEW */}
       {viewMode === 'tower-floor-flat' && (
         <div ref={topTableRef} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-              <Layers size={18} style={{ color: currentTowerObj.color }} />
-              {currentTowerObj.name}
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                <Layers size={18} style={{ color: currentTowerObj.color }} />
+                {currentTowerObj.code} — {currentTowerObj.name}
+              </h2>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+                ({selectedFloor === 'All' ? `All ${currentTowerObj.floors} Floors • 3 Floors per page (Page ${currentFloorPage} of ${totalFloorPages || 1})` : `Floor ${selectedFloor} View`})
+              </span>
+              <span style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                backgroundColor: '#DCFCE7',
+                color: '#16A34A',
+                border: '1px solid #BBF7D0',
+                padding: '2px 8px',
+                borderRadius: '8px'
+              }}>
+                {currentTowerStats.rate}% Occupied ({currentTowerStats.occupied} Flats)
+              </span>
+              <span style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                backgroundColor: '#FEF3C7',
+                color: '#B45309',
+                border: '1px solid #FDE68A',
+                padding: '2px 8px',
+                borderRadius: '8px'
+              }}>
+                {currentTowerStats.unoccupied} Unoccupied (Vacant)
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.75rem', flexWrap: 'wrap' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: 'var(--indigo)' }} />
+                Occupied by Owner
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: 'var(--electric-blue)' }} />
+                Occupied by Tenant
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '12px', height: '10px', borderRadius: '3px', backgroundColor: '#FFFBEB', border: '1px solid #FCD34D' }} />
+                <span style={{ color: '#92400E', fontWeight: 600 }}>Unoccupied / Vacant (Light Amber)</span>
+              </span>
+            </div>
           </div>
 
           {/* Search Result Banner (when active search) */}
@@ -1527,179 +1462,59 @@ export const ResidentDirectory = () => {
       {/* Resident & Flat Dossier Modal */}
       <Modal
         isOpen={!!selectedResidentModal}
-        onClose={() => {
-          setSelectedResidentModal(null);
-          setIsEditingModal(false);
-        }}
-        title={isEditingModal ? `Edit Details • ${selectedResidentModal?.flat}` : (selectedResidentModal?.name || 'Resident Details')}
+        onClose={() => setSelectedResidentModal(null)}
+        title={selectedResidentModal?.name || 'Resident Details'}
         subtitle={`Flat ${selectedResidentModal?.flat} • ${selectedResidentModal?.tower} (${selectedResidentModal?.apartment})`}
-        maxWidth="620px"
       >
         {selectedResidentModal && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* When editing, render clean Name & Type fields */}
-            {isEditingModal && (
-              <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      RESIDENT NAME
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editForm.name}
-                      onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                      placeholder="Resident Full Name"
-                      style={{
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                        padding: '6px 10px',
-                        borderRadius: '6px',
-                        width: '100%'
-                      }}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      RESIDENT TYPE
-                    </label>
-                    <select
-                      className="form-control"
-                      value={editForm.type}
-                      onChange={e => setEditForm({ ...editForm, type: e.target.value })}
-                      style={{
-                        padding: '6px 10px',
-                        fontSize: '0.875rem',
-                        fontWeight: 700,
-                        borderRadius: '6px',
-                        width: '100%'
-                      }}
-                    >
-                      <option value="Flat Owner">Flat Owner</option>
-                      <option value="Tenant">Tenant</option>
-                    </select>
-                  </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px', backgroundColor: 'var(--bg-hover)', borderRadius: '10px' }}>
+              <div style={{
+                width: '54px',
+                height: '54px',
+                borderRadius: '50%',
+                backgroundColor: selectedResidentModal.type === 'Flat Owner' ? 'var(--indigo)' : 'var(--electric-blue)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: '1.25rem'
+              }}>
+                {selectedResidentModal.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>{selectedResidentModal.name}</h3>
+                  <StatusPill status={selectedResidentModal.status} />
+                </div>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--electric-blue)', fontWeight: 600 }}>
+                  {selectedResidentModal.type} • ID: {selectedResidentModal.id}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  {selectedResidentModal.apartment} — Floor {selectedResidentModal.floor}, Flat {selectedResidentModal.flat}
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* 4 Cards Grid */}
             <div className="grid-cols-2" style={{ gap: '12px' }}>
-              {/* Card 1: CONTACT INFORMATION */}
               <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '4px' }}>
-                  CONTACT INFORMATION
-                </div>
-                {isEditingModal ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-                    <div>
-                      <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '2px' }}>Phone Number</label>
-                      <input
-                        type="tel"
-                        className="form-control"
-                        value={editForm.phone}
-                        onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
-                        placeholder="+91..."
-                        style={{
-                          fontWeight: 700,
-                          fontSize: '0.875rem',
-                          padding: '5px 10px',
-                          borderRadius: '6px',
-                          width: '100%'
-                        }}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '2px' }}>Email Address</label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        value={editForm.email}
-                        onChange={e => setEditForm({ ...editForm, email: e.target.value })}
-                        placeholder="email@example.com"
-                        style={{
-                          fontSize: '0.75rem',
-                          padding: '5px 10px',
-                          borderRadius: '6px',
-                          width: '100%'
-                        }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>{selectedResidentModal.phone}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedResidentModal.email}</div>
-                  </>
-                )}
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>CONTACT INFORMATION</div>
+                <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>{selectedResidentModal.phone}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedResidentModal.email}</div>
               </div>
-
-              {/* Card 2: PARKING & VEHICLES */}
               <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '4px' }}>
-                  PARKING & VEHICLES
-                </div>
-                {isEditingModal ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-                    <div>
-                      <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '2px' }}>Parking Slot</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={editForm.parking}
-                        onChange={e => setEditForm({ ...editForm, parking: e.target.value })}
-                        placeholder="Slot: P1-3801"
-                        style={{
-                          fontWeight: 700,
-                          fontSize: '0.875rem',
-                          padding: '5px 10px',
-                          borderRadius: '6px',
-                          width: '100%'
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '2px' }}>Vehicle Details</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={editForm.vehicles}
-                        onChange={e => setEditForm({ ...editForm, vehicles: e.target.value })}
-                        placeholder="KA-03-VL-9413 (Kia Seltos)"
-                        style={{
-                          fontSize: '0.75rem',
-                          padding: '5px 10px',
-                          borderRadius: '6px',
-                          width: '100%'
-                        }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>Slot: {selectedResidentModal.parking || 'None'}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedResidentModal.vehicles || 'No vehicle registered'}</div>
-                  </>
-                )}
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>PARKING & VEHICLES</div>
+                <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>Slot: {selectedResidentModal.parking || 'None'}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedResidentModal.vehicles || 'No vehicle registered'}</div>
               </div>
-
-              {/* Card 3: TOWER LEVEL */}
               <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                  TOWER LEVEL
-                </div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>TOWER LEVEL</div>
                 <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>{selectedResidentModal.tower}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Floor {selectedResidentModal.floor} (Elevator access)</div>
               </div>
-
-              {/* Card 4: RWA VERIFICATION */}
               <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                  RWA VERIFICATION
-                </div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>RWA VERIFICATION</div>
                 <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem', color: 'var(--success)' }}>
                   ✓ Approved & Active
                 </div>
@@ -1707,45 +1522,13 @@ export const ResidentDirectory = () => {
               </div>
             </div>
 
-            {/* Footer Buttons */}
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-              {isEditingModal ? (
-                <>
-                  <button className="btn btn-secondary" onClick={() => setIsEditingModal(false)}>
-                    Cancel
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleSaveEdit}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <Save size={14} /> Save Changes
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className="btn btn-secondary" onClick={() => setSelectedResidentModal(null)}>
-                    Close
-                  </button>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => handleStartEdit(selectedResidentModal)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontWeight: 600,
-                      borderColor: 'var(--border-color)',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <Edit3 size={14} color="var(--electric-blue)" /> Edit
-                  </button>
-                  <a href={`tel:${selectedResidentModal.phone}`} className="btn btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    <Phone size={14} /> Call Resident
-                  </a>
-                </>
-              )}
+              <button className="btn btn-secondary" onClick={() => setSelectedResidentModal(null)}>
+                Close
+              </button>
+              <a href={`tel:${selectedResidentModal.phone}`} className="btn btn-primary" style={{ textDecoration: 'none' }}>
+                <Phone size={14} /> Call Resident
+              </a>
             </div>
           </div>
         )}

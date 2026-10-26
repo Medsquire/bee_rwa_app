@@ -285,7 +285,7 @@ export const ApartmentManagement = () => {
               onClick={() => setActiveTab('users')}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
-              <span>Executive Users</span>
+              <span>All Staff Directory</span>
               <ChevronRight size={14} />
             </button>
           </div>

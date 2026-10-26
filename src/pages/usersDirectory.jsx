@@ -1,2 +1,2 @@
-export { ExecutiveUsersDirectory as UsersDirectory, ExecutiveUsersDirectory as default } from './ExecutiveUsersDirectory';
-export * from './ExecutiveUsersDirectory';
+export * from './EmployeeDirectory';
+export { default } from './EmployeeDirectory';
