@@ -7,6 +7,7 @@ import {
   Megaphone,
   Home,
   Briefcase,
+  Users,
   ShieldCheck,
   UserCheck,
   LogOut
@@ -54,7 +55,7 @@ export const Sidebar = () => {
       badgeColor: '#F59E0B'
     },
     { id: 'agency', label: 'Agencies', icon: ShieldCheck },
-    { id: 'users', label: 'Users', icon: Briefcase },
+    { id: 'users', label: 'Users', icon: Users },
     { id: 'announcements', label: 'Announcements', icon: Megaphone }
   ];
 

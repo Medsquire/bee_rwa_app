@@ -813,6 +813,74 @@ export const INITIAL_NOTIFICATIONS = [
   }
 ];
 
+export const INITIAL_COUNCIL_USERS = [
+  {
+    id: 'USR-001',
+    name: 'Anita Sharma',
+    role: 'President',
+    hierarchyRank: 1,
+    phone: '+91 98765 43210',
+    email: 'anita.sharma@example.com',
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=240&auto=format&fit=crop&q=80',
+    tower: 'Golden Tower 1',
+    flat: 'GT1-801',
+    term: '2025 - 2027',
+    status: 'Active'
+  },
+  {
+    id: 'USR-002',
+    name: 'Rohit Mehta',
+    role: 'Vice President',
+    hierarchyRank: 2,
+    phone: '+91 98765 43211',
+    email: 'rohit.mehta@example.com',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=240&auto=format&fit=crop&q=80',
+    tower: 'Golden Tower 2',
+    flat: 'GT2-604',
+    term: '2025 - 2027',
+    status: 'Active'
+  },
+  {
+    id: 'USR-003',
+    name: 'Sneha Patel',
+    role: 'Executive',
+    hierarchyRank: 3,
+    phone: '+91 98765 43212',
+    email: 'sneha.patel@example.com',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
+    tower: 'Golden Tower 1',
+    flat: 'GT1-201',
+    term: '2025 - 2027',
+    status: 'Active'
+  },
+  {
+    id: 'USR-004',
+    name: 'Vikram Singh',
+    role: 'Secretary',
+    hierarchyRank: 4,
+    phone: '+91 98765 43213',
+    email: 'vikram.singh@example.com',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=240&auto=format&fit=crop&q=80',
+    tower: 'Golden Tower 2',
+    flat: 'GT2-305',
+    term: '2025 - 2027',
+    status: 'Active'
+  },
+  {
+    id: 'USR-005',
+    name: 'Divya Reddy',
+    role: 'Treasurer',
+    hierarchyRank: 5,
+    phone: '+91 98765 43214',
+    email: 'divya.reddy@example.com',
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=240&auto=format&fit=crop&q=80',
+    tower: 'Golden Tower 3',
+    flat: 'GT3-402',
+    term: '2025 - 2027',
+    status: 'Active'
+  }
+];
+
 export const INITIAL_usersS = [
   {
     id: 'EMP-101',

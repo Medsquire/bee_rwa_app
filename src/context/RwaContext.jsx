@@ -13,6 +13,7 @@ import {
   INITIAL_ANNOUNCEMENTS,
   INITIAL_NOTIFICATIONS,
   INITIAL_usersS,
+  INITIAL_COUNCIL_USERS,
   INITIAL_AGENCIES
 } from '../data/initialData';
 
@@ -68,6 +69,13 @@ export const RwaProvider = ({ children }) => {
   const [announcements, setAnnouncements] = useState(() => loadStored('ANNOUNCEMENTS', INITIAL_ANNOUNCEMENTS));
   const [notifications, setNotifications] = useState(() => loadStored('NOTIFICATIONS', INITIAL_NOTIFICATIONS));
   const [userss, setuserss] = useState(() => loadStored('usersS', INITIAL_usersS));
+  const [councilUsers, setCouncilUsers] = useState(() => {
+    const stored = loadStored('COUNCIL_USERS', null);
+    if (stored && Array.isArray(stored) && stored.some(u => u.name === 'Anita Sharma')) {
+      return stored;
+    }
+    return INITIAL_COUNCIL_USERS;
+  });
   const [agencies, setAgencies] = useState(() => loadStored('AGENCIES', INITIAL_AGENCIES));
 
   // Toast / Banner state
@@ -95,6 +103,7 @@ export const RwaProvider = ({ children }) => {
       localStorage.setItem(STORAGE_KEY_PREFIX + 'ANNOUNCEMENTS', JSON.stringify(announcements));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'NOTIFICATIONS', JSON.stringify(notifications));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'usersS', JSON.stringify(userss));
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'COUNCIL_USERS', JSON.stringify(councilUsers));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'AGENCIES', JSON.stringify(agencies));
       localStorage.setItem(STORAGE_KEY_PREFIX + 'IS_AUTH', JSON.stringify(isAuthenticated));
     } catch (e) {
@@ -103,7 +112,7 @@ export const RwaProvider = ({ children }) => {
   }, [
     currentRoleKey, isAuthenticated, activeTab, theme, residents, registrationRequests,
     complaints, facilities, bookings, financeSummary, maintenanceDues,
-    transactions, announcements, notifications, userss, agencies
+    transactions, announcements, notifications, userss, councilUsers, agencies
   ]);
 
   // Agency assignment helper: assigns/updates towers for a complex
@@ -616,8 +625,57 @@ export const RwaProvider = ({ children }) => {
     setAnnouncements(INITIAL_ANNOUNCEMENTS);
     setNotifications(INITIAL_NOTIFICATIONS);
     setuserss(INITIAL_usersS);
+    setCouncilUsers(INITIAL_COUNCIL_USERS);
 
     showToast('All demo data reset to default successfully!', 'success');
+  };
+
+  // Council Users Management
+  const addCouncilUser = (userData) => {
+    const roleHierarchyMap = {
+      'President': 1,
+      'Vice President': 2,
+      'Executive': 3,
+      'Secretary': 4,
+      'Treasurer': 5
+    };
+    const rank = roleHierarchyMap[userData.role] || 3;
+    const newUser = {
+      ...userData,
+      id: `USR-${Date.now().toString().slice(-4)}`,
+      hierarchyRank: rank,
+      status: userData.status || 'Active'
+    };
+    setCouncilUsers(prev => [...prev, newUser]);
+    showToast(`Added ${newUser.name} as ${newUser.role}`, 'success');
+    return newUser;
+  };
+
+  const updateCouncilUser = (userId, updatedFields) => {
+    const roleHierarchyMap = {
+      'President': 1,
+      'Vice President': 2,
+      'Executive': 3,
+      'Secretary': 4,
+      'Treasurer': 5
+    };
+    setCouncilUsers(prev => prev.map(u => {
+      if (u.id === userId) {
+        const nextRole = updatedFields.role || u.role;
+        return {
+          ...u,
+          ...updatedFields,
+          hierarchyRank: roleHierarchyMap[nextRole] || u.hierarchyRank || 3
+        };
+      }
+      return u;
+    }));
+    showToast('Council user details updated successfully', 'success');
+  };
+
+  const deleteCouncilUser = (userId) => {
+    setCouncilUsers(prev => prev.filter(u => u.id !== userId));
+    showToast('User removed from council directory', 'info');
   };
 
   // Add new users
@@ -729,6 +787,11 @@ export const RwaProvider = ({ children }) => {
         addusers,
         addUser: addusers,
         addEmployee: addusers,
+        councilUsers,
+        setCouncilUsers,
+        addCouncilUser,
+        updateCouncilUser,
+        deleteCouncilUser,
         agencies,
         setAgencies,
         assignAgencyTowers,

@@ -1,589 +1,682 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRwa } from '../context/RwaContext';
-import { ApartmentBadge, StatusPill, StatCard, Modal } from '../components/CommonUI';
+import { Modal } from '../components/CommonUI';
 import {
-  Users,
-  Search,
-  Filter,
   Phone,
   Mail,
-  ShieldCheck,
-  Briefcase,
-  Clock,
-  Award,
+  Search,
   UserPlus,
-  Building2,
-  Wrench,
-  CheckCircle2,
-  Calendar,
-  AlertCircle
+  Edit3,
+  Trash2,
+  Copy,
+  Check,
+  User
 } from 'lucide-react';
 
-export const UsersDirectory = () => {
-  const { userss, addusers, apartments, selectedApartment, setSelectedApartment, setActiveTab, currentUser } = useRwa();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [selectedStaff, setSelectedStaff] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+// Exact Palette from user reference image
+const ROLE_THEME = {
+  president: {
+    color: '#1E2D4A', // Deep Navy Blue
+    roleTitle: 'President'
+  },
+  'vice president': {
+    color: '#5B739E', // Slate / Steel Blue
+    roleTitle: 'Vice President'
+  },
+  vice_president: {
+    color: '#5B739E',
+    roleTitle: 'Vice President'
+  },
+  executive: {
+    color: '#649E8D', // Sage Green / Teal
+    roleTitle: 'Executive'
+  },
+  exicutive: {
+    color: '#649E8D',
+    roleTitle: 'Executive'
+  },
+  secretary: {
+    color: '#7C78B8', // Soft Indigo / Lavender
+    roleTitle: 'Secretary'
+  },
+  treasurer: {
+    color: '#ECA257', // Warm Peach / Amber
+    roleTitle: 'Treasurer'
+  }
+};
 
-  // Form state for new users
-  const [newStaff, setNewStaff] = useState({
+const getRoleTheme = (roleStr = '') => {
+  const normalized = roleStr.trim().toLowerCase();
+  return ROLE_THEME[normalized] || {
+    color: '#475569',
+    roleTitle: roleStr
+  };
+};
+
+export const UsersDirectory = () => {
+  const {
+    councilUsers = [],
+    addCouncilUser,
+    updateCouncilUser,
+    deleteCouncilUser,
+    showToast
+  } = useRwa();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [copiedId, setCopiedId] = useState(null);
+
+  // Modal States
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+
+  // New User Form State
+  const [newUser, setNewUser] = useState({
     name: '',
-    designation: '',
-    department: 'Facility Operations',
-    complex: 'Golden Apartment',
-    tower: 'Golden Tower 1',
+    role: 'Executive',
     phone: '',
     email: '',
-    shift: 'General (09:00 AM - 06:00 PM)',
-    status: 'On Duty',
-    experience: '3 Years'
+    image: '',
+    tower: 'Golden Tower 1',
+    flat: 'GT1-101',
+    term: '2025 - 2027'
   });
 
-  const departments = [
-    'All',
-    'Elevator & Electrical',
-    'Water Supply & Plumbing',
-    'Facility Operations',
-    'Security & Surveillance',
-    'Sanitation & Hygiene',
-    'Power & Generators',
-    'Environment & STP',
-    'Parks & Landscaping'
-  ];
+  // Filtered users based on search
+  const filteredUsers = useMemo(() => {
+    return [...councilUsers].filter((u) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        !searchTerm ||
+        u.name.toLowerCase().includes(term) ||
+        u.role.toLowerCase().includes(term) ||
+        u.phone.toLowerCase().includes(term) ||
+        u.email.toLowerCase().includes(term)
+      );
+    });
+  }, [councilUsers, searchTerm]);
 
-  const filtereduserss = userss.filter(emp => {
-    const matchesApt = selectedApartment === 'All' || emp.complex === selectedApartment || emp.complex === 'All Complexes';
-    const matchesDept = departmentFilter === 'All' || emp.department === departmentFilter;
-    const matchesStatus = statusFilter === 'All' || emp.status === statusFilter;
-    const matchesSearch =
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.phone.includes(searchTerm) ||
-      (emp.email && emp.email.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Extract tiers: President (Tier 1), Vice President (Tier 2), Executive/Secretary/Treasurer (Tier 3)
+  const president = useMemo(
+    () => filteredUsers.find((u) => u.role.trim().toLowerCase() === 'president'),
+    [filteredUsers]
+  );
 
-    return matchesApt && matchesDept && matchesStatus && matchesSearch;
-  });
+  const vicePresident = useMemo(
+    () =>
+      filteredUsers.find((u) => {
+        const r = u.role.trim().toLowerCase();
+        return r === 'vice president' || r === 'vice_president';
+      }),
+    [filteredUsers]
+  );
 
-  const onDutyCount = userss.filter(e => e.status === 'On Duty').length;
-  const availableCount = userss.filter(e => e.status === 'Available').length;
-  const verifiedCount = userss.filter(e => e.policeVerified).length;
+  const executive = useMemo(
+    () =>
+      filteredUsers.find((u) => {
+        const r = u.role.trim().toLowerCase();
+        return r === 'executive' || r === 'exicutive';
+      }),
+    [filteredUsers]
+  );
+
+  const secretary = useMemo(
+    () => filteredUsers.find((u) => u.role.trim().toLowerCase() === 'secretary'),
+    [filteredUsers]
+  );
+
+  const treasurer = useMemo(
+    () => filteredUsers.find((u) => u.role.trim().toLowerCase() === 'treasurer'),
+    [filteredUsers]
+  );
+
+  // Remaining users if any extra are added
+  const otherUsers = useMemo(() => {
+    const knownIds = new Set([
+      president?.id,
+      vicePresident?.id,
+      executive?.id,
+      secretary?.id,
+      treasurer?.id
+    ].filter(Boolean));
+    return filteredUsers.filter((u) => !knownIds.has(u.id));
+  }, [filteredUsers, president, vicePresident, executive, secretary, treasurer]);
+
+  const copyToClipboard = (text, id) => {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    if (showToast) showToast(`Copied: ${text}`, 'info');
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
-    if (!newStaff.name || !newStaff.designation || !newStaff.phone) {
-      alert('Please fill out Name, Designation, and Contact Phone.');
+    if (!newUser.name.trim() || !newUser.phone.trim() || !newUser.email.trim()) {
+      alert('Please fill out Name, Phone Number, and Email.');
       return;
     }
-    addusers(newStaff);
+
+    const defaultAvatars = {
+      President: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=240&auto=format&fit=crop&q=80',
+      'Vice President': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=240&auto=format&fit=crop&q=80',
+      Executive: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
+      Secretary: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=240&auto=format&fit=crop&q=80',
+      Treasurer: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=240&auto=format&fit=crop&q=80'
+    };
+
+    const finalImage = newUser.image.trim() || defaultAvatars[newUser.role] || defaultAvatars.Executive;
+
+    addCouncilUser({
+      ...newUser,
+      image: finalImage
+    });
+
     setIsAddModalOpen(false);
-    setNewStaff({
+    setNewUser({
       name: '',
-      designation: '',
-      department: 'Facility Operations',
-      complex: 'Golden Apartment',
-      tower: 'Tower A',
+      role: 'Executive',
       phone: '',
       email: '',
-      shift: 'General (09:00 AM - 06:00 PM)',
-      status: 'On Duty',
-      experience: '3 Years'
+      image: '',
+      tower: 'Golden Tower 1',
+      flat: 'GT1-101',
+      term: '2025 - 2027'
     });
   };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(59, 130, 246, 0.12)',
-              color: 'var(--electric-blue)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Briefcase size={22} />
-            </div>
-            <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>users & Staff Directory</h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                Maintenance contractors, security command, caretakers, and facility engineers for BEE PROPERTY
-              </p>
-            </div>
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    updateCouncilUser(editingUser.id, editingUser);
+    setEditingUser(null);
+  };
+
+  const getInitials = (name = '') => {
+    return name
+      .replace(/Col\.|Dr\.|Mr\.|Mrs\./g, '')
+      .trim()
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  };
+
+  // Render an individual card matching the user's reference image exactly
+  const renderExactCard = (user) => {
+    if (!user) return null;
+    const theme = getRoleTheme(user.role);
+
+    return (
+      <div key={user.id} className="exact-tree-card">
+        {/* Top Colored Accent Stripe */}
+        <div
+          className="exact-tree-top-stripe"
+          style={{ backgroundColor: theme.color }}
+        />
+
+        {/* Card Body: Round Avatar + Name & Contacts */}
+        <div className="exact-tree-body">
+          {/* Avatar */}
+          {user.image ? (
+            <img
+              src={user.image}
+              alt={user.name}
+              className="exact-tree-avatar"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                if (e.target.nextSibling) {
+                  e.target.nextSibling.style.display = 'flex';
+                }
+              }}
+            />
+          ) : null}
+          <div
+            className="exact-tree-avatar-fallback"
+            style={{
+              display: user.image ? 'none' : 'flex',
+              backgroundColor: theme.color
+            }}
+          >
+            {getInitials(user.name)}
+          </div>
+
+          {/* Details */}
+          <div className="exact-tree-info">
+            <div className="exact-tree-name">{user.name}</div>
+
+            {/* Phone */}
+            <a
+              href={`tel:${user.phone.replace(/\s+/g, '')}`}
+              className="exact-tree-contact"
+              title="Click to call"
+            >
+              <Phone size={13} style={{ color: '#94A3B8', flexShrink: 0 }} />
+              <span>{user.phone}</span>
+            </a>
+
+            {/* Email */}
+            <a
+              href={`mailto:${user.email}`}
+              className="exact-tree-contact"
+              title="Click to email"
+            >
+              <Mail size={13} style={{ color: '#94A3B8', flexShrink: 0 }} />
+              <span>{user.email}</span>
+            </a>
           </div>
         </div>
 
-        <button className="btn btn-primary btn-sm" onClick={() => setIsAddModalOpen(true)}>
-          <UserPlus size={16} /> Add Staff Member
+        {/* Bottom Role Pill Button */}
+        <div className="exact-tree-pill-container">
+          <div
+            className="exact-tree-role-pill"
+            style={{ backgroundColor: theme.color }}
+          >
+            {theme.roleTitle}
+          </div>
+        </div>
+
+        {/* Hover Action Bar */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            display: 'flex',
+            gap: '6px',
+            opacity: 0.85
+          }}
+        >
+          <button
+            onClick={() => setEditingUser(user)}
+            title="Edit member"
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '6px',
+              border: '1px solid var(--border-color)',
+              background: 'var(--bg-card-solid)',
+              color: 'var(--text-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+          >
+            <Edit3 size={12} />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Top Header & Toolbar (No Sub-headings, No Count Cards) */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
+        paddingBottom: '4px'
+      }}>
+        <div style={{ position: 'relative', flex: '1 1 260px', maxWidth: '360px' }}>
+          <Search
+            size={16}
+            style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--text-muted)'
+            }}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search hierarchy members..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              paddingLeft: '38px',
+              height: '38px',
+              fontSize: '0.875rem',
+              borderRadius: '10px',
+              backgroundColor: 'var(--bg-card-solid)',
+              borderColor: 'var(--border-color)'
+            }}
+          />
+        </div>
+
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={() => setIsAddModalOpen(true)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 18px',
+            borderRadius: '10px',
+            fontWeight: 700,
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
+          }}
+        >
+          <UserPlus size={16} /> Add Member
         </button>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid-cols-4">
-        <StatCard
-          title="TOTAL STAFF"
-          value={userss.length}
-          subtitle="Enclave operations team"
-          icon={Users}
-          color="blue"
-        />
-        <StatCard
-          title="ON DUTY"
-          value={onDutyCount}
-          subtitle="Active on campus now"
-          icon={Clock}
-          color="green"
-        />
-        <StatCard
-          title="STANDBY / AVAILABLE"
-          value={availableCount}
-          subtitle="Ready for dispatch"
-          icon={CheckCircle2}
-          color="cyan"
-        />
-        <StatCard
-          title="POLICE VERIFIED"
-          value={`${verifiedCount} / ${userss.length}`}
-          subtitle="100% Background checked"
-          icon={ShieldCheck}
-          color="indigo"
-        />
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="glass-card">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', flex: 1 }}>
-            {/* Search Input */}
-            <div style={{ position: 'relative', width: '280px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
-              <input
-                type="text"
-                placeholder="Search staff, role, ID, phone..."
-                className="form-control"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ paddingLeft: '36px' }}
-              />
-            </div>
-
-            {/* Department Dropdown */}
-            <select
-              className="form-control"
-              value={departmentFilter}
-              onChange={e => setDepartmentFilter(e.target.value)}
-              style={{ width: 'auto' }}
-            >
-              {departments.map(d => (
-                <option key={d} value={d}>{d === 'All' ? 'All Departments' : d}</option>
-              ))}
-            </select>
-
-            {/* Complex Dropdown */}
-            <select
-              className="form-control"
-              value={selectedApartment}
-              onChange={e => setSelectedApartment(e.target.value)}
-              style={{ width: 'auto' }}
-            >
-              <option value="All">All Complexes</option>
-              {apartments.map(a => (
-                <option key={a.id} value={a.name}>{a.name}</option>
-              ))}
-            </select>
-
-            {/* Status Dropdown */}
-            <select
-              className="form-control"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-              style={{ width: 'auto' }}
-            >
-              <option value="All">All Statuses</option>
-              <option value="On Duty">On Duty Only</option>
-              <option value="Available">Available Only</option>
-            </select>
+      {filteredUsers.length === 0 ? (
+        <div className="empty-state" style={{ padding: '48px 24px' }}>
+          <div className="empty-state-icon">
+            <User size={28} />
           </div>
-
-          <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-            Showing <strong>{filtereduserss.length}</strong> of <strong>{userss.length}</strong> personnel
-          </span>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '6px' }}>No users match your search</h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '16px' }}>
+            Try searching by another name, role, phone number, or email.
+          </p>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => setSearchTerm('')}
+          >
+            Reset Search
+          </button>
         </div>
-      </div>
+      ) : (
+        /* EXACT REFERENCE TREE STRUCTURE */
+        <div className="exact-tree-wrapper">
+          {/* LEVEL 1: PRESIDENT (Centered) */}
+          {president && (
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              {renderExactCard(president)}
+            </div>
+          )}
 
-      {/* Staff Cards Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
-        gap: '20px'
-      }}>
-        {filtereduserss.map(emp => (
+          {/* CONNECTOR 1: Vertical Arrow from President to Vice President */}
+          {president && vicePresident && (
+            <div className="exact-tree-connector-single">
+              <svg width="24" height="48" viewBox="0 0 24 48" style={{ display: 'block' }}>
+                <line x1="12" y1="0" x2="12" y2="40" stroke="#94A3B8" strokeWidth="2" />
+                <polygon points="7,40 17,40 12,47" fill="#94A3B8" />
+              </svg>
+            </div>
+          )}
+
+          {/* LEVEL 2: VICE PRESIDENT (Centered) */}
+          {vicePresident && (
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              {renderExactCard(vicePresident)}
+            </div>
+          )}
+
+          {/* CONNECTOR 2: Branching Arrow Lines from Vice President to Executive, Secretary, Treasurer */}
+          {vicePresident && (executive || secretary || treasurer) && (
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '1032px',
+                height: '54px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                margin: '0 auto'
+              }}
+            >
+              <svg
+                width="1032"
+                height="54"
+                viewBox="0 0 1032 54"
+                style={{ width: '100%', height: '54px', display: 'block' }}
+              >
+                {/* Vertical line dropping from Vice President bottom center (516, 0) */}
+                <line x1="516" y1="0" x2="516" y2="24" stroke="#94A3B8" strokeWidth="2" />
+
+                {/* Horizontal branch line spanning left (160) to right (872) */}
+                <line x1="160" y1="24" x2="872" y2="24" stroke="#94A3B8" strokeWidth="2" />
+
+                {/* Drop 1 to Left Card (Executive) at 160 */}
+                <line x1="160" y1="24" x2="160" y2="46" stroke="#94A3B8" strokeWidth="2" />
+                <polygon points="155,46 165,46 160,53" fill="#94A3B8" />
+
+                {/* Drop 2 to Center Card (Secretary) at 516 */}
+                <line x1="516" y1="24" x2="516" y2="46" stroke="#94A3B8" strokeWidth="2" />
+                <polygon points="511,46 521,46 516,53" fill="#94A3B8" />
+
+                {/* Drop 3 to Right Card (Treasurer) at 872 */}
+                <line x1="872" y1="24" x2="872" y2="46" stroke="#94A3B8" strokeWidth="2" />
+                <polygon points="867,46 877,46 872,53" fill="#94A3B8" />
+              </svg>
+            </div>
+          )}
+
+          {/* LEVEL 3: 3 CARDS SIDE BY SIDE (Executive, Secretary, Treasurer) */}
           <div
-            key={emp.id}
-            className="glass-card"
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative',
-              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-              borderTop: emp.status === 'On Duty' ? '3px solid var(--success)' : '3px solid var(--cyan-blue)'
+              justifyContent: 'center',
+              alignItems: 'stretch',
+              gap: '36px',
+              width: '100%',
+              maxWidth: '1032px',
+              flexWrap: 'wrap'
             }}
           >
-            <div>
-              {/* Top Row: Avatar & Badges */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '14px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '12px',
-                    background: 'var(--grad-royal)',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 800,
-                    fontSize: '1rem',
-                    flexShrink: 0
-                  }}>
-                    {emp.avatar || emp.name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-                      {emp.name}
-                    </h3>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--electric-blue)', fontWeight: 600 }}>
-                      {emp.designation}
-                    </div>
-                  </div>
-                </div>
+            {executive && renderExactCard(executive)}
+            {secretary && renderExactCard(secretary)}
+            {treasurer && renderExactCard(treasurer)}
+          </div>
 
-                <StatusPill status={emp.status} />
-              </div>
-
-              {/* Department & Complex Tags */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
-                <span className="badge badge-indigo" style={{ fontSize: '0.6875rem' }}>
-                  <Wrench size={11} style={{ marginRight: '4px' }} />
-                  {emp.department}
-                </span>
-                <ApartmentBadge apartment={emp.complex} />
-              </div>
-
-              {/* Meta details list */}
-              <div style={{
-                backgroundColor: 'var(--bg-hover)',
-                borderRadius: '8px',
-                padding: '12px',
-                fontSize: '0.8125rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                marginBottom: '16px'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Building2 size={13} /> Station / Tower:
-                  </span>
-                  <span style={{ fontWeight: 600 }}>{emp.tower}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Clock size={13} /> Shift:
-                  </span>
-                  <span style={{ fontWeight: 600, fontSize: '0.75rem' }}>{emp.shift}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Award size={13} /> Experience:
-                  </span>
-                  <span style={{ fontWeight: 600 }}>{emp.experience}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <ShieldCheck size={13} color="var(--success)" /> Verification:
-                  </span>
-                  <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.75rem' }}>
-                    {emp.verificationCode}
-                  </span>
-                </div>
-              </div>
-
-              {/* Phone & Email */}
-              <div style={{ fontSize: '0.8125rem', display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
-                <a
-                  href={`tel:${emp.phone}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    color: 'var(--text-primary)',
-                    textDecoration: 'none',
-                    fontWeight: 600
-                  }}
-                >
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '6px',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--electric-blue)'
-                  }}>
-                    <Phone size={13} />
-                  </div>
-                  {emp.phone}
-                </a>
-                {emp.email && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
-                    <Mail size={13} style={{ marginLeft: '5px', color: 'var(--text-muted)' }} />
-                    {emp.email}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
-              <button
-                className="btn btn-secondary btn-sm"
-                style={{ flex: 1 }}
-                onClick={() => setSelectedStaff(emp)}
-              >
-                Full Profile
-              </button>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => {
-                  setActiveTab('complaints');
+          {/* ANY EXTRA USERS (if custom added) */}
+          {otherUsers.length > 0 && (
+            <div style={{ marginTop: '36px', width: '100%', maxWidth: '1032px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '24px',
+                  flexWrap: 'wrap'
                 }}
               >
-                Assign Work
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Staff Details Modal */}
-      <Modal
-        isOpen={!!selectedStaff}
-        onClose={() => setSelectedStaff(null)}
-        title={selectedStaff?.name || 'Staff Profile'}
-        subtitle={`${selectedStaff?.designation} • ${selectedStaff?.department}`}
-      >
-        {selectedStaff && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', backgroundColor: 'var(--bg-hover)', borderRadius: '10px' }}>
-              <div style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '14px',
-                background: 'var(--grad-royal)',
-                color: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: '1.25rem'
-              }}>
-                {selectedStaff.avatar}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>{selectedStaff.name}</h3>
-                  <StatusPill status={selectedStaff.status} />
-                </div>
-                <div style={{ fontSize: '0.8125rem', color: 'var(--electric-blue)', fontWeight: 600, marginTop: '2px' }}>
-                  {selectedStaff.designation} (ID: {selectedStaff.id})
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  Rating: ★ {selectedStaff.rating} / 5.0 • {selectedStaff.experience} Experience
-                </div>
+                {otherUsers.map((u) => renderExactCard(u))}
               </div>
             </div>
+          )}
+        </div>
+      )}
 
-            <div className="grid-cols-2" style={{ gap: '12px' }}>
-              <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>ASSIGNED FACILITY</div>
-                <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>{selectedStaff.complex}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Location: {selectedStaff.tower}</div>
-              </div>
-              <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>SHIFT TIMING</div>
-                <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>{selectedStaff.shift}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Rotational Roster</div>
-              </div>
-              <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>PRIMARY CONTACT</div>
-                <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem' }}>{selectedStaff.phone}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{selectedStaff.email || 'No email provided'}</div>
-              </div>
-              <div className="glass-card" style={{ padding: '12px' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>POLICE CLEARANCE</div>
-                <div style={{ fontWeight: 700, marginTop: '4px', fontSize: '0.875rem', color: 'var(--success)' }}>
-                  ✓ {selectedStaff.verificationCode}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Valid through 2027</div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-              <button className="btn btn-secondary" onClick={() => setSelectedStaff(null)}>
-                Close
-              </button>
-              <a href={`tel:${selectedStaff.phone}`} className="btn btn-primary" style={{ textDecoration: 'none' }}>
-                <Phone size={14} /> Call Now
-              </a>
-            </div>
-          </div>
-        )}
-      </Modal>
-
-      {/* Add Staff Modal */}
+      {/* Add Member Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Register New Staff Member"
-        subtitle="Add a new users, maintenance technician, or security personnel to the roster"
+        title="Add Council Member"
       >
         <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="form-group">
-            <label className="form-label">Full Name *</label>
+          <div>
+            <label className="form-label" style={{ fontWeight: 600 }}>Full Name *</label>
             <input
               type="text"
               className="form-control"
-              placeholder="e.g. Anand Kumar"
+              placeholder="e.g. Sneha Patel"
+              value={newUser.name}
+              onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
               required
-              value={newStaff.name}
-              onChange={e => setNewStaff({ ...newStaff, name: e.target.value })}
             />
           </div>
 
-          <div className="grid-cols-2" style={{ gap: '12px' }}>
-            <div className="form-group">
-              <label className="form-label">Designation *</label>
+          <div>
+            <label className="form-label" style={{ fontWeight: 600 }}>Hierarchy Role *</label>
+            <select
+              className="form-control"
+              value={newUser.role}
+              onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+            >
+              <option value="President">President</option>
+              <option value="Vice President">Vice President</option>
+              <option value="Executive">Executive</option>
+              <option value="Secretary">Secretary</option>
+              <option value="Treasurer">Treasurer</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label className="form-label" style={{ fontWeight: 600 }}>Phone Number *</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="e.g. Electrician / Gate Guard"
+                placeholder="+91 98765 00000"
+                value={newUser.phone}
+                onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
                 required
-                value={newStaff.designation}
-                onChange={e => setNewStaff({ ...newStaff, designation: e.target.value })}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Department *</label>
-              <select
-                className="form-control"
-                value={newStaff.department}
-                onChange={e => setNewStaff({ ...newStaff, department: e.target.value })}
-              >
-                {departments.filter(d => d !== 'All').map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid-cols-2" style={{ gap: '12px' }}>
-            <div className="form-group">
-              <label className="form-label">Assigned Complex *</label>
-              <select
-                className="form-control"
-                value={newStaff.complex}
-                onChange={e => setNewStaff({ ...newStaff, complex: e.target.value })}
-              >
-                <option value="Golden Apartment">Golden Apartment</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Station / Tower Area</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="e.g. Golden Tower 1 / Security Gate"
-                value={newStaff.tower}
-                onChange={e => setNewStaff({ ...newStaff, tower: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="grid-cols-2" style={{ gap: '12px' }}>
-            <div className="form-group">
-              <label className="form-label">Contact Phone *</label>
-              <input
-                type="tel"
-                className="form-control"
-                placeholder="+91 98450 00000"
-                required
-                value={newStaff.phone}
-                onChange={e => setNewStaff({ ...newStaff, phone: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Email (Optional)</label>
+            <div>
+              <label className="form-label" style={{ fontWeight: 600 }}>Email Address *</label>
               <input
                 type="email"
                 className="form-control"
-                placeholder="staff@beeproperty.org"
-                value={newStaff.email}
-                onChange={e => setNewStaff({ ...newStaff, email: e.target.value })}
+                placeholder="name@example.com"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                required
               />
             </div>
           </div>
 
-          <div className="grid-cols-2" style={{ gap: '12px' }}>
-            <div className="form-group">
-              <label className="form-label">Shift Timing</label>
-              <select
-                className="form-control"
-                value={newStaff.shift}
-                onChange={e => setNewStaff({ ...newStaff, shift: e.target.value })}
-              >
-                <option value="General (09:00 AM - 06:00 PM)">General (09:00 AM - 06:00 PM)</option>
-                <option value="Morning (06:30 AM - 03:30 PM)">Morning (06:30 AM - 03:30 PM)</option>
-                <option value="Day (08:00 AM - 05:00 PM)">Day (08:00 AM - 05:00 PM)</option>
-                <option value="Afternoon (01:00 PM - 10:00 PM)">Afternoon (01:00 PM - 10:00 PM)</option>
-                <option value="Night (10:00 PM - 07:00 AM)">Night (10:00 PM - 07:00 AM)</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Experience</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="e.g. 5 Years"
-                value={newStaff.experience}
-                onChange={e => setNewStaff({ ...newStaff, experience: e.target.value })}
-              />
-            </div>
+          <div>
+            <label className="form-label" style={{ fontWeight: 600 }}>Profile Image URL</label>
+            <input
+              type="url"
+              className="form-control"
+              placeholder="https://images.unsplash.com/... (Leave blank for default)"
+              value={newUser.image}
+              onChange={(e) => setNewUser({ ...newUser, image: e.target.value })}
+            />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
-            <button type="button" className="btn btn-secondary" onClick={() => setIsAddModalOpen(false)}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setIsAddModalOpen(false)}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
-              Register Staff Member
+            <button
+              type="submit"
+              className="btn btn-primary"
+            >
+              Save Member
             </button>
           </div>
         </form>
       </Modal>
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <Modal
+          isOpen={Boolean(editingUser)}
+          onClose={() => setEditingUser(null)}
+          title={`Edit Details: ${editingUser.name}`}
+        >
+          <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label className="form-label" style={{ fontWeight: 600 }}>Full Name</label>
+              <input
+                type="text"
+                className="form-control"
+                value={editingUser.name}
+                onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontWeight: 600 }}>Hierarchy Role</label>
+              <select
+                className="form-control"
+                value={editingUser.role}
+                onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+              >
+                <option value="President">President</option>
+                <option value="Vice President">Vice President</option>
+                <option value="Executive">Executive</option>
+                <option value="Secretary">Secretary</option>
+                <option value="Treasurer">Treasurer</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label className="form-label" style={{ fontWeight: 600 }}>Phone Number</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={editingUser.phone}
+                  onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="form-label" style={{ fontWeight: 600 }}>Email Address</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  value={editingUser.email}
+                  onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontWeight: 600 }}>Profile Image URL</label>
+              <input
+                type="url"
+                className="form-control"
+                value={editingUser.image || ''}
+                onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ color: 'var(--error)' }}
+                onClick={() => {
+                  if (window.confirm(`Remove ${editingUser.name} from the hierarchy?`)) {
+                    deleteCouncilUser(editingUser.id);
+                    setEditingUser(null);
+                  }
+                }}
+              >
+                <Trash2 size={14} style={{ marginRight: '6px' }} /> Remove Member
+              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setEditingUser(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 };
 
-export const usersDirectory = UsersDirectory;
 export const EmployeeDirectory = UsersDirectory;
 export default UsersDirectory;
