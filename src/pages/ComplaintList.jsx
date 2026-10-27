@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
-import { ComplaintDetailsModal } from './ComplaintDetailsModal';
+import { ComplaintDetailsModal, ComplaintTrackingModal, SAMPLE_ISSUE_PHOTOS } from './ComplaintDetailsModal';
 import { StatCard } from '../components/CommonUI';
 import { 
   AlertTriangle, 
@@ -22,8 +22,19 @@ import {
   Sparkles, 
   ShieldAlert,
   Building2,
-  CalendarCheck
+  CalendarCheck,
+  PartyPopper,
+  Crosshair
 } from 'lucide-react';
+
+export const getNormalizedComplaintStatus = (status) => {
+  const s = (status || '').toLowerCase().trim();
+  if (s === 'closed') return 'Closed';
+  if (s === 'resolved') return 'Resolved';
+  if (s === 'in progress' || s === 'reopened') return 'In Progress';
+  if (s === 'approved' || s === 'assigned' || s === 'acknowledged') return 'Approved';
+  return 'Pending Approval';
+};
 
 export const ComplaintList = () => {
   const { 
@@ -40,6 +51,7 @@ export const ComplaintList = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedScope, setSelectedScope] = useState('All');
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [trackingComplaint, setTrackingComplaint] = useState(null);
 
   const categories = [
     { id: 'All', label: 'All Issues', icon: Wrench },
@@ -48,7 +60,8 @@ export const ComplaintList = () => {
     { id: 'Electricity and Lighting', label: 'Power & DG Backup', icon: Zap },
     { id: 'Park and Garden', label: 'Parks & Grounds', icon: Trees },
     { id: 'Gym Equipment', label: 'Gym & Sports', icon: Dumbbell },
-    { id: 'Cleanliness', label: 'Cleaning & STP', icon: Sparkles }
+    { id: 'Cleanliness', label: 'Cleaning & STP', icon: Sparkles },
+    { id: 'Function Hall', label: 'Function Hall', icon: PartyPopper }
   ];
 
   const getComplaintScope = (cmp) => {
@@ -68,6 +81,10 @@ export const ComplaintList = () => {
       loc.includes('gymnasium') ||
       loc.includes('clubhouse') ||
       loc.includes('swimming pool') ||
+      loc.includes('hall') ||
+      loc.includes('haul') ||
+      loc.includes('banquet') ||
+      loc.includes('function') ||
       loc.includes('common')
     ) {
       return 'Common Area';
@@ -80,6 +97,47 @@ export const ComplaintList = () => {
     return 'Common Area';
   };
 
+  const getComplaintFloor = (cmp) => {
+    if (cmp.floor) return cmp.floor;
+    const loc = (cmp.location || '').toLowerCase();
+    const title = (cmp.title || '').toLowerCase();
+    const sub = (cmp.submittedBy || '').toLowerCase();
+
+    if (loc.includes('rooftop') || title.includes('rooftop')) return 'Rooftop';
+    if (loc.includes('basement') || loc.includes('p2') || loc.includes('p1')) {
+      if (loc.includes('p2')) return 'Basement (P2)';
+      if (loc.includes('p1')) return 'Basement (P1)';
+      return 'Basement';
+    }
+    if (loc.includes('gymnasium') || loc.includes('gym') || loc.includes('central park') || loc.includes('gate') || loc.includes('ground')) {
+      return 'Ground Floor';
+    }
+    if (loc.includes('sports annex')) return '1st Floor';
+
+    const multiFloorMatch = loc.match(/(?:floor\s*(\d+\s*-\s*\d+)|(\d+(?:st|nd|rd|th)?\s*(?:&|and)\s*\d+(?:st|nd|rd|th)?)\s*floor)/i);
+    if (multiFloorMatch) {
+      return multiFloorMatch[1] ? `Floor ${multiFloorMatch[1]}` : multiFloorMatch[2] + ' Floor';
+    }
+
+    const singleFloorMatch = loc.match(/(\d+)(?:st|nd|rd|th)?\s*floor/i);
+    if (singleFloorMatch) {
+      return `${singleFloorMatch[1]}th Floor`;
+    }
+
+    const flatMatch = sub.match(/gt\d+-(\d+)/i) || loc.match(/gt\d+-(\d+)/i);
+    if (flatMatch) {
+      const flatNum = parseInt(flatMatch[1], 10);
+      const floorNum = Math.floor(flatNum / 100);
+      if (floorNum === 0) return 'Ground Floor';
+      if (floorNum === 1) return '1st Floor';
+      if (floorNum === 2) return '2nd Floor';
+      if (floorNum === 3) return '3rd Floor';
+      return `${floorNum}th Floor`;
+    }
+
+    return 'Common Floor';
+  };
+
   const tower1Complaints = complaints.filter(c => getComplaintScope(c) === 'Golden Tower 1');
   const tower2Complaints = complaints.filter(c => getComplaintScope(c) === 'Golden Tower 2');
   const tower3Complaints = complaints.filter(c => getComplaintScope(c) === 'Golden Tower 3');
@@ -87,9 +145,20 @@ export const ComplaintList = () => {
 
   const filteredComplaints = complaints.filter(cmp => {
     const matchesApt = selectedApartment === 'All' || cmp.apartment === selectedApartment;
-    const matchesStatus = statusFilter === 'All' || cmp.status === statusFilter;
+    const normalizedStatus = getNormalizedComplaintStatus(cmp.status);
+    const matchesStatus = statusFilter === 'All' 
+      ? true 
+      : normalizedStatus === statusFilter;
     const matchesPriority = priorityFilter === 'All' || cmp.priority === priorityFilter;
-    const matchesCategory = activeCategory === 'All' || cmp.category === activeCategory;
+    const matchesCategory = activeCategory === 'All' || 
+      cmp.category === activeCategory ||
+      (activeCategory === 'Function Hall' && (
+        cmp.category === 'Function Hall' ||
+        cmp.category === 'Function Haul' ||
+        cmp.category === 'function haul' ||
+        (cmp.location && (cmp.location.toLowerCase().includes('hall') || cmp.location.toLowerCase().includes('haul') || cmp.location.toLowerCase().includes('banquet') || cmp.location.toLowerCase().includes('function'))) ||
+        (cmp.title && (cmp.title.toLowerCase().includes('hall') || cmp.title.toLowerCase().includes('haul') || cmp.title.toLowerCase().includes('banquet')))
+      ));
     const matchesScope = selectedScope === 'All' || getComplaintScope(cmp) === selectedScope;
     const matchesSearch = 
       cmp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -103,12 +172,13 @@ export const ComplaintList = () => {
 
   const getCategoryIcon = (cat) => {
     const c = (cat || '').toLowerCase();
-    if (c.includes('lift') || c.includes('elevator')) return <Layers size={16} color="#3B82F6" />;
-    if (c.includes('water') || c.includes('plumb')) return <Droplets size={16} color="#06B6D4" />;
-    if (c.includes('light') || c.includes('elect')) return <Zap size={16} color="#F59E0B" />;
-    if (c.includes('gym') || c.includes('sport')) return <Dumbbell size={16} color="#8B5CF6" />;
-    if (c.includes('park') || c.includes('garden')) return <Trees size={16} color="#10B981" />;
-    return <Wrench size={16} color="#64748B" />;
+    if (c.includes('lift') || c.includes('elevator')) return <Layers size={14} color="#3B82F6" />;
+    if (c.includes('water') || c.includes('plumb')) return <Droplets size={14} color="#06B6D4" />;
+    if (c.includes('light') || c.includes('elect')) return <Zap size={14} color="#F59E0B" />;
+    if (c.includes('gym') || c.includes('sport')) return <Dumbbell size={14} color="#8B5CF6" />;
+    if (c.includes('park') || c.includes('garden')) return <Trees size={14} color="#10B981" />;
+    if (c.includes('hall') || c.includes('haul') || c.includes('banquet') || c.includes('function')) return <PartyPopper size={14} color="#EC4899" />;
+    return <Wrench size={14} color="#64748B" />;
   };
 
   return (
@@ -199,40 +269,6 @@ export const ComplaintList = () => {
         />
       </div>
 
-      {/* Scope Filter Indicator (if a card is clicked) */}
-      {selectedScope !== 'All' && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: '#EFF6FF',
-          border: '1px solid #BFDBFE',
-          padding: '8px 16px',
-          borderRadius: '8px',
-          fontSize: '0.8125rem',
-          color: '#1D4ED8',
-          fontWeight: 600
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>Filtered by: <strong>{selectedScope}</strong> ({filteredComplaints.length} issue{filteredComplaints.length !== 1 ? 's' : ''})</span>
-          </div>
-          <button
-            onClick={() => setSelectedScope('All')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#1D4ED8',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.75rem'
-            }}
-          >
-            Show All Complaints
-          </button>
-        </div>
-      )}
-
       {/* Horizontal Asset Category Selector (Icon-driven, less text) */}
       <div style={{
         display: 'flex',
@@ -241,16 +277,32 @@ export const ComplaintList = () => {
         paddingBottom: '4px'
       }}>
         {categories.map(cat => {
-          const isSelected = activeCategory === cat.id;
+          const isSelected = cat.id === 'All' 
+            ? (activeCategory === 'All' && selectedScope === 'All')
+            : (activeCategory === cat.id);
           const Icon = cat.icon;
           const count = cat.id === 'All' 
             ? complaints.length 
-            : complaints.filter(c => c.category === cat.id).length;
+            : complaints.filter(c => 
+                c.category === cat.id || 
+                (cat.id === 'Function Hall' && (
+                  c.category === 'Function Hall' ||
+                  c.category === 'Function Haul' ||
+                  c.category === 'function haul' ||
+                  (c.location && (c.location.toLowerCase().includes('hall') || c.location.toLowerCase().includes('haul') || c.location.toLowerCase().includes('banquet') || c.location.toLowerCase().includes('function'))) ||
+                  (c.title && (c.title.toLowerCase().includes('hall') || c.title.toLowerCase().includes('haul') || c.title.toLowerCase().includes('banquet')))
+                ))
+              ).length;
 
           return (
             <button
               key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
+              onClick={() => {
+                setActiveCategory(cat.id);
+                if (cat.id === 'All') {
+                  setSelectedScope('All');
+                }
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -318,22 +370,11 @@ export const ComplaintList = () => {
             style={{ width: 'auto', height: '36px', fontSize: '0.8125rem' }}
           >
             <option value="All">All Statuses</option>
-            <option value="Submitted">Pending Dispatch</option>
+            <option value="Pending Approval">Pending Approval</option>
+            <option value="Approved">Approved</option>
             <option value="In Progress">In Progress</option>
             <option value="Resolved">Resolved</option>
-          </select>
-
-          {/* Apartment Dropdown */}
-          <select 
-            className="form-control"
-            value={selectedApartment}
-            onChange={e => setSelectedApartment(e.target.value)}
-            style={{ width: 'auto', height: '36px', fontSize: '0.8125rem' }}
-          >
-            <option value="All">All Apartments</option>
-            {apartments.map(a => (
-              <option key={a.id} value={a.name}>{a.name}</option>
-            ))}
+            <option value="Closed">Closed</option>
           </select>
         </div>
 
@@ -345,165 +386,259 @@ export const ComplaintList = () => {
       {/* Classified Table matching parallel app */}
       <div style={{
         backgroundColor: '#FFFFFF',
-        borderRadius: '12px',
+        borderRadius: '10px',
         border: '1px solid #E2E8F0',
         overflow: 'hidden',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)'
       }}>
         <div className="table-responsive">
           <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
-                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TICKET ID</th>
-                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ISSUE & ASSET</th>
-                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LOCATION</th>
-                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ASSIGNED TECHNICIAN</th>
-                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>STATUS</th>
-                <th style={{ padding: '12px 14px', fontSize: '0.6875rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>ACTION</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', width: '50px', textAlign: 'center' }}>S.NO</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CATEGORY</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>FLOOR</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LOCATION</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ASSIGNED TECHNICIAN</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>STATUS</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>IMAGE</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>ACTION</th>
               </tr>
             </thead>
             <tbody>
-              {filteredComplaints.map(cmp => {
-                const isPending = cmp.status === 'Pending' || cmp.status === 'Submitted';
-                const isInProgress = cmp.status === 'In Progress' || cmp.status === 'Assigned';
+              {filteredComplaints.length === 0 ? (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center', padding: '24px', color: '#64748B', fontSize: '0.8rem' }}>
+                    No complaints match your criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredComplaints.map((cmp, index) => {
+                  const isAwaitingApproval = cmp.status === 'Pending Approval' || cmp.requiresApproval;
+                  const isPending = cmp.status === 'Pending' || cmp.status === 'Submitted';
+                  const isInProgress = cmp.status === 'In Progress' || cmp.status === 'Assigned';
 
-                return (
-                  <tr key={cmp.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                    {/* TICKET ID */}
-                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
-                      <span style={{
-                        backgroundColor: '#EFF6FF',
-                        border: '1px solid #BFDBFE',
-                        color: '#2563EB',
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        fontWeight: 700,
-                        fontSize: '0.75rem'
-                      }}>
-                        {cmp.id}
-                      </span>
-                    </td>
-
-                    {/* ISSUE & ASSET */}
-                    <td style={{ padding: '14px', minWidth: '240px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
-                          backgroundColor: '#F1F5F9',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          {getCategoryIcon(cmp.category)}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.84rem', color: '#0F172A' }}>
-                            {cmp.title}
-                          </div>
-                          <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
-                            {cmp.category} • Priority: <strong style={{ color: cmp.priority === 'Urgent' ? '#EF4444' : '#F59E0B' }}>{cmp.priority}</strong>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* LOCATION */}
-                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
-                      <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#334155' }}>
-                        {cmp.apartment.split(' ')[0]}
-                      </div>
-                      <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
-                        {cmp.location}
-                      </div>
-                    </td>
-
-                    {/* ASSIGNED TECHNICIAN */}
-                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
-                      {cmp.assignedTo && cmp.assignedTo !== 'Unassigned' ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', fontWeight: 600, color: '#0F172A' }}>
-                          <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
-                          <span>{cmp.assignedTo.split('(')[0].trim()}</span>
-                        </div>
-                      ) : (
-                        <span style={{ fontSize: '0.75rem', color: '#EA580C', fontWeight: 600, backgroundColor: '#FFF7ED', padding: '2px 6px', borderRadius: '4px' }}>
-                          Needs Dispatch
-                        </span>
-                      )}
-                    </td>
-
-                    {/* STATUS PILL */}
-                    <td style={{ padding: '14px', whiteSpace: 'nowrap' }}>
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '4px 10px',
-                        borderRadius: '9999px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        backgroundColor: isPending 
-                          ? '#FFF7ED' 
-                          : isInProgress 
-                            ? '#EFF6FF' 
-                            : '#F0FDF4',
-                        color: isPending 
-                          ? '#EA580C' 
-                          : isInProgress 
-                            ? '#2563EB' 
-                            : '#16A34A',
-                        border: isPending 
-                          ? '1px solid #FED7AA' 
-                          : isInProgress 
-                            ? '1px solid #BFDBFE' 
-                            : '1px solid #BBF7D0'
-                      }}>
+                  return (
+                    <tr key={cmp.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                      {/* S.NO */}
+                      <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <span style={{
-                          width: '6px',
-                          height: '6px',
-                          borderRadius: '50%',
-                          backgroundColor: isPending ? '#EA580C' : isInProgress ? '#2563EB' : '#16A34A'
-                        }} />
-                        {cmp.status}
-                      </span>
-                    </td>
-
-                    {/* ACTION */}
-                    <td style={{ padding: '14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <button
-                        onClick={() => setSelectedComplaint(cmp)}
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid #CBD5E1',
-                          color: '#2563EB',
-                          padding: '5px 12px',
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
+                          backgroundColor: '#F1F5F9',
+                          color: '#475569',
+                          padding: '2px 7px',
+                          borderRadius: '5px',
                           fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.backgroundColor = '#EFF6FF';
-                          e.currentTarget.style.borderColor = '#2563EB';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.borderColor = '#CBD5E1';
-                        }}
-                      >
-                        <span>Dispatch / Manage</span>
-                        <ChevronRight size={13} />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                          fontSize: '0.72rem'
+                        }}>
+                          {index + 1}
+                        </span>
+                      </td>
+
+                      {/* CATEGORY */}
+                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} title={cmp.title}>
+                          <div style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '6px',
+                            backgroundColor: '#F1F5F9',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            {getCategoryIcon(cmp.category)}
+                          </div>
+                          <span style={{ fontWeight: 650, fontSize: '0.8125rem', color: '#0F172A' }}>
+                            {cmp.category}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* FLOOR */}
+                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                        <span style={{
+                          backgroundColor: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          color: '#334155',
+                          padding: '2px 7px',
+                          borderRadius: '5px',
+                          fontWeight: 600,
+                          fontSize: '0.72rem',
+                          display: 'inline-block'
+                        }}>
+                          {getComplaintFloor(cmp)}
+                        </span>
+                      </td>
+
+                      {/* LOCATION */}
+                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '0.76rem', fontWeight: 600, color: '#334155' }}>
+                          {cmp.apartment.split(' ')[0]}
+                        </div>
+                        <div style={{ fontSize: '0.675rem', color: '#64748B', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {cmp.location}
+                        </div>
+                      </td>
+
+                      {/* ASSIGNED TECHNICIAN */}
+                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                        {cmp.assignedTo && cmp.assignedTo !== 'Unassigned' ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', fontWeight: 600, color: '#0F172A' }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
+                            <span>{cmp.assignedTo.split('(')[0].trim()}</span>
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: '0.7rem', color: '#EA580C', fontWeight: 600, backgroundColor: '#FFF7ED', padding: '1px 6px', borderRadius: '4px' }}>
+                            Needs Dispatch
+                          </span>
+                        )}
+                      </td>
+
+                      {/* STATUS PILL */}
+                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                        {(() => {
+                          const displayStatus = getNormalizedComplaintStatus(cmp.status);
+                          const stylesByStatus = {
+                            'Pending Approval': {
+                              bg: '#FEF3C7',
+                              color: '#92400E',
+                              border: '#FCD34D',
+                              dot: '#D97706'
+                            },
+                            'Approved': {
+                              bg: '#ECFDF5',
+                              color: '#065F46',
+                              border: '#A7F3D0',
+                              dot: '#059669'
+                            },
+                            'In Progress': {
+                              bg: '#EFF6FF',
+                              color: '#1D4ED8',
+                              border: '#BFDBFE',
+                              dot: '#2563EB'
+                            },
+                            'Resolved': {
+                              bg: '#F0FDF4',
+                              color: '#15803D',
+                              border: '#BBF7D0',
+                              dot: '#16A34A'
+                            },
+                            'Closed': {
+                              bg: '#F1F5F9',
+                              color: '#475569',
+                              border: '#CBD5E1',
+                              dot: '#64748B'
+                            }
+                          };
+                          const st = stylesByStatus[displayStatus] || stylesByStatus['Pending Approval'];
+
+                          return (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '3px 9px',
+                                borderRadius: '9999px',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                backgroundColor: st.bg,
+                                color: st.color,
+                                border: `1px solid ${st.border}`
+                              }}>
+                                <span style={{
+                                  width: '6px',
+                                  height: '6px',
+                                  borderRadius: '50%',
+                                  backgroundColor: st.dot
+                                }} />
+                                {displayStatus}
+                              </span>
+                            </div>
+                          );
+                        })()}
+                      </td>
+
+                      {/* IMAGE */}
+                      <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <div
+                          onClick={() => setSelectedComplaint(cmp)}
+                          style={{
+                            width: '42px',
+                            height: '32px',
+                            borderRadius: '6px',
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                            display: 'inline-block',
+                            border: '1.5px solid #CBD5E1',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                            transition: 'all 0.15s ease',
+                            backgroundColor: '#0F172A',
+                            verticalAlign: 'middle'
+                          }}
+                          title="Click to view full work order popup"
+                          onMouseEnter={e => {
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                            e.currentTarget.style.borderColor = '#2563EB';
+                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(37, 99, 235, 0.25)';
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.transform = 'scale(1.0)';
+                            e.currentTarget.style.borderColor = '#CBD5E1';
+                            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+                          }}
+                        >
+                          <img
+                            src={cmp.photoUrl || (SAMPLE_ISSUE_PHOTOS && SAMPLE_ISSUE_PHOTOS[cmp.category]) || 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=400&q=80'}
+                            alt={cmp.title}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              display: 'block'
+                            }}
+                          />
+                        </div>
+                      </td>
+
+                      {/* ACTION */}
+                      <td style={{ padding: '8px 10px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                          <button
+                            onClick={() => setSelectedComplaint(cmp)}
+                            style={{
+                              backgroundColor: isAwaitingApproval ? '#FFFBEB' : 'transparent',
+                              border: isAwaitingApproval ? '1px solid #F59E0B' : '1px solid #CBD5E1',
+                              color: isAwaitingApproval ? '#B45309' : '#2563EB',
+                              padding: '4px 9px',
+                              borderRadius: '5px',
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '3px',
+                              transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.backgroundColor = '#EFF6FF';
+                              e.currentTarget.style.borderColor = '#2563EB';
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.backgroundColor = isAwaitingApproval ? '#FFFBEB' : 'transparent';
+                              e.currentTarget.style.borderColor = isAwaitingApproval ? '#F59E0B' : '#CBD5E1';
+                            }}
+                          >
+                            <span>{isAwaitingApproval ? 'Review & Approve' : 'Manage'}</span>
+                            <ChevronRight size={12} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -512,9 +647,18 @@ export const ComplaintList = () => {
       {/* Details & Dispatch Modal */}
       {selectedComplaint && (
         <ComplaintDetailsModal
-          complaint={selectedComplaint}
+          complaint={complaints.find(c => c.id === selectedComplaint.id) || selectedComplaint}
           isOpen={!!selectedComplaint}
           onClose={() => setSelectedComplaint(null)}
+        />
+      )}
+
+      {/* Complaint Tracking Modal */}
+      {trackingComplaint && (
+        <ComplaintTrackingModal
+          complaint={complaints.find(c => c.id === trackingComplaint.id) || trackingComplaint}
+          isOpen={!!trackingComplaint}
+          onClose={() => setTrackingComplaint(null)}
         />
       )}
     </div>
