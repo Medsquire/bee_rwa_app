@@ -258,7 +258,13 @@ export const ResidentDirectory = () => {
   // Filtered residents for list view
   const filteredResidents = useMemo(() => {
     return enrichedResidents.filter(r => {
-      const matchesComplex = selectedComplex === 'All' || r.apartment === selectedComplex;
+      const matchesComplex = selectedComplex === 'All' || 
+        r.apartment === selectedComplex ||
+        (selectedComplex === 'Golden Apartment' && (
+          r.apartment === 'Golden Apartment' ||
+          r.apartment?.toLowerCase().includes('tower') ||
+          r.apartment?.toLowerCase().includes('golden')
+        ));
       const matchesType = typeFilter === 'All' || r.type === typeFilter;
       const matchesTower = selectedTower === 'All' || r.tower === selectedTower;
       const matchesFloor = selectedFloor === 'All' || r.floor === Number(selectedFloor);

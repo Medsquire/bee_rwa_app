@@ -14,10 +14,16 @@ import {
 export const SubmitComplaint = () => {
   const { apartments, currentUser, submitComplaint, setActiveTab } = useRwa();
 
+  const getInitialApartment = () => {
+    if (currentUser?.tower?.includes('2')) return 'Tower-2';
+    if (currentUser?.tower?.includes('3')) return 'Tower-3';
+    return 'Tower-1';
+  };
+
   const [formData, setFormData] = useState({
     title: '',
     category: 'Lift / Elevator',
-    apartment: currentUser?.apartment || 'Golden Apartment',
+    apartment: getInitialApartment(),
     location: '',
     priority: 'Medium',
     description: '',
@@ -62,6 +68,9 @@ export const SubmitComplaint = () => {
 
     const newId = submitComplaint({
       ...formData,
+      tower: formData.apartment.includes('1') ? 'Golden Tower 1' :
+             formData.apartment.includes('2') ? 'Golden Tower 2' :
+             formData.apartment.includes('3') ? 'Golden Tower 3' : 'Common Area',
       hasAttachment: !!formData.attachmentFile || formData.hasAttachment
     });
 
@@ -106,7 +115,7 @@ export const SubmitComplaint = () => {
               setFormData({
                 title: '',
                 category: 'Lift / Elevator',
-                apartment: currentUser?.apartment || 'Golden Apartment',
+                apartment: getInitialApartment(),
                 location: '',
                 priority: 'Medium',
                 description: '',
@@ -185,11 +194,10 @@ export const SubmitComplaint = () => {
                 value={formData.apartment}
                 onChange={e => setFormData({ ...formData, apartment: e.target.value })}
               >
-                {apartments.map(apt => (
-                  <option key={apt.id} value={apt.name}>
-                    {apt.name} ({apt.towerCode})
-                  </option>
-                ))}
+                <option value="Tower-1">Tower-1</option>
+                <option value="Tower-2">Tower-2</option>
+                <option value="Tower-3">Tower-3</option>
+                <option value="Golden Apartment (All Towers)">Golden Apartment (All Towers)</option>
               </select>
             </div>
 

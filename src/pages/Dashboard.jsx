@@ -42,7 +42,13 @@ export const Dashboard = () => {
 
   // Filter complaints by selected apartment
   const filteredComplaints = complaints.filter(cmp => {
-    const matchesApt = selectedApartment === 'All' || cmp.apartment === selectedApartment;
+    const matchesApt = selectedApartment === 'All' || 
+      cmp.apartment === selectedApartment ||
+      (selectedApartment === 'Golden Apartment' && (
+        cmp.apartment === 'Golden Apartment' ||
+        cmp.apartment?.toLowerCase().includes('tower') ||
+        cmp.apartment?.toLowerCase().includes('golden')
+      ));
     const matchesSearch =
       cmp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cmp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -206,6 +206,11 @@ export const RwaProvider = ({ children }) => {
       id: `res-${Date.now()}`,
       name: target.applicantName,
       apartment: target.apartment,
+      tower: target.tower || (
+        target.apartment?.includes('1') ? 'Golden Tower 1' :
+        target.apartment?.includes('2') ? 'Golden Tower 2' :
+        target.apartment?.includes('3') ? 'Golden Tower 3' : 'Golden Tower 1'
+      ),
       flat: target.flatNumber,
       type: target.residentType,
       phone: target.phone,
@@ -322,12 +327,19 @@ export const RwaProvider = ({ children }) => {
       dispatchedToAgentApp = true;
     }
 
+    const resolvedTower = data.tower || (
+      data.apartment?.toLowerCase().includes('1') ? 'Golden Tower 1' :
+      data.apartment?.toLowerCase().includes('2') ? 'Golden Tower 2' :
+      data.apartment?.toLowerCase().includes('3') ? 'Golden Tower 3' : ''
+    );
+
     const newComplaint = {
       id: newId,
       title: data.title,
       category: data.category,
       issueType: data.issueType || data.category,
       apartment: data.apartment || currentUser.apartment,
+      tower: resolvedTower,
       location: data.location,
       placeName: data.placeName || '',
       floor: data.floor || '',

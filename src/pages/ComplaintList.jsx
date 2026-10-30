@@ -67,6 +67,7 @@ export const ComplaintList = () => {
   const getComplaintScope = (cmp) => {
     const loc = (cmp.location || '').toLowerCase();
     const sub = (cmp.submittedBy || '').toLowerCase();
+    const apt = (cmp.apartment || '').toLowerCase();
 
     if (cmp.tower) {
       if (cmp.tower.includes('1')) return 'Golden Tower 1';
@@ -74,6 +75,10 @@ export const ComplaintList = () => {
       if (cmp.tower.includes('3')) return 'Golden Tower 3';
       return 'Common Area';
     }
+
+    if (apt.includes('tower-1') || apt.includes('tower 1') || apt.includes('gt-1') || apt.includes('gt1')) return 'Golden Tower 1';
+    if (apt.includes('tower-2') || apt.includes('tower 2') || apt.includes('gt-2') || apt.includes('gt2')) return 'Golden Tower 2';
+    if (apt.includes('tower-3') || apt.includes('tower 3') || apt.includes('gt-3') || apt.includes('gt3')) return 'Golden Tower 3';
 
     if (
       loc.includes('main entry gate') ||
@@ -144,7 +149,13 @@ export const ComplaintList = () => {
   const commonAreaComplaints = complaints.filter(c => getComplaintScope(c) === 'Common Area');
 
   const filteredComplaints = complaints.filter(cmp => {
-    const matchesApt = selectedApartment === 'All' || cmp.apartment === selectedApartment;
+    const matchesApt = selectedApartment === 'All' || 
+      cmp.apartment === selectedApartment ||
+      (selectedApartment === 'Golden Apartment' && (
+        cmp.apartment === 'Golden Apartment' ||
+        cmp.apartment?.toLowerCase().includes('tower') ||
+        cmp.apartment?.toLowerCase().includes('golden')
+      ));
     const normalizedStatus = getNormalizedComplaintStatus(cmp.status);
     const matchesStatus = statusFilter === 'All' 
       ? true 

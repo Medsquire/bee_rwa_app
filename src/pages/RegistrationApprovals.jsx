@@ -34,7 +34,13 @@ export const RegistrationApprovals = () => {
 
   // Filter requests
   const filteredRequests = registrationRequests.filter(req => {
-    const matchesApt = selectedApartment === 'All' || req.apartment === selectedApartment;
+    const matchesApt = selectedApartment === 'All' || 
+      req.apartment === selectedApartment ||
+      (selectedApartment === 'Golden Apartment' && (
+        req.apartment === 'Golden Apartment' ||
+        req.apartment?.toLowerCase().includes('tower') ||
+        req.apartment?.toLowerCase().includes('golden')
+      ));
     const matchesFilter = activeFilter === 'All' || req.status === activeFilter;
     const matchesSearch = 
       req.applicantName.toLowerCase().includes(searchTerm.toLowerCase()) ||

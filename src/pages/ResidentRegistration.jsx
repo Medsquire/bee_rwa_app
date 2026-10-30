@@ -21,7 +21,7 @@ export const ResidentRegistration = () => {
     email: '',
     phone: '',
     residentType: 'Flat Owner',
-    apartment: 'Golden Apartment',
+    apartment: 'Tower-1',
     flatNumber: '',
     ownerName: '',
     docType: 'Sale Deed / Title Deed',
@@ -106,7 +106,7 @@ export const ResidentRegistration = () => {
                 email: '',
                 phone: '',
                 residentType: 'Flat Owner',
-                apartment: 'Golden Apartment',
+                apartment: 'Tower-1',
                 flatNumber: '',
                 ownerName: '',
                 docType: 'Sale Deed / Title Deed',
@@ -200,11 +200,10 @@ export const ResidentRegistration = () => {
                 value={formData.apartment}
                 onChange={e => setFormData({ ...formData, apartment: e.target.value })}
               >
-                {apartments.map(apt => (
-                  <option key={apt.id} value={apt.name}>
-                    {apt.name} ({apt.towerCode})
-                  </option>
-                ))}
+                <option value="Tower-1">Tower-1</option>
+                <option value="Tower-2">Tower-2</option>
+                <option value="Tower-3">Tower-3</option>
+                <option value="Golden Apartment (All Towers)">Golden Apartment (All Towers)</option>
               </select>
             </div>
 

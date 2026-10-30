@@ -96,14 +96,15 @@ export const PriorityBadge = ({ priority }) => {
 export const ApartmentBadge = ({ apartment }) => {
   let color = 'var(--electric-blue)';
   let bg = 'rgba(59, 130, 246, 0.12)';
+  const apt = (apartment || '').toLowerCase();
   
-  if (apartment?.includes('Tower 2')) {
+  if (apt.includes('tower 2') || apt.includes('tower-2') || apt.includes('gt-2') || apt.includes('gt2')) {
     color = '#2563EB';
     bg = 'rgba(37, 99, 235, 0.12)';
-  } else if (apartment?.includes('Tower 3')) {
+  } else if (apt.includes('tower 3') || apt.includes('tower-3') || apt.includes('gt-3') || apt.includes('gt3')) {
     color = '#059669';
     bg = 'rgba(16, 185, 129, 0.12)';
-  } else if (apartment?.includes('Golden') || apartment?.includes('Tower 1')) {
+  } else if (apt.includes('golden') || apt.includes('tower 1') || apt.includes('tower-1') || apt.includes('gt-1') || apt.includes('gt1')) {
     color = '#D97706';
     bg = 'rgba(245, 158, 11, 0.12)';
   }
