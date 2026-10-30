@@ -76,7 +76,13 @@ export const RwaProvider = ({ children }) => {
     }
     return INITIAL_COUNCIL_USERS;
   });
-  const [agencies, setAgencies] = useState(() => loadStored('AGENCIES', INITIAL_AGENCIES));
+  const [agencies, setAgencies] = useState(() => {
+    const stored = loadStored('AGENCIES', null);
+    if (stored && Array.isArray(stored) && stored.length === 3 && stored.some(a => a.id === 'AGY-101' && a.category === 'Cleaning & Gardening')) {
+      return stored;
+    }
+    return INITIAL_AGENCIES;
+  });
 
   // Toast / Banner state
   const [toast, setToast] = useState(null);
@@ -759,6 +765,7 @@ export const RwaProvider = ({ children }) => {
     setNotifications(INITIAL_NOTIFICATIONS);
     setuserss(INITIAL_usersS);
     setCouncilUsers(INITIAL_COUNCIL_USERS);
+    setAgencies(INITIAL_AGENCIES);
 
     showToast('All demo data reset to default successfully!', 'success');
   };

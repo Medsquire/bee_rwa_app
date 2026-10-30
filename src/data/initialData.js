@@ -1113,183 +1113,104 @@ export const INITIAL_usersS = [
 export const INITIAL_AGENCIES = [
   {
     id: 'AGY-101',
-    name: 'Otis Elevator India Pvt Ltd',
-    shortName: 'Otis Elevators AMC',
-    category: 'Lifts & Elevators',
-    serviceType: 'Comprehensive AMC (Annual Maintenance Contract)',
+    name: 'CleanPro & GreenCare Facility Services',
+    shortName: 'CleanPro & GreenCare',
+    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80',
+    category: 'Cleaning & Gardening',
+    serviceType: 'Common Area Housekeeping, Waste Management & Landscaping',
     status: 'Active',
-    sla: '24/7 Breakdown Standby • 30 Min Response',
-    contractId: 'AMC-OTIS-2026-BLR',
-    contractPeriod: '01 Jan 2026 – 31 Dec 2027',
-    monthlyPayout: 78000,
+    employeeCount: 18,
+    services: [
+      'Daily Corridor, Lobby & Staircase Mopping',
+      'Solid Waste Segregation & Garbage Chute Care',
+      'Landscape Lawn Mowing & Plant Pruning',
+      'Garden Watering & Organic Composting',
+      'Basement & Terrace Floor Power Washing'
+    ],
+    primaryRoles: ['Cleaning', 'Gardening', 'Waste Management'],
+    leadEngineer: 'Sunita Sharma & Munuswamy K.',
+    leadTitle: 'Housekeeping & Horticulture Lead',
+    phone: '+91 99112 44331',
+    emergencyHotline: '+91 80 4123 7708',
+    email: 'operations@cleanprogreencare.in',
+    rating: 4.9,
+    openTicketsCount: 1,
+    activeTicketIds: ['CMP-2026-087'],
     assignedComplexes: [
       {
         complex: 'Golden Apartment',
         towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
-        unitsAssigned: '6 Passenger Elevators (ARD Equipped)',
+        unitsAssigned: 'Daily Cleaning, Landscaping & Garbage Management',
         isPrimary: true
       }
-    ],
-    leadEngineer: 'Sanjay Kumar',
-    leadTitle: 'Senior Field Lead Engineer',
-    phone: '+91 98455 11001',
-    emergencyHotline: '1800-120-6847',
-    email: 'sanjay.otis.blr@otis.com',
-    rating: 4.9,
-    openTicketsCount: 1,
-    activeTicketIds: ['CMP-2026-081'],
-    lastInspectionDate: '2026-10-18',
-    nextScheduledService: '2026-11-02'
+    ]
   },
   {
     id: 'AGY-102',
-    name: 'AquaTech Water & STP Engineering',
-    shortName: 'AquaTech Sump & STP',
-    category: 'Water Supply & STP',
-    serviceType: 'Hydro-pneumatic & Reservoir Operations AMC',
+    name: 'AquaFlow Plumbing & Sanitation Tech',
+    shortName: 'AquaFlow Plumbing',
+    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=800&q=80',
+    category: 'Plumbing & Water Systems',
+    serviceType: 'Emergency Plumbing, Water Sump Maintenance & STP Operations',
     status: 'Active',
-    sla: '24/7 Water Standby • 45 Min Response',
-    contractId: 'AMC-AQUA-2025-08',
-    contractPeriod: '01 Apr 2025 – 31 Mar 2027',
-    monthlyPayout: 65000,
-    assignedComplexes: [
-      {
-        complex: 'Golden Apartment',
-        towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
-        unitsAssigned: '100,000L Underground Sump & Dual Booster Stations',
-        isPrimary: true
-      }
+    employeeCount: 14,
+    services: [
+      '24/7 Emergency Plumbing & Pipe Leak Fixes',
+      'Overhead & Underground Sump Pump Maintenance',
+      'STP Wastewater Treatment & Filtration Checks',
+      'Dual Booster Water Pressure Pump Operations',
+      'Drainage Line Desilting & Clog Clearing'
     ],
+    primaryRoles: ['Plumbing', 'Water Supply', 'STP Plant'],
     leadEngineer: 'Ramesh Babu',
-    leadTitle: 'Chief Plumbing & Pump Contractor',
+    leadTitle: 'Chief Plumbing & Hydraulics Engineer',
     phone: '+91 98451 44556',
     emergencyHotline: '+91 80 4123 7799',
-    email: 'operations@aquatechwaters.in',
+    email: 'service@aquaflowplumbing.in',
     rating: 4.8,
     openTicketsCount: 2,
     activeTicketIds: ['CMP-2026-082', 'CMP-2026-085'],
-    lastInspectionDate: '2026-10-15',
-    nextScheduledService: '2026-10-30'
+    assignedComplexes: [
+      {
+        complex: 'Golden Apartment',
+        towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
+        unitsAssigned: '100,000L Underground Sump, Booster Pumps & Plumbing Network',
+        isPrimary: true
+      }
+    ]
   },
   {
     id: 'AGY-103',
-    name: 'Schneider Electric & Cummins DG Solutions',
-    shortName: 'Schneider & Cummins DG',
-    category: 'Electricity & DG Backup',
-    serviceType: 'Power Infrastructure & Transformer AMC',
+    name: 'ShieldGuard Elite Security & Surveillance',
+    shortName: 'ShieldGuard Security',
+    image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80',
+    category: 'Security & Access Control',
+    serviceType: 'Manned Guarding, Gate Access Control & 24/7 Surveillance',
     status: 'Active',
-    sla: '1-Hour Breakdown Resolution • Bi-weekly DG Run Checks',
-    contractId: 'AMC-DG-2026-02',
-    contractPeriod: '01 Feb 2026 – 31 Jan 2028',
-    monthlyPayout: 52000,
-    assignedComplexes: [
-      {
-        complex: 'Golden Apartment',
-        towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
-        unitsAssigned: '250 kVA Cummins DG Genset & Auto Changeover',
-        isPrimary: true
-      }
+    employeeCount: 20,
+    services: [
+      '24/7 Guarded Gate Entry & Visitor Access Control',
+      'RFID Boom Barrier Vehicle Verification',
+      'Night Foot Patrol across All Towers & Perimeter',
+      'CCTV Control Room 24/7 Video Surveillance',
+      'Emergency First Responder & Fire Safety'
     ],
-    leadEngineer: 'Rajesh Verma',
-    leadTitle: 'Senior Electrical Engineer',
-    phone: '+91 98453 77889',
-    emergencyHotline: '1800-419-0111',
-    email: 'rajesh.verma@schneider-dg.com',
-    rating: 4.9,
-    openTicketsCount: 1,
-    activeTicketIds: ['CMP-2026-083'],
-    lastInspectionDate: '2026-10-12',
-    nextScheduledService: '2026-10-27'
-  },
-  {
-    id: 'AGY-104',
-    name: 'CleanPro Integrated Facility & Hygiene Ltd',
-    shortName: 'CleanPro Housekeeping',
-    category: 'Cleanliness & Waste',
-    serviceType: 'Common Area Housekeeping & Solid Waste Management',
-    status: 'Active',
-    sla: 'Daily 2-Shift Floor Mopping • 7 AM Waste Collection',
-    contractId: 'SVC-CLN-2026-99',
-    contractPeriod: '01 Jan 2026 – 31 Dec 2026',
-    monthlyPayout: 110000,
-    assignedComplexes: [
-      {
-        complex: 'Golden Apartment',
-        towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
-        unitsAssigned: 'Floors 1-12 Common Corridors, Garbage Chutes, Lobbies',
-        isPrimary: true
-      }
-    ],
-    leadEngineer: 'Sunita Devi',
-    leadTitle: 'Housekeeping Operations Manager',
-    phone: '+91 98458 33221',
-    emergencyHotline: '+91 80 4123 7708',
-    email: 'sunita.devi@cleanprofacility.org',
-    rating: 4.7,
-    openTicketsCount: 1,
-    activeTicketIds: ['CMP-2026-087'],
-    lastInspectionDate: '2026-10-21',
-    nextScheduledService: 'Daily Morning & Evening'
-  },
-  {
-    id: 'AGY-105',
-    name: 'SecuraGate Elite Security & Surveillance Force',
-    shortName: 'SecuraGate Security',
-    category: 'Security & Access',
-    serviceType: 'Manned Security & Access Control AMC',
-    status: 'Active',
-    sla: '24/7 Gate Guarding • RFID Scanner Rapid Repair < 2h',
-    contractId: 'SEC-RWA-2025-14',
-    contractPeriod: '01 Nov 2025 – 31 Oct 2027',
-    monthlyPayout: 145000,
-    assignedComplexes: [
-      {
-        complex: 'Golden Apartment',
-        towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
-        unitsAssigned: 'Main Entry Gate 1 & 2, Boom Barriers, 32 CCTV Cameras',
-        isPrimary: true
-      }
-    ],
-    leadEngineer: 'Vikram Singh',
-    leadTitle: 'Chief Security Officer',
-    phone: '+91 98459 66778',
+    primaryRoles: ['Security', 'Surveillance', 'Gate Access'],
+    leadEngineer: 'Inspector Bhaskar Rao (Retd.)',
+    leadTitle: 'Chief Security Liaison Officer',
+    phone: '+91 98800 11990',
     emergencyHotline: '+91 80 4123 7700',
-    email: 'command@securagateindia.com',
+    email: 'command@shieldguardsecurity.in',
     rating: 5.0,
     openTicketsCount: 1,
     activeTicketIds: ['CMP-2026-088'],
-    lastInspectionDate: '2026-10-20',
-    nextScheduledService: '24/7 Continuous Oversight'
-  },
-  {
-    id: 'AGY-106',
-    name: 'LifeFitness & Sports Care Technologies',
-    shortName: 'LifeFitness AMC',
-    category: 'Gym Equipment',
-    serviceType: 'Fitness Equipment Preventive Maintenance AMC',
-    status: 'Active',
-    sla: 'Bi-weekly Lubrication & 48h Motor Replacement',
-    contractId: 'AMC-FIT-2026-44',
-    contractPeriod: '01 Mar 2026 – 28 Feb 2027',
-    monthlyPayout: 35000,
     assignedComplexes: [
       {
         complex: 'Golden Apartment',
         towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
-        unitsAssigned: 'Central Fitness Gymnasium Annex (8 Treadmills, Weights)',
+        unitsAssigned: 'Gates 1 & 2, Boom Barriers, 32 CCTV Cameras & Night Guarding',
         isPrimary: true
       }
-    ],
-    leadEngineer: 'Mahendra Joshi',
-    leadTitle: 'Fitness Equipment Care Lead',
-    phone: '+91 98452 33445',
-    emergencyHotline: '+91 80 4123 7712',
-    email: 'care@lifefitnessindia.net',
-    rating: 4.6,
-    openTicketsCount: 1,
-    activeTicketIds: ['CMP-2026-084'],
-    lastInspectionDate: '2026-10-10',
-    nextScheduledService: '2026-10-25'
+    ]
   }
 ];
-
