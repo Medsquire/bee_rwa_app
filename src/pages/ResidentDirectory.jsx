@@ -93,6 +93,15 @@ export const ResidentDirectory = () => {
   const FLOORS_PER_PAGE = 3;
   const topTableRef = useRef(null);
 
+  // List Directory Pagination State
+  const [listPage, setListPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const listTableRef = useRef(null);
+
+  useEffect(() => {
+    setListPage(1);
+  }, [searchTerm, typeFilter, selectedApartment, selectedComplex]);
+
   const scrollToTop = () => {
     const mainWrapper = document.querySelector('.main-wrapper') || document.querySelector('main');
     if (mainWrapper) {
@@ -275,6 +284,22 @@ export const ResidentDirectory = () => {
       return matchesComplex && matchesType && matchesSearch && (viewMode === 'list' ? true : matchesTower && matchesFloor);
     });
   }, [enrichedResidents, selectedComplex, typeFilter, selectedTower, selectedFloor, searchTerm, viewMode]);
+
+  // List Directory Pagination Calculations
+  const totalListPages = Math.max(1, Math.ceil(filteredResidents.length / itemsPerPage));
+  const startListIndex = (listPage - 1) * itemsPerPage;
+  const endListIndex = Math.min(startListIndex + itemsPerPage, filteredResidents.length);
+  const paginatedResidents = useMemo(() => {
+    return filteredResidents.slice(startListIndex, endListIndex);
+  }, [filteredResidents, startListIndex, endListIndex]);
+
+  const handleListPageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalListPages) return;
+    setListPage(newPage);
+    if (listTableRef.current) {
+      listTableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // Generate floor structure for the selected tower
   const floorHierarchy = useMemo(() => {
@@ -1411,7 +1436,7 @@ export const ResidentDirectory = () => {
 
       {/* VIEW MODE 2: COMPLETE DIRECTORY TABLE LIST */}
       {viewMode === 'list' && (
-        <div className="glass-card">
+        <div className="glass-card" ref={listTableRef}>
           {/* Controls */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
@@ -1437,10 +1462,28 @@ export const ResidentDirectory = () => {
                   <option key={a.id} value={a.name}>{a.name}</option>
                 ))}
               </select>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                <span>Per Page:</span>
+                <select
+                  className="form-control"
+                  value={itemsPerPage}
+                  onChange={e => {
+                    setItemsPerPage(Number(e.target.value));
+                    setListPage(1);
+                  }}
+                  style={{ width: 'auto', padding: '4px 8px', height: '32px' }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
             </div>
 
             <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-              Showing <strong>{filteredResidents.length}</strong> of <strong>{residents.length}</strong> residents
+              Showing <strong>{filteredResidents.length > 0 ? startListIndex + 1 : 0} - {endListIndex}</strong> of <strong>{filteredResidents.length}</strong> residents
             </span>
           </div>
 
@@ -1461,72 +1504,166 @@ export const ResidentDirectory = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredResidents.map(res => (
-                  <tr key={res.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: res.type === 'Flat Owner' ? 'var(--indigo)' : 'var(--electric-blue)',
-                          color: '#FFFFFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: '0.75rem'
-                        }}>
-                          {res.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 700 }}>{res.name}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {res.id}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--electric-blue)' }}>{res.tower}</span>
-                        <ApartmentBadge apartment={res.apartment} />
-                      </div>
-                    </td>
-                    <td>
-                      <span className="badge badge-neutral" style={{ fontWeight: 700 }}>Floor {res.floor}</span>
-                    </td>
-                    <td style={{ fontWeight: 800, fontSize: '0.9375rem', color: 'var(--electric-blue)' }}>{res.flat}</td>
-                    <td>
-                      <span className={`badge ${res.type === 'Flat Owner' ? 'badge-indigo' : 'badge-neutral'}`}>
-                        {res.type}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: '0.8125rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Phone size={12} style={{ color: 'var(--text-muted)' }} /> {res.phone}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
-                        <Mail size={12} style={{ color: 'var(--text-muted)' }} /> {res.email}
-                      </div>
-                    </td>
-                    <td style={{ fontSize: '0.8125rem', fontWeight: 600 }}>{res.parking || 'Unassigned'}</td>
-                    <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Car size={13} /> {res.vehicles || 'None'}
-                      </div>
-                    </td>
-                    <td>
-                      <button 
-                        className="btn btn-secondary btn-xs"
-                        onClick={() => setSelectedResidentModal(res)}
-                      >
-                        Profile
-                      </button>
+                {paginatedResidents.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
+                      No residents match your filter criteria.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedResidents.map(res => (
+                    <tr key={res.id}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: res.type === 'Flat Owner' ? 'var(--indigo)' : 'var(--electric-blue)',
+                            color: '#FFFFFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: '0.75rem'
+                          }}>
+                            {res.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 700 }}>{res.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {res.id}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--electric-blue)' }}>{res.tower}</span>
+                          <ApartmentBadge apartment={res.apartment} />
+                        </div>
+                      </td>
+                      <td>
+                        <span className="badge badge-neutral" style={{ fontWeight: 700 }}>Floor {res.floor}</span>
+                      </td>
+                      <td style={{ fontWeight: 800, fontSize: '0.9375rem', color: 'var(--electric-blue)' }}>{res.flat}</td>
+                      <td>
+                        <span className={`badge ${res.type === 'Flat Owner' ? 'badge-indigo' : 'badge-neutral'}`}>
+                          {res.type}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '0.8125rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Phone size={12} style={{ color: 'var(--text-muted)' }} /> {res.phone}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                          <Mail size={12} style={{ color: 'var(--text-muted)' }} /> {res.email}
+                        </div>
+                      </td>
+                      <td style={{ fontSize: '0.8125rem', fontWeight: 600 }}>{res.parking || 'Unassigned'}</td>
+                      <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Car size={13} /> {res.vehicles || 'None'}
+                        </div>
+                      </td>
+                      <td>
+                        <button 
+                          className="btn btn-secondary btn-xs"
+                          onClick={() => setSelectedResidentModal(res)}
+                        >
+                          Profile
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
+
+          {/* List Pagination Bar */}
+          {filteredResidents.length > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              paddingTop: '16px',
+              marginTop: '12px',
+              borderTop: '1px solid var(--border-color)'
+            }}>
+              <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                Page <strong>{listPage}</strong> of <strong>{totalListPages}</strong> ({filteredResidents.length} total residents)
+              </span>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleListPageChange(1)}
+                  disabled={listPage === 1}
+                  style={{ padding: '6px 10px', opacity: listPage === 1 ? 0.4 : 1, cursor: listPage === 1 ? 'not-allowed' : 'pointer' }}
+                  title="First Page"
+                >
+                  <ChevronsLeft size={14} />
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleListPageChange(listPage - 1)}
+                  disabled={listPage === 1}
+                  style={{ padding: '6px 10px', opacity: listPage === 1 ? 0.4 : 1, cursor: listPage === 1 ? 'not-allowed' : 'pointer' }}
+                  title="Previous Page"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+
+                {/* Numbered Page Buttons */}
+                {(() => {
+                  const pages = [];
+                  const maxButtons = 5;
+                  let startPage = Math.max(1, listPage - 2);
+                  let endPage = Math.min(totalListPages, startPage + maxButtons - 1);
+                  if (endPage - startPage < maxButtons - 1) {
+                    startPage = Math.max(1, endPage - maxButtons + 1);
+                  }
+                  for (let p = startPage; p <= endPage; p++) {
+                    pages.push(p);
+                  }
+                  return pages.map(pageNum => (
+                    <button
+                      key={pageNum}
+                      onClick={() => handleListPageChange(pageNum)}
+                      className={`btn btn-sm ${listPage === pageNum ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{
+                        padding: '6px 12px',
+                        minWidth: '32px',
+                        fontWeight: listPage === pageNum ? 700 : 500
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  ));
+                })()}
+
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleListPageChange(listPage + 1)}
+                  disabled={listPage === totalListPages}
+                  style={{ padding: '6px 10px', opacity: listPage === totalListPages ? 0.4 : 1, cursor: listPage === totalListPages ? 'not-allowed' : 'pointer' }}
+                  title="Next Page"
+                >
+                  <ChevronRight size={14} />
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleListPageChange(totalListPages)}
+                  disabled={listPage === totalListPages}
+                  style={{ padding: '6px 10px', opacity: listPage === totalListPages ? 0.4 : 1, cursor: listPage === totalListPages ? 'not-allowed' : 'pointer' }}
+                  title="Last Page"
+                >
+                  <ChevronsRight size={14} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

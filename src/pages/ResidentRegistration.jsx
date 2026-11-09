@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRwa } from '../context/RwaContext';
 import { ApartmentBadge } from '../components/CommonUI';
+import { getFlatsForTower, UN_OCCUPIED_FLATS_SET, TOWERS_CONFIG } from '../data/initialData';
 import { 
   UserPlus, 
   CheckCircle2, 
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const ResidentRegistration = () => {
-  const { apartments, submitRegistration, setActiveTab } = useRwa();
+  const { apartments, residents, submitRegistration, setActiveTab } = useRwa();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -30,15 +31,80 @@ export const ResidentRegistration = () => {
     agreed: false
   });
 
+  const [selectedFloor, setSelectedFloor] = useState('All');
+  const [isCustomFlat, setIsCustomFlat] = useState(false);
   const [errors, setErrors] = useState({});
   const [submittedId, setSubmittedId] = useState(null);
+
+  // Available flats for the selected tower / apartment
+  const availableFlats = useMemo(() => {
+    return getFlatsForTower(formData.apartment);
+  }, [formData.apartment]);
+
+  // Max floors in the currently selected tower
+  const maxFloors = useMemo(() => {
+    if (availableFlats.length === 0) return 38;
+    return Math.max(...availableFlats.map(f => f.floor));
+  }, [availableFlats]);
+
+  // Filter flats by floor if selected
+  const filteredFlats = useMemo(() => {
+    if (selectedFloor === 'All') return availableFlats;
+    return availableFlats.filter(f => f.floor.toString() === selectedFloor);
+  }, [availableFlats, selectedFloor]);
+
+  // Fast resident map by flat number
+  const residentMap = useMemo(() => {
+    const map = new Map();
+    if (residents && Array.isArray(residents)) {
+      residents.forEach(r => {
+        if (r.flat) map.set(r.flat, r);
+      });
+    }
+    return map;
+  }, [residents]);
+
+  const handleApartmentChange = (e) => {
+    const newApt = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      apartment: newApt,
+      flatNumber: ''
+    }));
+    setSelectedFloor('All');
+    setIsCustomFlat(false);
+  };
+
+  const handleFlatSelect = (e) => {
+    const val = e.target.value;
+    if (val === '__custom__') {
+      setIsCustomFlat(true);
+      setFormData(prev => ({ ...prev, flatNumber: '' }));
+      return;
+    }
+    setIsCustomFlat(false);
+
+    // Look up resident if tenant registering
+    const existingResident = residentMap.get(val);
+    const ownerName = existingResident?.type === 'Flat Owner' ? existingResident.name : '';
+
+    setFormData(prev => ({
+      ...prev,
+      flatNumber: val,
+      ownerName: (prev.residentType === 'Tenant' && ownerName && !prev.ownerName) ? ownerName : prev.ownerName
+    }));
+
+    if (errors.flatNumber) {
+      setErrors(prev => ({ ...prev, flatNumber: null }));
+    }
+  };
 
   const validate = () => {
     const errs = {};
     if (!formData.fullName.trim()) errs.fullName = 'Full Name is required';
     if (!formData.email.trim() || !formData.email.includes('@')) errs.email = 'Valid Email is required';
     if (!formData.phone.trim() || formData.phone.length < 10) errs.phone = 'Valid 10-digit Phone Number is required';
-    if (!formData.flatNumber.trim()) errs.flatNumber = 'Flat / Unit Number is required (e.g. A-402, B-105)';
+    if (!formData.flatNumber.trim()) errs.flatNumber = 'Please select your Flat / Unit Number from the dropdown';
     if (formData.residentType === 'Tenant' && !formData.ownerName.trim()) {
       errs.ownerName = 'Landlord / Flat Owner name is required for tenant verification';
     }
@@ -114,6 +180,8 @@ export const ResidentRegistration = () => {
                 remarks: '',
                 agreed: false
               });
+              setSelectedFloor('All');
+              setIsCustomFlat(false);
             }}
           >
             Submit Another Request
@@ -130,9 +198,6 @@ export const ResidentRegistration = () => {
     <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Resident Access Registration</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          Self-registration portal for new Flat Owners and Tenants in Golden Apartment (Golden Tower 1, 2 & 3)
-        </p>
       </div>
 
       <div className="glass-card">
@@ -161,12 +226,20 @@ export const ResidentRegistration = () => {
                 />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Flat Owner (Purchaser)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Full ownership rights, voting in AGM, and amenity access</div>
                 </div>
               </div>
 
               <div 
-                onClick={() => setFormData({ ...formData, residentType: 'Tenant', docType: 'Rental Agreement (11 Months)' })}
+                onClick={() => {
+                  const existingResident = formData.flatNumber ? residentMap.get(formData.flatNumber) : null;
+                  const owner = existingResident?.type === 'Flat Owner' ? existingResident.name : '';
+                  setFormData({ 
+                    ...formData, 
+                    residentType: 'Tenant', 
+                    docType: 'Rental Agreement (11 Months)',
+                    ownerName: (!formData.ownerName && owner) ? owner : formData.ownerName
+                  });
+                }}
                 style={{
                   padding: '16px',
                   borderRadius: 'var(--radius-md)',
@@ -185,38 +258,137 @@ export const ResidentRegistration = () => {
                 />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Tenant (Leaseholder)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Residential tenancy with owner authorization & amenity privileges</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Step 2: Apartment Complex & Flat */}
+          {/* Step 2: Apartment Complex / Block & Flat */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
             <div className="form-group">
-              <label className="form-label required">Apartment Complex</label>
+              <label className="form-label required">Apartment Complex / Block</label>
               <select 
                 className="form-control"
                 value={formData.apartment}
-                onChange={e => setFormData({ ...formData, apartment: e.target.value })}
+                onChange={handleApartmentChange}
               >
-                <option value="Tower-1">Tower-1</option>
-                <option value="Tower-2">Tower-2</option>
-                <option value="Tower-3">Tower-3</option>
+                <option value="Tower-1">Tower-1 (Golden Tower 1)</option>
+                <option value="Tower-2">Tower-2 (Golden Tower 2)</option>
+                <option value="Tower-3">Tower-3 (Golden Tower 3)</option>
                 <option value="Golden Apartment (All Towers)">Golden Apartment (All Towers)</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label required">Flat / Unit Number</label>
-              <input 
-                type="text" 
-                placeholder="e.g. GT1-204 or GT2-604" 
-                className="form-control"
-                value={formData.flatNumber}
-                onChange={e => setFormData({ ...formData, flatNumber: e.target.value })}
-              />
-              {errors.flatNumber && <div className="form-error">{errors.flatNumber}</div>}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className="form-label required" style={{ margin: 0 }}>Flat / Unit Number</label>
+                {!isCustomFlat && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Floor:</span>
+                    <select
+                      value={selectedFloor}
+                      onChange={e => setSelectedFloor(e.target.value)}
+                      style={{
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--bg-elevated)',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontWeight: 600
+                      }}
+                      title="Quick filter flats by floor"
+                    >
+                      <option value="All">All Floors (1 - {maxFloors})</option>
+                      {Array.from({ length: maxFloors }, (_, i) => i + 1).map(fl => (
+                        <option key={fl} value={fl.toString()}>Floor {fl}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {!isCustomFlat ? (
+                <>
+                  <select 
+                    className="form-control"
+                    value={formData.flatNumber}
+                    onChange={handleFlatSelect}
+                  >
+                    <option value="">-- Select Flat Number ({filteredFlats.length} units) --</option>
+                    {selectedFloor === 'All' ? (
+                      Array.from({ length: maxFloors }, (_, i) => i + 1).map(fl => {
+                        const floorFlats = availableFlats.filter(f => f.floor === fl);
+                        if (floorFlats.length === 0) return null;
+                        return (
+                          <optgroup key={fl} label={`Floor ${fl} (${floorFlats.length} flats)`}>
+                            {floorFlats.map(f => {
+                              const isVacant = UN_OCCUPIED_FLATS_SET.has(f.flat);
+                              const resident = residentMap.get(f.flat);
+                              let label = f.flat;
+                              if (isVacant) {
+                                label += ' • [Vacant / Available]';
+                              } else if (resident) {
+                                label += ` • [Occupied: ${resident.name} (${resident.type})]`;
+                              }
+                              return (
+                                <option key={f.flat} value={f.flat}>
+                                  {label}
+                                </option>
+                              );
+                            })}
+                          </optgroup>
+                        );
+                      })
+                    ) : (
+                      filteredFlats.map(f => {
+                        const isVacant = UN_OCCUPIED_FLATS_SET.has(f.flat);
+                        const resident = residentMap.get(f.flat);
+                        let label = f.flat;
+                        if (isVacant) {
+                          label += ' • [Vacant / Available]';
+                        } else if (resident) {
+                          label += ` • [Occupied: ${resident.name} (${resident.type})]`;
+                        }
+                        return (
+                          <option key={f.flat} value={f.flat}>
+                            {label}
+                          </option>
+                        );
+                      })
+                    )}
+                    <option value="__custom__">✏️ Other / Custom Unit Number...</option>
+                  </select>
+                  {errors.flatNumber && <div className="form-error">{errors.flatNumber}</div>}
+                </>
+              ) : (
+                <div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. GT1-PH-01 or Villa-02" 
+                      className="form-control"
+                      value={formData.flatNumber}
+                      onChange={e => setFormData({ ...formData, flatNumber: e.target.value })}
+                      autoFocus
+                    />
+                    <button 
+                      type="button" 
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => {
+                        setIsCustomFlat(false);
+                        setFormData(prev => ({ ...prev, flatNumber: '' }));
+                      }}
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      Back to Dropdown
+                    </button>
+                  </div>
+                  {errors.flatNumber && <div className="form-error">{errors.flatNumber}</div>}
+                  <span className="form-help">Type custom unit or return to flat dropdown</span>
+                </div>
+              )}
             </div>
           </div>
 

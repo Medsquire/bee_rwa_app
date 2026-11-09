@@ -222,17 +222,52 @@ const VEHICLE_MODELS = [
 
 const EMAIL_DOMAINS = ['gmail.com', 'outlook.com', 'yahoo.com', 'techcorp.in', 'infonet.com', 'cloudscale.com'];
 
+export const TOWERS_CONFIG = [
+  { id: 'gt-1', code: 'Golden Tower 1', name: 'Golden Tower 1', shortCode: 'GT-1', prefix: 'GT1', floors: 38, unitsPerFloor: 8, getUnits: (f) => (f >= 35 ? 6 : 8), towerNum: 1 },
+  { id: 'gt-2', code: 'Golden Tower 2', name: 'Golden Tower 2', shortCode: 'GT-2', prefix: 'GT2', floors: 35, unitsPerFloor: 8, getUnits: (f) => (f >= 32 ? 6 : 8), towerNum: 2 },
+  { id: 'gt-3', code: 'Golden Tower 3', name: 'Golden Tower 3', shortCode: 'GT-3', prefix: 'GT3', floors: 32, unitsPerFloor: 8, getUnits: (f) => (f <= 4 ? 10 : f >= 28 ? 6 : 8), towerNum: 3 }
+];
+
+export const getFlatsForTower = (towerIdentifier) => {
+  const getFlatsForSingleTower = (tower) => {
+    const flats = [];
+    for (let f = 1; f <= tower.floors; f++) {
+      const unitsCount = tower.getUnits ? tower.getUnits(f) : tower.unitsPerFloor;
+      for (let u = 1; u <= unitsCount; u++) {
+        flats.push({
+          flat: `${tower.prefix}-${f}${u < 10 ? '0' + u : u}`,
+          floor: f,
+          unit: u,
+          tower: tower.code,
+          prefix: tower.prefix
+        });
+      }
+    }
+    return flats;
+  };
+
+  if (!towerIdentifier || towerIdentifier.toLowerCase().includes('all')) {
+    return TOWERS_CONFIG.flatMap(t => getFlatsForSingleTower(t));
+  }
+
+  const tower = TOWERS_CONFIG.find(t => 
+    t.prefix.toLowerCase() === towerIdentifier?.toLowerCase() ||
+    t.code.toLowerCase() === towerIdentifier?.toLowerCase() ||
+    towerIdentifier?.toLowerCase()?.includes(t.prefix.toLowerCase()) ||
+    towerIdentifier?.toLowerCase()?.includes(`tower-${t.towerNum}`) ||
+    towerIdentifier?.toLowerCase()?.includes(`tower ${t.towerNum}`)
+  ) || TOWERS_CONFIG[0];
+
+  return getFlatsForSingleTower(tower);
+};
+
 // Helper to deterministically generate realistic residents for all occupied flats across all 3 towers
 const generateFullResidentsDirectory = () => {
   const seedMap = new Map();
   SEED_RESIDENTS.forEach(r => seedMap.set(r.flat, r));
 
   const list = [];
-  const towersConfig = [
-    { code: 'Golden Tower 1', prefix: 'GT1', floors: 38, unitsPerFloor: 8, getUnits: (f) => (f >= 35 ? 6 : 8), towerNum: 1 },
-    { code: 'Golden Tower 2', prefix: 'GT2', floors: 35, unitsPerFloor: 8, getUnits: (f) => (f >= 32 ? 6 : 8), towerNum: 2 },
-    { code: 'Golden Tower 3', prefix: 'GT3', floors: 32, unitsPerFloor: 8, getUnits: (f) => (f <= 4 ? 10 : f >= 28 ? 6 : 8), towerNum: 3 }
-  ];
+  const towersConfig = TOWERS_CONFIG;
 
   let counter = 100;
   towersConfig.forEach(tow => {
