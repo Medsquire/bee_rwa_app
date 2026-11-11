@@ -429,6 +429,18 @@ const parseInitialAsset = (loc = '', title = '', availableAssets = []) => {
   return availableAssets[0] || 'Other';
 };
 
+export const isComplaintApproved = (complaint) => {
+  if (!complaint) return false;
+  if (typeof complaint === 'string') {
+    return complaint.trim().toLowerCase() === 'approved';
+  }
+  return Boolean(
+    complaint.approvedByRwa ||
+    complaint.dispatchedToAgentApp ||
+    complaint.status === 'Approved'
+  );
+};
+
 export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
   const { 
     currentRoleKey, 
@@ -520,10 +532,10 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
 
   // Approval state: first show only pending approval, then show approved after clicking "Send directly to the agency app"
   const [isApprovedLocally, setIsApprovedLocally] = useState(() => {
-    return !!complaint.approvedByRwa || !!complaint.dispatchedToAgentApp || complaint.status === 'Approved';
+    return isComplaintApproved(complaint);
   });
 
-  const isApproved = isApprovedLocally || complaint.approvedByRwa || complaint.dispatchedToAgentApp || complaint.status === 'Approved' || selectedStatus === 'Approved';
+  const isApproved = isApprovedLocally || isComplaintApproved(complaint) || selectedStatus === 'Approved';
 
   // Close searchable dropdown on outside click
   useEffect(() => {

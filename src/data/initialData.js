@@ -809,6 +809,81 @@ export const INITIAL_TRANSACTIONS = [
 ];
 
 export const INITIAL_ANNOUNCEMENTS = [
+  // November 2026 Announcements
+  {
+    id: 'ANN-308',
+    title: 'Emergency Booster Pump Line Pressure Testing – Tower 2',
+    description: 'Hydrostatic pressure testing on the secondary booster riser between floors 15 and 25. Minor fluctuations in kitchen water pressure between 11:00 AM and 01:00 PM. Overhead tanks are fully topped up.',
+    category: 'Water Supply',
+    apartmentScope: 'Golden Tower 2',
+    targetAudience: 'All Residents',
+    priority: 'Urgent',
+    publishedBy: 'Ramesh Babu (Chief Plumbing Contractor)',
+    publishedDate: '2026-11-10 09:30',
+    pinned: true
+  },
+  {
+    id: 'ANN-315',
+    title: 'Passenger Lift #1 Annual Wire Rope Lubrication – Tower 1',
+    description: 'Scheduled preventive wire rope lubrication and hoistway sensor calibration for Passenger Lift #1 in Golden Tower 1. Lift #2 and Service Lift will remain fully operational.',
+    category: 'Facility Maintenance',
+    apartmentScope: 'Golden Tower 1',
+    targetAudience: 'All Residents',
+    priority: 'High',
+    publishedBy: 'Sanjay Kumar (Lift Maintenance Lead)',
+    publishedDate: '2026-11-10 11:00',
+    pinned: false
+  },
+  {
+    id: 'ANN-316',
+    title: 'Terrace Rainwater Harvesting Filter Bed Desilting – Tower 3',
+    description: 'Routine maintenance of secondary sand and gravel filtration chambers on Tower 3 terrace. Domestic water supply will remain completely unaffected.',
+    category: 'Water Supply',
+    apartmentScope: 'Golden Tower 3',
+    targetAudience: 'All Residents',
+    priority: 'Medium',
+    publishedBy: 'Sunita Sharma (Housekeeping Lead)',
+    publishedDate: '2026-11-10 14:00',
+    pinned: false
+  },
+  {
+    id: 'ANN-306',
+    title: 'Annual General Body Meeting (AGM) 2026 – Final Voting & Budget Approval',
+    description: 'The RWA Annual General Body Meeting will be held at the Rooftop Banquet Hall. Key voting on solar net-metering capital expenditure, audited society accounts, and intercom AMC renewal. High tea served for all attendees.',
+    category: 'RWA Meeting',
+    apartmentScope: 'Golden Apartment (All Towers)',
+    targetAudience: 'Flat Owners & Tenants',
+    priority: 'High',
+    publishedBy: 'Sujana (President)',
+    publishedDate: '2026-11-08 10:30',
+    pinned: true
+  },
+  {
+    id: 'ANN-307',
+    title: 'Rooftop Solar PV Net-Metering Commissioning & Grid Sync',
+    description: 'BESCOM officials will complete final grid synchronization for our 120kW rooftop solar system. Expected reduction in common area energy charges by 42% starting this billing cycle.',
+    category: 'Facility Maintenance',
+    apartmentScope: 'Golden Apartment (All Towers)',
+    targetAudience: 'All Residents',
+    priority: 'Medium',
+    publishedBy: 'Kavaya (Vice President)',
+    publishedDate: '2026-11-04 14:00',
+    pinned: false
+  },
+  {
+    id: 'ANN-309',
+    title: 'Children Play Zone & Sandpit Rubber Flooring Upgradation',
+    description: 'New anti-skid EPDM shock-absorbing safety tiles being laid in the toddler play section. Play area will partially reopen on Wednesday morning.',
+    category: 'Community Event',
+    apartmentScope: 'Golden Apartment (All Towers)',
+    targetAudience: 'All Residents',
+    priority: 'Low',
+    publishedBy: 'Raghavan Pillai (Estate Caretaker)',
+    publishedDate: '2026-11-16 11:00',
+    pinned: false
+  },
+
+  // October 2026 Announcements
   {
     id: 'ANN-301',
     title: 'Water Supply Interruption & Overhead Tank Deep Cleaning Drive',
@@ -831,7 +906,7 @@ export const INITIAL_ANNOUNCEMENTS = [
     priority: 'High',
     publishedBy: 'Dr. Arvind Subramanian (President)',
     publishedDate: '2026-10-20 17:30',
-    pinned: true
+    pinned: false
   },
   {
     id: 'ANN-303',
@@ -867,6 +942,58 @@ export const INITIAL_ANNOUNCEMENTS = [
     priority: 'High',
     publishedBy: 'Rajeshwar Rao (Finance Manager)',
     publishedDate: '2026-10-17 10:00',
+    pinned: false
+  },
+
+  // September 2026 Announcements
+  {
+    id: 'ANN-310',
+    title: 'Quarterly Fire Drill & Fire Hydrant Pressure Inspection',
+    description: 'Mandatory mock evacuation drill conducted in coordination with the local Fire Station. Audible fire alarm sirens sounded for 3 minutes. All hose reels and wet risers inspected.',
+    category: 'Security Notice',
+    apartmentScope: 'Golden Apartment (All Towers)',
+    targetAudience: 'All Residents',
+    priority: 'High',
+    publishedBy: 'Vikram Singh (Security Chief)',
+    publishedDate: '2026-09-15 10:00',
+    pinned: false
+  },
+  {
+    id: 'ANN-311',
+    title: 'Ganesh Chaturthi Eco-Friendly Immersion Guidelines',
+    description: 'Dedicated artificial immersion tanks set up near Central Park gate 2. Clay Ganesha idols only; no synthetic colors allowed into the society swimming pool or natural drainage lines.',
+    category: 'Community Event',
+    apartmentScope: 'All Apartments',
+    targetAudience: 'All Residents',
+    priority: 'Medium',
+    publishedBy: 'Dr. Arvind Subramanian (President)',
+    publishedDate: '2026-09-07 16:30',
+    pinned: false
+  },
+  {
+    id: 'ANN-312',
+    title: 'Bi-Annual Underground Sump Desilting & Chlorination',
+    description: 'Deep mechanical desilting and UV chlorination of 2,50,000 litre central reservoir completed. Water quality certified compliant with IS 10500 standards.',
+    category: 'Water Supply',
+    apartmentScope: 'Golden Apartment (All Towers)',
+    targetAudience: 'All Residents',
+    priority: 'Urgent',
+    publishedBy: 'Kavaya (Vice President)',
+    publishedDate: '2026-09-24 08:30',
+    pinned: false
+  },
+
+  // December 2026 Announcements
+  {
+    id: 'ANN-313',
+    title: 'Christmas Carol & New Year Gala Night Pre-Registration',
+    description: 'Join us for Christmas carol singing by resident children, live orchestra, and New Year welcome dinner at Central Park Clubhouse lawn. Food coupons registration opens Dec 1st.',
+    category: 'Community Event',
+    apartmentScope: 'Golden Apartment (All Towers)',
+    targetAudience: 'All Residents',
+    priority: 'Medium',
+    publishedBy: 'Sujana (President)',
+    publishedDate: '2026-12-24 18:00',
     pinned: false
   }
 ];
@@ -1245,6 +1372,39 @@ export const INITIAL_AGENCIES = [
         towers: ['Golden Tower 1', 'Golden Tower 2', 'Golden Tower 3'],
         unitsAssigned: 'Gates 1 & 2, Boom Barriers, 32 CCTV Cameras & Night Guarding',
         isPrimary: true
+      }
+    ]
+  },
+  {
+    id: 'AGY-104',
+    name: 'Apex Elevators & Lift AMC Solutions',
+    shortName: 'Apex Lift AMC',
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18f156f?auto=format&fit=crop&w=800&q=80',
+    category: 'Lift & Elevator Maintenance',
+    serviceType: 'Passenger Lift Maintenance, ARD Emergency Rescue & Annual AMC',
+    status: 'Inactive',
+    employeeCount: 6,
+    services: [
+      'Bi-Monthly Passenger Lift AMC Servicing',
+      'Automatic Rescue Device (ARD) Battery Diagnostics',
+      'Emergency Lift Phone & Intercom Wiring Checks',
+      'Overhead Traction Motor & Cable Inspections'
+    ],
+    primaryRoles: ['Lift AMC', 'Elevator Repair'],
+    leadEngineer: 'Sanjay Kumar (Lift Tech)',
+    leadTitle: 'Senior Elevator AMC Specialist',
+    phone: '+91 98400 33221',
+    emergencyHotline: '+91 80 4123 7755',
+    email: 'support@apexelevators.in',
+    rating: 4.2,
+    openTicketsCount: 1,
+    activeTicketIds: ['CMP-2026-081'],
+    assignedComplexes: [
+      {
+        complex: 'Golden Apartment',
+        towers: ['Golden Tower 1', 'Golden Tower 2'],
+        unitsAssigned: 'Passenger Lifts 1 & 2',
+        isPrimary: false
       }
     ]
   }

@@ -52,7 +52,7 @@ export const FacilityOverview = () => {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Community Facilities & Sports Amenities</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Community Facilities & Sports Amenities</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             Operating hours, real-time occupancy, equipment audits, and slot booking access
           </p>

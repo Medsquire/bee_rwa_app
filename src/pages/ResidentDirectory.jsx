@@ -435,20 +435,8 @@ export const ResidentDirectory = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(59, 130, 246, 0.12)',
-              color: 'var(--electric-blue)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Home size={22} />
-            </div>
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Residence</h1>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Residence</h1>
              
             </div>
           </div>

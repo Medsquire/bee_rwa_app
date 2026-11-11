@@ -66,7 +66,13 @@ export const RwaProvider = ({ children }) => {
   const [financeSummary, setFinanceSummary] = useState(() => loadStored('FINANCE_SUMM', INITIAL_FINANCE_SUMMARY));
   const [maintenanceDues, setMaintenanceDues] = useState(() => loadStored('DUES', INITIAL_MAINTENANCE_DUES));
   const [transactions, setTransactions] = useState(() => loadStored('TXNS', INITIAL_TRANSACTIONS));
-  const [announcements, setAnnouncements] = useState(() => loadStored('ANNOUNCEMENTS', INITIAL_ANNOUNCEMENTS));
+  const [announcements, setAnnouncements] = useState(() => {
+    const stored = loadStored('ANNOUNCEMENTS', null);
+    if (stored && Array.isArray(stored) && stored.some(a => a.id === 'ANN-315')) {
+      return stored;
+    }
+    return INITIAL_ANNOUNCEMENTS;
+  });
   const [notifications, setNotifications] = useState(() => loadStored('NOTIFICATIONS', INITIAL_NOTIFICATIONS));
   const [userss, setuserss] = useState(() => loadStored('usersS', INITIAL_usersS));
   const [councilUsers, setCouncilUsers] = useState(() => {
@@ -78,7 +84,7 @@ export const RwaProvider = ({ children }) => {
   });
   const [agencies, setAgencies] = useState(() => {
     const stored = loadStored('AGENCIES', null);
-    if (stored && Array.isArray(stored) && stored.length === 3 && stored.some(a => a.id === 'AGY-101' && a.category === 'Cleaning & Gardening')) {
+    if (stored && Array.isArray(stored) && stored.length >= 4 && stored.some(a => a.id === 'AGY-104')) {
       return stored;
     }
     return INITIAL_AGENCIES;
@@ -713,7 +719,7 @@ export const RwaProvider = ({ children }) => {
       targetAudience: data.targetAudience || 'All Residents',
       priority: data.priority || 'Medium',
       publishedBy: `${currentUser.name} (${currentUser.roleTitle})`,
-      publishedDate: nowStr,
+      publishedDate: data.publishedDate ? (data.publishedDate.includes(':') ? data.publishedDate : `${data.publishedDate} 10:00`) : nowStr,
       pinned: !!data.pinned
     };
 

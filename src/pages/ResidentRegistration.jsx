@@ -197,7 +197,7 @@ export const ResidentRegistration = () => {
   return (
     <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Resident Access Registration</h1>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Resident Access Registration</h1>
       </div>
 
       <div className="glass-card">

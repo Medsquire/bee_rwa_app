@@ -56,7 +56,7 @@ export const ApartmentManagement = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
       {/* Title */}
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
           Property & Common Asset Monitoring
         </h1>
 

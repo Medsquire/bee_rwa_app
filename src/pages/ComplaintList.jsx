@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
-import { ComplaintDetailsModal, ComplaintTrackingModal, SAMPLE_ISSUE_PHOTOS } from './ComplaintDetailsModal';
+import { ComplaintDetailsModal, ComplaintTrackingModal, SAMPLE_ISSUE_PHOTOS, isComplaintApproved } from './ComplaintDetailsModal';
 import { StatCard } from '../components/CommonUI';
 import { 
   AlertTriangle, 
@@ -27,13 +27,8 @@ import {
   Crosshair
 } from 'lucide-react';
 
-export const getNormalizedComplaintStatus = (status) => {
-  const s = (status || '').toLowerCase().trim();
-  if (s === 'closed') return 'Closed';
-  if (s === 'resolved') return 'Resolved';
-  if (s === 'in progress' || s === 'reopened') return 'In Progress';
-  if (s === 'approved' || s === 'assigned' || s === 'acknowledged') return 'Approved';
-  return 'Pending Approval';
+export const getNormalizedComplaintStatus = (statusOrCmp) => {
+  return isComplaintApproved(statusOrCmp) ? 'Approved' : 'Pending Approval';
 };
 
 export const ComplaintList = () => {
@@ -156,7 +151,7 @@ export const ComplaintList = () => {
         cmp.apartment?.toLowerCase().includes('tower') ||
         cmp.apartment?.toLowerCase().includes('golden')
       ));
-    const normalizedStatus = getNormalizedComplaintStatus(cmp.status);
+    const normalizedStatus = getNormalizedComplaintStatus(cmp);
     const matchesStatus = statusFilter === 'All' 
       ? true 
       : normalizedStatus === statusFilter;
@@ -197,7 +192,7 @@ export const ComplaintList = () => {
       {/* Page Title & Action */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
             Issue Resolving & Maintenance
           </h1>
         </div>
@@ -378,14 +373,19 @@ export const ComplaintList = () => {
             className="form-control"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            style={{ width: 'auto', height: '36px', fontSize: '0.8125rem' }}
+            style={{ 
+              width: 'auto', 
+              height: '36px', 
+              padding: '0 30px 0 10px', 
+              fontSize: '0.8125rem', 
+              borderRadius: '6px',
+              lineHeight: '34px',
+              boxSizing: 'border-box'
+            }}
           >
             <option value="All">All Statuses</option>
-            <option value="Pending Approval">Pending Approval</option>
             <option value="Approved">Approved</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-            <option value="Closed">Closed</option>
+            <option value="Pending Approval">Pending Approval</option>
           </select>
         </div>
 
@@ -425,7 +425,7 @@ export const ComplaintList = () => {
                 </tr>
               ) : (
                 filteredComplaints.map((cmp, index) => {
-                  const isAwaitingApproval = cmp.status === 'Pending Approval' || cmp.requiresApproval;
+                  const isAwaitingApproval = !isComplaintApproved(cmp);
                   const isPending = cmp.status === 'Pending' || cmp.status === 'Submitted';
                   const isInProgress = cmp.status === 'In Progress' || cmp.status === 'Assigned';
 
@@ -509,40 +509,8 @@ export const ComplaintList = () => {
                       {/* STATUS PILL */}
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
                         {(() => {
-                          const displayStatus = getNormalizedComplaintStatus(cmp.status);
-                          const stylesByStatus = {
-                            'Pending Approval': {
-                              bg: '#FEF3C7',
-                              color: '#92400E',
-                              border: '#FCD34D',
-                              dot: '#D97706'
-                            },
-                            'Approved': {
-                              bg: '#ECFDF5',
-                              color: '#065F46',
-                              border: '#A7F3D0',
-                              dot: '#059669'
-                            },
-                            'In Progress': {
-                              bg: '#EFF6FF',
-                              color: '#1D4ED8',
-                              border: '#BFDBFE',
-                              dot: '#2563EB'
-                            },
-                            'Resolved': {
-                              bg: '#F0FDF4',
-                              color: '#15803D',
-                              border: '#BBF7D0',
-                              dot: '#16A34A'
-                            },
-                            'Closed': {
-                              bg: '#F1F5F9',
-                              color: '#475569',
-                              border: '#CBD5E1',
-                              dot: '#64748B'
-                            }
-                          };
-                          const st = stylesByStatus[displayStatus] || stylesByStatus['Pending Approval'];
+                          const displayStatus = getNormalizedComplaintStatus(cmp);
+                          const isApproved = displayStatus === 'Approved';
 
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
@@ -554,17 +522,17 @@ export const ComplaintList = () => {
                                 borderRadius: '9999px',
                                 fontSize: '0.72rem',
                                 fontWeight: 700,
-                                backgroundColor: st.bg,
-                                color: st.color,
-                                border: `1px solid ${st.border}`
+                                backgroundColor: isApproved ? '#ECFDF5' : '#FEF3C7',
+                                color: isApproved ? '#065F46' : '#92400E',
+                                border: `1px solid ${isApproved ? '#A7F3D0' : '#FCD34D'}`
                               }}>
                                 <span style={{
                                   width: '6px',
                                   height: '6px',
                                   borderRadius: '50%',
-                                  backgroundColor: st.dot
+                                  backgroundColor: isApproved ? '#059669' : '#D97706'
                                 }} />
-                                {displayStatus}
+                                {isApproved ? 'Approved' : 'Pending Approval'}
                               </span>
                             </div>
                           );

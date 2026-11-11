@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
 import beePropertyBg from '../assets/bee_rwa_property.jpg';
+import logoImg from '../assets/logo.jpg';
 import { 
   Building2, 
   Lock, 
@@ -12,7 +13,8 @@ import {
   AlertCircle, 
   CheckCircle2, 
   Sparkles,
-  KeyRound
+  KeyRound,
+  X
 } from 'lucide-react';
 
 export const LoginPage = () => {
@@ -22,6 +24,11 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Forgot password modal state
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSubmitted, setForgotSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,10 +50,10 @@ export const LoginPage = () => {
     }, 400);
   };
 
-  const autofill = (u, p) => {
-    setUsername(u);
-    setPassword(p);
-    setError('');
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) return;
+    setForgotSubmitted(true);
   };
 
   return (
@@ -61,201 +68,59 @@ export const LoginPage = () => {
       alignItems: 'center',
       justifyContent: 'flex-end',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      padding: '20px'
     }}>
-      {/* Left side brand banner / ambiance text */}
-      <div style={{
-        position: 'absolute',
-        left: '5%',
-        bottom: '8%',
-        maxWidth: '560px',
-        color: '#FFFFFF',
-        zIndex: 2
-      }} className="login-left-banner">
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 14px',
-          borderRadius: '20px',
-          backgroundColor: 'rgba(34, 211, 238, 0.15)',
-          border: '1px solid rgba(34, 211, 238, 0.3)',
-          color: '#22D3EE',
-          fontSize: '0.8125rem',
-          fontWeight: 700,
-          marginBottom: '16px',
-          backdropFilter: 'blur(8px)'
-        }}>
-          <Sparkles size={14} /> Gated Enclave Community
-        </div>
-        <h1 style={{
-          fontSize: '2.75rem',
-          fontWeight: 900,
-          lineHeight: 1.15,
-          letterSpacing: '-0.02em',
-          textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)'
-        }}>
-          BEE PROPERTY RWA
-        </h1>
-        <p style={{
-          fontSize: '1.0625rem',
-          color: 'rgba(255, 255, 255, 0.85)',
-          marginTop: '12px',
-          lineHeight: 1.6,
-          textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)'
-        }}>
-          Resident Welfare Association management system for Golden Apartment (Golden Tower 1, 2 & 3).
-        </p>
 
-        {/* Complex Pills */}
-        <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
-          <span style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            border: '1px solid rgba(245, 158, 11, 0.5)',
-            color: '#F59E0B',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            backdropFilter: 'blur(6px)'
-          }}>
-            🏛️ Golden Tower 1 (12 Floors • Sujana)
-          </span>
-          <span style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            border: '1px solid rgba(234, 179, 8, 0.5)',
-            color: '#FDE047',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            backdropFilter: 'blur(6px)'
-          }}>
-            🏛️ Golden Tower 2 (12 Floors • Kavaya)
-          </span>
-          <span style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            border: '1px solid rgba(217, 119, 6, 0.5)',
-            color: '#FBBF24',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            backdropFilter: 'blur(6px)'
-          }}>
-            🏛️ Golden Tower 3 (10 Floors • Desk)
-          </span>
-        </div>
-      </div>
-
-      {/* Right side login form container */}
+      {/* Reduced compact login form container */}
       <div style={{
         width: '100%',
-        maxWidth: '480px',
-        minHeight: '100vh',
-        backgroundColor: 'rgba(11, 18, 32, 0.88)',
+        maxWidth: '350px',
+        backgroundColor: 'rgba(11, 18, 32, 0.90)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.5)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+        borderRadius: '14px',
+        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.65)',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '48px 36px',
+        padding: '26px 22px',
         zIndex: 5,
-        color: '#FFFFFF'
+        color: '#FFFFFF',
+        marginRight: 'clamp(12px, 5vw, 60px)'
       }}>
         {/* Brand header */}
-        <div style={{ marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
             <div style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #1D4ED8 0%, #22D3EE 100%)',
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              backgroundColor: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#FFFFFF',
-              boxShadow: '0 4px 16px rgba(34, 211, 238, 0.4)'
+              overflow: 'hidden',
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.35)',
+              padding: '2px',
+              flexShrink: 0
             }}>
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
+              <img 
+                src={logoImg} 
+                alt="BEE PROPERTY Logo" 
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+              />
             </div>
             <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+              <div style={{ fontSize: '1.05rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
                 BEE PROPERTY
-              </div>
-              <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--cyan-blue)', letterSpacing: '0.08em' }}>
-                RWA MANAGEMENT PORTAL
               </div>
             </div>
           </div>
 
-          <h2 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 6px 0' }}>
-            Executive Login
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0' }}>
+            RWA Portal
           </h2>
-          <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.875rem', margin: 0 }}>
-            Sign in with authorized administrator credentials to manage enclave facilities and residents.
-          </p>
-        </div>
-
-        {/* Quick Demo Access Bar */}
-        <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '10px',
-          padding: '12px 14px',
-          marginBottom: '22px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#22D3EE', marginBottom: '8px' }}>
-            <KeyRound size={13} /> ONE-CLICK DEMO CREDENTIALS:
-          </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              type="button"
-              onClick={() => autofill('sujana', 'rwa123')}
-              style={{
-                flex: 1,
-                padding: '7px 10px',
-                borderRadius: '6px',
-                border: '1px solid rgba(59, 130, 246, 0.5)',
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                color: '#FFFFFF',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.35)'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)'}
-            >
-              👑 President (sujana)
-            </button>
-            <button
-              type="button"
-              onClick={() => autofill('kavaya', 'rwa123')}
-              style={{
-                flex: 1,
-                padding: '7px 10px',
-                borderRadius: '6px',
-                border: '1px solid rgba(34, 211, 238, 0.5)',
-                backgroundColor: 'rgba(34, 211, 238, 0.15)',
-                color: '#FFFFFF',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.3)'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.15)'}
-            >
-              🛡️ Vice President (kavaya)
-            </button>
-          </div>
         </div>
 
         {/* Error Alert */}
@@ -267,25 +132,25 @@ export const LoginPage = () => {
             backgroundColor: 'rgba(239, 68, 68, 0.18)',
             border: '1px solid rgba(239, 68, 68, 0.4)',
             color: '#FCA5A5',
-            padding: '10px 14px',
-            borderRadius: '8px',
-            fontSize: '0.8125rem',
-            marginBottom: '18px'
+            padding: '8px 12px',
+            borderRadius: '6px',
+            fontSize: '0.78rem',
+            marginBottom: '14px'
           }}>
-            <AlertCircle size={16} style={{ flexShrink: 0 }} />
+            <AlertCircle size={15} strokeWidth={1.5} style={{ flexShrink: 0 }} />
             <span>{error}</span>
           </div>
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
           {/* Username input */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '5px' }}>
               Username
             </label>
             <div style={{ position: 'relative' }}>
-              <User size={16} style={{ position: 'absolute', left: '14px', top: '12px', color: 'rgba(255, 255, 255, 0.4)' }} />
+              <User size={15} strokeWidth={1.5} style={{ position: 'absolute', left: '12px', top: '11px', color: 'rgba(255, 255, 255, 0.45)' }} />
               <input
                 type="text"
                 className="form-control"
@@ -293,28 +158,26 @@ export const LoginPage = () => {
                 value={username}
                 onChange={e => { setUsername(e.target.value); setError(''); }}
                 style={{
-                  paddingLeft: '40px',
+                  paddingLeft: '36px',
                   backgroundColor: 'rgba(255, 255, 255, 0.07)',
                   borderColor: 'rgba(255, 255, 255, 0.15)',
                   color: '#FFFFFF',
-                  height: '42px',
-                  borderRadius: '8px'
+                  height: '38px',
+                  borderRadius: '6px',
+                  fontSize: '0.8125rem'
                 }}
                 required
               />
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: 'rgba(255, 255, 255, 0.5)', marginTop: '4px' }}>
-              Role IDs: <strong>sujana</strong> (President) or <strong>kavaya</strong> (Vice President)
             </div>
           </div>
 
           {/* Password input */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '5px' }}>
               Password
             </label>
             <div style={{ position: 'relative' }}>
-              <Lock size={16} style={{ position: 'absolute', left: '14px', top: '12px', color: 'rgba(255, 255, 255, 0.4)' }} />
+              <Lock size={15} strokeWidth={1.5} style={{ position: 'absolute', left: '12px', top: '11px', color: 'rgba(255, 255, 255, 0.45)' }} />
               <input
                 type={showPassword ? 'text' : 'password'}
                 className="form-control"
@@ -322,13 +185,14 @@ export const LoginPage = () => {
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(''); }}
                 style={{
-                  paddingLeft: '40px',
-                  paddingRight: '40px',
+                  paddingLeft: '36px',
+                  paddingRight: '36px',
                   backgroundColor: 'rgba(255, 255, 255, 0.07)',
                   borderColor: 'rgba(255, 255, 255, 0.15)',
                   color: '#FFFFFF',
-                  height: '42px',
-                  borderRadius: '8px'
+                  height: '38px',
+                  borderRadius: '6px',
+                  fontSize: '0.8125rem'
                 }}
                 required
               />
@@ -337,8 +201,8 @@ export const LoginPage = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
                   position: 'absolute',
-                  right: '12px',
-                  top: '10px',
+                  right: '10px',
+                  top: '9px',
                   background: 'none',
                   border: 'none',
                   color: 'rgba(255, 255, 255, 0.45)',
@@ -346,21 +210,35 @@ export const LoginPage = () => {
                   padding: '2px'
                 }}
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <EyeOff size={15} strokeWidth={1.5} /> : <Eye size={15} strokeWidth={1.5} />}
               </button>
-            </div>
-            <div style={{ fontSize: '0.6875rem', color: 'rgba(255, 255, 255, 0.5)', marginTop: '4px' }}>
-              Assigned password: <strong>rwa123</strong>
             </div>
           </div>
 
-          {/* Remember me & Help */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+          {/* Remember me & Forgot Password */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.65)' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
               <input type="checkbox" defaultChecked style={{ accentColor: 'var(--electric-blue)' }} />
               <span>Remember session</span>
             </label>
-            <span style={{ color: 'var(--cyan-blue)', cursor: 'pointer' }}>Password: rwa123</span>
+            <button
+              type="button"
+              onClick={() => setShowForgotModal(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                color: '#38BDF8',
+                cursor: 'pointer',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                textDecoration: 'none'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = '#7DD3FC'}
+              onMouseLeave={e => e.currentTarget.style.color = '#38BDF8'}
+            >
+              Forgot password?
+            </button>
           </div>
 
           {/* Submit button */}
@@ -368,21 +246,21 @@ export const LoginPage = () => {
             type="submit"
             disabled={isLoading}
             style={{
-              height: '44px',
-              borderRadius: '8px',
+              height: '38px',
+              borderRadius: '6px',
               border: 'none',
               background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)',
               color: '#FFFFFF',
               fontWeight: 700,
-              fontSize: '0.9375rem',
+              fontSize: '0.85rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
               cursor: isLoading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 16px rgba(37, 99, 235, 0.4)',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
               transition: 'all 0.2s ease',
-              marginTop: '6px'
+              marginTop: '4px'
             }}
             onMouseEnter={e => { if (!isLoading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
             onMouseLeave={e => { if (!isLoading) e.currentTarget.style.filter = 'none'; }}
@@ -392,43 +270,125 @@ export const LoginPage = () => {
             ) : (
               <>
                 <span>Sign In to RWA Portal</span>
-                <ArrowRight size={17} />
+                <ArrowRight size={15} strokeWidth={1.5} />
               </>
             )}
           </button>
         </form>
-
-        {/* Credentials guide table */}
-        <div style={{
-          marginTop: '28px',
-          padding: '12px 14px',
-          borderRadius: '8px',
-          backgroundColor: 'rgba(0, 0, 0, 0.35)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          fontSize: '0.75rem'
-        }}>
-          <div style={{ fontWeight: 700, color: 'rgba(255, 255, 255, 0.8)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <ShieldCheck size={13} color="#10B981" /> RWA Access Credentials:
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'rgba(255, 255, 255, 0.65)', padding: '2px 0' }}>
-            <span>President:</span>
-            <span style={{ color: '#F59E0B', fontWeight: 600 }}>p : sujana</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'rgba(255, 255, 255, 0.65)', padding: '2px 0' }}>
-            <span>Vice President:</span>
-            <span style={{ color: '#22D3EE', fontWeight: 600 }}>vp : kavaya</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'rgba(255, 255, 255, 0.65)', padding: '2px 0', borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: '4px', paddingTop: '4px' }}>
-            <span>Password:</span>
-            <span style={{ color: '#10B981', fontWeight: 700 }}>rwa123</span>
-          </div>
-        </div>
-
-        {/* Footer info */}
-        <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.6875rem', color: 'rgba(255, 255, 255, 0.4)' }}>
-          BEE PROPERTY RWA v1.0 • Outer Ring Road Bangalore
-        </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.72)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100,
+          padding: '16px'
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '340px',
+            backgroundColor: '#0B1220',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '12px',
+            padding: '20px',
+            boxShadow: '0 20px 45px rgba(0, 0, 0, 0.75)',
+            color: '#FFFFFF'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 700 }}>
+                <KeyRound size={16} strokeWidth={1.5} color="#38BDF8" />
+                <span>Reset Password</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setShowForgotModal(false); setForgotSubmitted(false); setForgotEmail(''); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <X size={16} strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {forgotSubmitted ? (
+              <div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  color: '#6EE7B7',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.78rem',
+                  marginBottom: '14px'
+                }}>
+                  <CheckCircle2 size={16} strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                  <span>Reset instructions sent to your registered email!</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => { setShowForgotModal(false); setForgotSubmitted(false); setForgotEmail(''); }}
+                  style={{ width: '100%', height: '36px', fontSize: '0.8125rem' }}
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. sujana@beeproperty.org"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  style={{
+                    height: '38px',
+                    fontSize: '0.8125rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    borderColor: 'rgba(255, 255, 255, 0.18)',
+                    color: '#FFFFFF',
+                    borderRadius: '6px'
+                  }}
+                  required
+                />
+                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ flex: 1, height: '36px', fontSize: '0.8125rem', padding: '0 10px' }}
+                  >
+                    Send Reset Link
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowForgotModal(false)}
+                    style={{ height: '36px', fontSize: '0.8125rem', padding: '0 10px' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

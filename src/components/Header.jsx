@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRwa } from '../context/RwaContext';
+import logoImg from '../assets/logo.jpg';
 import { Moon, Sun } from 'lucide-react';
 
 export const Header = () => {
@@ -47,7 +48,26 @@ export const Header = () => {
       color: '#FFFFFF'
     }}>
       {/* Left: Breadcrumb matching parallel app */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '0.875rem' }}>
+        <div style={{
+          width: '26px',
+          height: '26px',
+          borderRadius: '6px',
+          backgroundColor: '#FFFFFF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          padding: '1px',
+          flexShrink: 0,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+        }}>
+          <img 
+            src={logoImg} 
+            alt="BEE PROPERTY" 
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+          />
+        </div>
         <span style={{ color: 'rgba(255, 255, 255, 0.55)', fontWeight: 500 }}>
           BEE Property Management
         </span>

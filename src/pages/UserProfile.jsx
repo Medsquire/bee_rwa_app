@@ -21,10 +21,8 @@ export const UserProfile = () => {
   return (
     <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>User Profile & Association Membership</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          Registered resident credentials, apartment allotment, parking tags, and role governance privileges
-        </p>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>User Profile & Association Membership</h1>
+        
       </div>
 
       {/* Profile Overview Card */}
@@ -53,7 +51,7 @@ export const UserProfile = () => {
               <span className="badge badge-success">Active Member</span>
             </div>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              Member ID: RWA-2026-M{currentUser.flatNumber.replace('-', '')} • Enclave Resident since 2023
+              Member ID: RWA-2026-M{currentUser.flatNumber.replace('-', '')} 
             </p>
           </div>
         </div>
@@ -139,9 +137,7 @@ export const UserProfile = () => {
         <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '4px' }}>
           Evaluate as Another Role
         </h3>
-        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-          Click any persona below to instantaneously experience the application through their viewpoint:
-        </p>
+       
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
           {Object.entries(roles).map(([k, r]) => {

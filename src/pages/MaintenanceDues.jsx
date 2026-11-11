@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRwa } from '../context/RwaContext';
+import logoImg from '../assets/logo.jpg';
 import { StatusPill, ApartmentBadge, Modal } from '../components/CommonUI';
 import { 
   Receipt, 
@@ -77,7 +78,7 @@ export const MaintenanceDues = () => {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Maintenance Dues Register</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Maintenance Dues Register</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             October 2026 billing cycle assessment, payment verification, and automated receipt issuance
           </p>
@@ -313,6 +314,11 @@ export const MaintenanceDues = () => {
               position: 'relative'
             }}>
               <div style={{ textAlign: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '14px', marginBottom: '14px' }}>
+                <img 
+                  src={logoImg} 
+                  alt="BEE PROPERTY" 
+                  style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'contain', margin: '0 auto 8px', display: 'block', backgroundColor: '#FFFFFF', padding: '2px', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }} 
+                />
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>BEE PROPERTY RWA</h3>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                   Golden Apartment Residential Association (Reg No: RWA/BLR/2022/9912)

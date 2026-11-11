@@ -101,7 +101,7 @@ export const TransactionsLedger = () => {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Financial Ledger & Disbursements</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Financial Ledger & Disbursements</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             Audited register of operational expenses, vendor invoices, and maintenance fee inflows
           </p>

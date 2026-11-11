@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRwa } from '../context/RwaContext';
+import logoImg from '../assets/logo.jpg';
 import {
   LayoutDashboard,
   Building2,
@@ -81,26 +82,34 @@ export const Sidebar = () => {
         gap: '12px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
       }}>
-        {/* Blue B square logo */}
+        {/* BEE PROPERTY Website Logo */}
         <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '8px',
-          backgroundColor: '#2563EB',
+          width: '38px',
+          height: '38px',
+          borderRadius: '9px',
+          backgroundColor: '#FFFFFF',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#FFFFFF',
-          fontWeight: 900,
-          fontSize: '1.25rem',
-          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
+          overflow: 'hidden',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+          padding: '2px',
+          flexShrink: 0
         }}>
-          B
+          <img 
+            src={logoImg} 
+            alt="BEE PROPERTY" 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'contain' 
+            }} 
+          />
         </div>
 
         <div>
           <div style={{ fontWeight: 900, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#FFFFFF', lineHeight: 1.1 }}>
-            BEE
+            Bee Property
           </div>
           <div style={{ fontSize: '0.625rem', fontWeight: 700, color: '#93C5FD', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '2px' }}>
             RWA PORTAL
@@ -156,7 +165,7 @@ export const Sidebar = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                  <Icon size={18} style={{ color: isActive ? '#FFFFFF' : '#94A3B8', flexShrink: 0 }} />
+                  <Icon size={18} strokeWidth={1.5} style={{ color: isActive ? '#FFFFFF' : '#94A3B8', flexShrink: 0 }} />
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {item.label}
                   </span>
@@ -292,7 +301,7 @@ export const Sidebar = () => {
             e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.35)';
           }}
         >
-          <LogOut size={15} />
+          <LogOut size={15} strokeWidth={1.5} />
           <span>Logout</span>
         </button>
       </div>

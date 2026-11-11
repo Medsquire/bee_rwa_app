@@ -45,7 +45,7 @@ export const NotificationsPage = () => {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Notifications Center</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Notifications Center</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             System alerts, complaint progress milestones, dues reminders, and committee updates
           </p>

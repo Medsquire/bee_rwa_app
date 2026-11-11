@@ -134,7 +134,7 @@ export const SubmitComplaint = () => {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Submit Common Area Complaint</h1>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Submit Common Area Complaint</h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
           Log issues regarding lifts, water pumps, lighting, parks, sports gear, or security
         </p>
