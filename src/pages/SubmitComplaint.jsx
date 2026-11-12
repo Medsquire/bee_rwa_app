@@ -132,15 +132,21 @@ export const SubmitComplaint = () => {
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ maxWidth: '1150px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Submit Common Area Complaint</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          Log issues regarding lifts, water pumps, lighting, parks, sports gear, or security
-        </p>
       </div>
 
-      <div className="glass-card">
+      <div 
+        className="glass-card"
+        style={{
+          border: '2px solid #16A34A',
+          borderRadius: '16px',
+          padding: 'clamp(24px, 3.5vw, 40px)',
+          boxShadow: '0 4px 20px rgba(22, 163, 74, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)',
+          backgroundColor: 'var(--card-bg, #FFFFFF)'
+        }}
+      >
         <form onSubmit={handleSubmit}>
           {/* Title */}
           <div className="form-group">

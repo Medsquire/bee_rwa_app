@@ -96,6 +96,30 @@ export const Announcements = () => {
     'Security Notice'
   ];
 
+  const getCategoryShortLabel = (cat) => {
+    if (!cat) return '';
+    const map = {
+      'Water Supply': 'Water',
+      'Lift / Elevator': 'Lifts',
+      'Facility Maintenance': 'Maintenance',
+      'Community Event': 'Events',
+      'RWA Meeting': 'Meetings',
+      'Finance Reminder': 'Finance',
+      'Security Notice': 'Security',
+      'All Categories': 'All',
+      'All': 'All'
+    };
+    return map[cat] || cat.split(' ')[0] || cat;
+  };
+
+  const getAudienceShortLabel = (aud) => {
+    if (!aud) return 'Residents';
+    if (aud.toLowerCase().includes('all')) return 'Residents';
+    if (aud.toLowerCase().includes('owner')) return 'Owners';
+    if (aud.toLowerCase().includes('tenant')) return 'Tenants';
+    return aud.split(' ')[0] || aud;
+  };
+
   // Close calendar popover on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -383,14 +407,14 @@ export const Announcements = () => {
           <h1 style={{
             fontSize: '1.5rem',
             fontWeight: 800,
-            color: '#0F172A',
+            color: 'var(--text-primary)',
             margin: 0,
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
           }}>
-            <Megaphone size={19} color="#2563EB" />
-            Community Notice Board & Circulars
+            <Megaphone size={19} color="#2563EB" strokeWidth={1.5} />
+            Announcements
           </h1>
         </div>
 
@@ -413,10 +437,10 @@ export const Announcements = () => {
                 gap: '7px',
                 padding: '6px 12px',
                 borderRadius: '7px',
-                backgroundColor: '#FFFFFF',
-                border: isCalendarOpen ? '1.5px solid #2563EB' : '1px solid #CBD5E1',
-                boxShadow: isCalendarOpen ? '0 0 0 3px rgba(37, 99, 235, 0.12)' : '0 1px 2px rgba(0,0,0,0.04)',
-                color: '#0F172A',
+                backgroundColor: 'var(--card-bg, #FFFFFF)',
+                border: isCalendarOpen ? '1.5px solid #2563EB' : '1px solid var(--border-color, #CBD5E1)',
+                boxShadow: isCalendarOpen ? '0 0 0 3px rgba(37, 99, 235, 0.12)' : 'var(--shadow-sm)',
+                color: 'var(--text-primary)',
                 fontSize: '0.8rem',
                 fontWeight: 650,
                 cursor: 'pointer',
@@ -424,7 +448,7 @@ export const Announcements = () => {
               }}
               title="Click to change date or month"
               onMouseEnter={e => { if (!isCalendarOpen) e.currentTarget.style.borderColor = '#2563EB'; }}
-              onMouseLeave={e => { if (!isCalendarOpen) e.currentTarget.style.borderColor = '#CBD5E1'; }}
+              onMouseLeave={e => { if (!isCalendarOpen) e.currentTarget.style.borderColor = 'var(--border-color, #CBD5E1)'; }}
             >
               <Calendar size={14} color="#2563EB" />
               <span>{formatCalendarButtonLabel()}</span>
@@ -439,10 +463,11 @@ export const Announcements = () => {
                 right: 0,
                 marginTop: '6px',
                 width: '300px',
-                backgroundColor: '#FFFFFF',
+                backgroundColor: 'var(--card-bg, #FFFFFF)',
+                color: 'var(--text-primary)',
                 borderRadius: '10px',
-                border: '1px solid #CBD5E1',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                border: '1px solid var(--border-color, #CBD5E1)',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15)',
                 padding: '12px',
                 zIndex: 1000,
                 display: 'flex',
@@ -463,8 +488,9 @@ export const Announcements = () => {
                       width: '30px',
                       height: '30px',
                       borderRadius: '5px',
-                      border: '1px solid #E2E8F0',
-                      backgroundColor: '#FFFFFF',
+                      border: '1px solid var(--border-color, #E2E8F0)',
+                      backgroundColor: 'var(--card-bg, #FFFFFF)',
+                      color: 'var(--text-primary)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -542,8 +568,9 @@ export const Announcements = () => {
                       width: '30px',
                       height: '30px',
                       borderRadius: '5px',
-                      border: '1px solid #E2E8F0',
-                      backgroundColor: '#FFFFFF',
+                      border: '1px solid var(--border-color, #E2E8F0)',
+                      backgroundColor: 'var(--card-bg, #FFFFFF)',
+                      color: 'var(--text-primary)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -695,9 +722,9 @@ export const Announcements = () => {
               gap: '6px',
               padding: '6px 12px',
               borderRadius: '7px',
-              backgroundColor: isFilterOpen ? '#EFF6FF' : '#FFFFFF',
-              border: isFilterOpen ? '1.5px solid #2563EB' : '1px solid #CBD5E1',
-              color: isFilterOpen ? '#1D4ED8' : '#334155',
+              backgroundColor: isFilterOpen ? 'rgba(37, 99, 235, 0.15)' : 'var(--card-bg)',
+              border: isFilterOpen ? '1.5px solid #2563EB' : '1px solid var(--border-color)',
+              color: isFilterOpen ? 'var(--electric-blue)' : 'var(--text-primary)',
               fontSize: '0.8rem',
               fontWeight: 650,
               cursor: 'pointer',
@@ -705,7 +732,7 @@ export const Announcements = () => {
             }}
             title="Toggle search and filter options"
           >
-            <Filter size={14} color={hasActiveNonDateFilters || isFilterOpen ? '#2563EB' : '#64748B'} />
+            <Filter size={14} color={hasActiveNonDateFilters || isFilterOpen ? 'var(--electric-blue)' : 'var(--text-muted)'} />
             <span>Filter</span>
             {hasActiveNonDateFilters && (
               <span style={{
@@ -741,11 +768,11 @@ export const Announcements = () => {
       {/* 4. EXPANDABLE FILTER PANEL (Hidden by default, toggled via Filter button) */}
       {isFilterOpen && (
         <div style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--card-bg, #FFFFFF)',
           borderRadius: '9px',
           padding: '12px 14px',
-          border: '1px solid #CBD5E1',
-          boxShadow: '0 2px 5px rgba(0, 0, 0, 0.03)',
+          border: '1px solid var(--border-color, #CBD5E1)',
+          boxShadow: 'var(--shadow-sm)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -794,12 +821,12 @@ export const Announcements = () => {
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 9px center',
                 backgroundSize: '13px 13px',
-                backgroundColor: '#FFFFFF',
-                color: '#334155'
+                backgroundColor: 'var(--bg-input, #FFFFFF)',
+                color: 'var(--text-primary)'
               }}
             >
               {categories.map(c => (
-                <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
+                <option key={c} value={c}>{c === 'All' ? 'All Categories' : getCategoryShortLabel(c)}</option>
               ))}
             </select>
 
@@ -824,8 +851,8 @@ export const Announcements = () => {
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 9px center',
                 backgroundSize: '13px 13px',
-                backgroundColor: '#FFFFFF',
-                color: '#334155'
+                backgroundColor: 'var(--bg-input, #FFFFFF)',
+                color: 'var(--text-primary)'
               }}
             >
               <option value="All">All Towers</option>
@@ -855,8 +882,8 @@ export const Announcements = () => {
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 9px center',
                 backgroundSize: '13px 13px',
-                backgroundColor: '#FFFFFF',
-                color: '#334155'
+                backgroundColor: 'var(--bg-input, #FFFFFF)',
+                color: 'var(--text-primary)'
               }}
             >
               <option value="All">All Priorities</option>
@@ -922,14 +949,14 @@ export const Announcements = () => {
         flexWrap: 'wrap',
         gap: '8px',
         padding: '8px 12px',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg, #FFFFFF)',
         borderRadius: '8px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)'
+        border: '1px solid var(--border-color, #E2E8F0)',
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <Calendar size={15} color="#2563EB" />
-          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F172A' }}>
+          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>
             {isViewingToday
               ? `Today: Tuesday, 10 November 2026`
               : selectedDay !== null
@@ -937,8 +964,8 @@ export const Announcements = () => {
                 : `Entire Month: ${MONTH_NAMES[selectedMonth]} ${selectedYear}`}
           </span>
           <span style={{
-            backgroundColor: displayedAnnouncements.length > 0 ? '#EFF6FF' : '#F1F5F9',
-            color: displayedAnnouncements.length > 0 ? '#1D4ED8' : '#64748B',
+            backgroundColor: displayedAnnouncements.length > 0 ? 'rgba(37, 99, 235, 0.15)' : 'var(--bg-hover)',
+            color: displayedAnnouncements.length > 0 ? 'var(--electric-blue)' : 'var(--text-secondary)',
             fontSize: '0.7rem',
             fontWeight: 800,
             padding: '1px 7px',
@@ -963,7 +990,7 @@ export const Announcements = () => {
                 padding: 0
               }}
             >
-              View all {MONTH_NAMES[selectedMonth]} notices ({monthAnnouncements.length})
+              All ({monthAnnouncements.length})
             </button>
           )}
 
@@ -974,14 +1001,14 @@ export const Announcements = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#0F172A',
+                color: 'var(--text-primary)',
                 fontWeight: 700,
                 cursor: 'pointer',
                 padding: 0,
                 textDecoration: 'underline'
               }}
             >
-              Return to Today
+              Today
             </button>
           )}
         </div>
@@ -992,9 +1019,9 @@ export const Announcements = () => {
         {displayedAnnouncements.length === 0 ? (
           /* Clean Empty State */
           <div style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '9px',
-            border: '1px dashed #CBD5E1',
+            border: '1px dashed var(--border-color, #CBD5E1)',
             padding: '40px 20px',
             textAlign: 'center',
             display: 'flex',
@@ -1007,16 +1034,16 @@ export const Announcements = () => {
               width: '42px',
               height: '42px',
               borderRadius: '50%',
-              backgroundColor: '#F1F5F9',
+              backgroundColor: 'var(--bg-hover, #F1F5F9)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#94A3B8'
+              color: 'var(--text-muted, #94A3B8)'
             }}>
               <Calendar size={20} />
             </div>
 
-            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1E293B' }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {isViewingToday 
                 ? 'No announcements for today.' 
                 : selectedDay !== null
@@ -1038,7 +1065,7 @@ export const Announcements = () => {
                   onClick={() => setSelectedDay(null)}
                   style={{ fontSize: '0.75rem', padding: '4px 10px' }}
                 >
-                  View all in {MONTH_NAMES[selectedMonth]} ({monthAnnouncements.length})
+                  All ({monthAnnouncements.length})
                 </button>
               )}
 
@@ -1049,7 +1076,7 @@ export const Announcements = () => {
                   onClick={handleSelectToday}
                   style={{ fontSize: '0.75rem', padding: '4px 10px' }}
                 >
-                  Back to Today
+                  Today
                 </button>
               )}
 
@@ -1077,12 +1104,12 @@ export const Announcements = () => {
               <div
                 key={ann.id}
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'var(--card-bg, #FFFFFF)',
                   borderRadius: '8px',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid var(--border-color, #E2E8F0)',
                   borderLeft: `3.5px solid ${priorityBorder}`,
                   padding: '11px 14px',
-                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
+                  boxShadow: 'var(--shadow-sm)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '6px',
@@ -1099,9 +1126,9 @@ export const Announcements = () => {
                         gap: '3px',
                         padding: '1px 5px',
                         borderRadius: '4px',
-                        backgroundColor: '#FEF2F2',
-                        color: '#DC2626',
-                        border: '1px solid #FECACA',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        color: '#EF4444',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
                         fontSize: '0.675rem',
                         fontWeight: 800
                       }}>
@@ -1110,21 +1137,29 @@ export const Announcements = () => {
                     )}
                     <PriorityBadge priority={ann.priority} />
                     <span style={{
-                      backgroundColor: '#F1F5F9',
-                      color: '#475569',
-                      padding: '1px 6px',
-                      borderRadius: '4px',
-                      fontSize: '0.675rem',
+                      backgroundColor: 'var(--bg-hover, #F1F5F9)',
+                      color: 'var(--text-secondary)',
+                      padding: '2px 7px',
+                      borderRadius: '5px',
+                      fontSize: '0.6875rem',
                       fontWeight: 700
                     }}>
-                      {ann.category}
+                      {getCategoryShortLabel(ann.category)}
                     </span>
-                    <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
-                      Audience: <strong>{ann.targetAudience}</strong>
+                    <span style={{
+                      backgroundColor: 'var(--bg-hover, #F8FAFC)',
+                      border: '1px solid var(--border-color, #E2E8F0)',
+                      color: 'var(--text-secondary)',
+                      padding: '2px 7px',
+                      borderRadius: '5px',
+                      fontSize: '0.6875rem',
+                      fontWeight: 700
+                    }}>
+                      {getAudienceShortLabel(ann.targetAudience)}
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: '#64748B', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
                     <Clock size={11} />
                     <span>{ann.publishedDate}</span>
                   </div>
@@ -1137,13 +1172,13 @@ export const Announcements = () => {
                     style={{
                       fontSize: '0.88rem',
                       fontWeight: 800,
-                      color: '#0F172A',
+                      color: 'var(--text-primary)',
                       margin: 0,
                       cursor: 'pointer',
                       lineHeight: 1.3
                     }}
                     onMouseEnter={e => { e.currentTarget.style.color = '#2563EB'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#0F172A'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-primary)'; }}
                     title="Click to view complete details"
                   >
                     {ann.title}
@@ -1180,7 +1215,7 @@ export const Announcements = () => {
                     </span>
                     <span>•</span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      <User size={11} /> Published by: <strong>{ann.publishedBy.split('(')[0].trim()}</strong>
+                      <User size={11} strokeWidth={1.5} /> By: <strong>{ann.publishedBy.split('(')[0].trim()}</strong>
                     </span>
                   </div>
 
@@ -1201,8 +1236,8 @@ export const Announcements = () => {
                         gap: '3px'
                       }}
                     >
-                      <span>Full Notice</span>
-                      <ExternalLink size={11} />
+                      <span>Details</span>
+                      <ExternalLink size={11} strokeWidth={1.5} />
                     </button>
 
                     {isManagement && (
@@ -1249,24 +1284,24 @@ export const Announcements = () => {
             {/* Metadata Badges */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               {activeNoticeModal.pinned && (
-                <span className="badge" style={{ backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA' }}>
+                <span className="badge" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
                   <Pin size={12} /> PINNED NOTICE
                 </span>
               )}
               <PriorityBadge priority={activeNoticeModal.priority} />
-              <span className="badge badge-indigo">{activeNoticeModal.category}</span>
-              <span className="badge badge-neutral">Audience: {activeNoticeModal.targetAudience}</span>
-              <span className="badge badge-neutral">Scope: {activeNoticeModal.apartmentScope}</span>
+              <span className="badge badge-indigo">{getCategoryShortLabel(activeNoticeModal.category)}</span>
+              <span className="badge badge-neutral">{getAudienceShortLabel(activeNoticeModal.targetAudience)}</span>
+              <span className="badge badge-neutral">{activeNoticeModal.apartmentScope}</span>
             </div>
 
             {/* Complete Notice Body */}
             <div style={{
-              backgroundColor: '#F8FAFC',
+              backgroundColor: 'var(--bg-hover)',
               borderRadius: '8px',
               padding: '14px 16px',
-              border: '1px solid #E2E8F0',
+              border: '1px solid var(--border-color)',
               fontSize: '0.85rem',
-              color: '#1E293B',
+              color: 'var(--text-primary)',
               lineHeight: 1.6,
               whiteSpace: 'pre-wrap'
             }}>

@@ -73,7 +73,7 @@ export const RegistrationApprovals = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Resident Registration Approvals</h1>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Resident Approvals</h1>
           </div>
         </div>
 

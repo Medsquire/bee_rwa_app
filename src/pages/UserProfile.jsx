@@ -19,7 +19,7 @@ export const UserProfile = () => {
   const { currentUser, currentRoleKey, switchRole, roles } = useRwa();
 
   return (
-    <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <div>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>User Profile & Association Membership</h1>
         

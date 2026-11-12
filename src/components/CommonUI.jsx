@@ -121,11 +121,12 @@ export const ApartmentBadge = ({ apartment }) => {
 
 export const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'blue', onClick, style, compact }) => {
   const colorMap = {
-    blue: { iconBg: 'rgba(59, 130, 246, 0.12)', iconColor: '#3B82F6', borderLeft: '#3B82F6' },
-    cyan: { iconBg: 'rgba(34, 211, 238, 0.15)', iconColor: '#0891B2', borderLeft: '#22D3EE' },
+    blue: { iconBg: 'rgba(37, 99, 235, 0.15)', iconColor: '#2563EB', borderLeft: '#2563EB' },
+    cyan: { iconBg: 'rgba(6, 182, 212, 0.15)', iconColor: '#0891B2', borderLeft: '#06B6D4' },
     green: { iconBg: 'rgba(16, 185, 129, 0.15)', iconColor: '#10B981', borderLeft: '#10B981' },
     amber: { iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: '#F59E0B', borderLeft: '#F59E0B' },
     indigo: { iconBg: 'rgba(99, 102, 241, 0.15)', iconColor: '#6366F1', borderLeft: '#6366F1' },
+    purple: { iconBg: 'rgba(139, 92, 246, 0.15)', iconColor: '#8B5CF6', borderLeft: '#8B5CF6' },
     rose: { iconBg: 'rgba(239, 68, 68, 0.15)', iconColor: '#EF4444', borderLeft: '#EF4444' }
   };
 
@@ -133,43 +134,52 @@ export const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'b
 
   return (
     <div 
-      className={`glass-card stat-card ${onClick ? 'glass-card-interactive' : ''}`}
       style={{ 
-        borderLeft: `4px solid ${scheme.borderLeft}`,
-        ...(compact ? { padding: '12px 16px' } : {}),
+        backgroundColor: 'var(--card-bg)',
+        borderRadius: '8px',
+        padding: compact ? '10px 14px' : '14px 18px',
+        border: '1px solid var(--border-color)',
+        borderLeft: `3px solid ${scheme.borderLeft}`,
+        boxShadow: 'var(--shadow-sm)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '8px',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'transform 0.12s ease, box-shadow 0.12s ease',
         ...style 
       }}
       onClick={onClick}
+      onMouseEnter={onClick ? (e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }) : undefined}
+      onMouseLeave={onClick ? (e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }) : undefined}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: compact ? '0' : '12px' }}>
-        <div>
-          <p style={{ fontSize: compact ? '0.6875rem' : '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
-            {title}
-          </p>
-          <div className="stat-value" style={{ marginTop: compact ? '2px' : '4px', fontSize: compact ? '1.4rem' : undefined }}>
-            {value}
-          </div>
+      <div>
+        <p style={{ fontSize: compact ? '0.675rem' : '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
+          {title}
+        </p>
+        <div style={{ marginTop: compact ? '2px' : '4px', fontSize: compact ? '1.35rem' : '1.75rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+          {value}
         </div>
-        {Icon && (
-          <div style={{ 
-            width: compact ? '36px' : '46px', 
-            height: compact ? '36px' : '46px', 
-            borderRadius: compact ? '8px' : '12px', 
-            backgroundColor: scheme.iconBg, 
-            color: scheme.iconColor,
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            flexShrink: 0
-          }}>
-            <Icon size={compact ? 18 : 22} />
+        {subtitle && (
+          <div style={{ fontSize: compact ? '0.675rem' : '0.75rem', color: scheme.iconColor, fontWeight: 600, marginTop: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {trend && <span>{trend}</span>}
+            <span>{subtitle}</span>
           </div>
         )}
       </div>
-      {subtitle && (
-        <div style={{ fontSize: compact ? '0.75rem' : '0.8125rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', marginTop: compact ? '4px' : '0' }}>
-          {trend && <span style={{ fontWeight: 600, color: trend.startsWith('+') ? 'var(--success)' : 'var(--error)' }}>{trend}</span>}
-          <span>{subtitle}</span>
+      {Icon && (
+        <div style={{ 
+          width: compact ? '32px' : '40px', 
+          height: compact ? '32px' : '40px', 
+          borderRadius: '6px', 
+          backgroundColor: scheme.iconBg, 
+          color: scheme.iconColor,
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
+          <Icon size={compact ? 16 : 20} strokeWidth={1.5} />
         </div>
       )}
     </div>

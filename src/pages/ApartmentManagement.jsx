@@ -64,25 +64,26 @@ export const ApartmentManagement = () => {
 
       {/* Leadership & Towers Banner */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg, #FFFFFF)',
         borderRadius: '12px',
         padding: '20px 24px',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--border-color, #E2E8F0)',
         borderLeft: '4px solid #F59E0B',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 {currentApt.name} — Infrastructure & Leadership
               </h2>
               {currentApt.name === 'Golden Apartment' && (
                 <span style={{
                   fontSize: '0.75rem',
                   fontWeight: 800,
-                  backgroundColor: '#FEF3C7',
-                  color: '#B45309',
+                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                  color: '#F59E0B',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
                   padding: '3px 10px',
                   borderRadius: '12px'
                 }}>
@@ -90,7 +91,7 @@ export const ApartmentManagement = () => {
                 </span>
               )}
             </div>
-            <div style={{ fontSize: '0.8125rem', color: '#64748B', marginTop: '4px' }}>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
               {currentApt.address} • Security: {currentApt.securityContact}
             </div>
           </div>
@@ -102,8 +103,8 @@ export const ApartmentManagement = () => {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '6px 14px',
-                backgroundColor: '#FFFBEB',
-                border: '1px solid #FDE68A',
+                backgroundColor: 'var(--bg-hover, #FFFBEB)',
+                border: '1px solid var(--border-color, #FDE68A)',
                 borderRadius: '8px'
               }}>
                 <div style={{
@@ -122,9 +123,9 @@ export const ApartmentManagement = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#B45309' }}>PRESIDENT</div>
-                  <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#0F172A' }}>
+                  <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {currentApt.leadership.president}
-                    <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginLeft: '6px' }}>
+                    <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginLeft: '6px' }}>
                       ({currentApt.leadership.presidentFlat || 'GT1-801'})
                     </span>
                   </div>
@@ -137,8 +138,8 @@ export const ApartmentManagement = () => {
                   alignItems: 'center',
                   gap: '8px',
                   padding: '6px 14px',
-                  backgroundColor: '#EFF6FF',
-                  border: '1px solid #BFDBFE',
+                  backgroundColor: 'var(--bg-hover, #EFF6FF)',
+                  border: '1px solid var(--border-color, #BFDBFE)',
                   borderRadius: '8px'
                 }}>
                   <div style={{
@@ -157,9 +158,9 @@ export const ApartmentManagement = () => {
                   </div>
                   <div>
                     <div style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#1D4ED8' }}>VICE PRESIDENT</div>
-                    <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#0F172A' }}>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {currentApt.leadership.vicePresident}
-                      <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginLeft: '6px' }}>
+                      <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginLeft: '6px' }}>
                         ({currentApt.leadership.vicePresidentFlat || 'GT2-604'})
                       </span>
                     </div>
@@ -173,7 +174,7 @@ export const ApartmentManagement = () => {
         {/* 3 Towers Breakdown Cards */}
         {currentApt.towers && currentApt.towers.length > 0 && (
           <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em', marginBottom: '10px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '0.04em', marginBottom: '10px' }}>
               TOWER BREAKDOWN ({currentApt.towers.length} TOWERS)
             </div>
             <div style={{
@@ -185,9 +186,9 @@ export const ApartmentManagement = () => {
                 <div
                   key={tow.id}
                   style={{
-                    backgroundColor: '#F8FAFC',
+                    backgroundColor: 'var(--card-bg, #FFFFFF)',
                     borderRadius: '10px',
-                    border: '1px solid #E2E8F0',
+                    border: '1px solid var(--border-color, #E2E8F0)',
                     borderTop: `3px solid ${tow.color || '#2563EB'}`,
                     padding: '14px 16px'
                   }}
@@ -195,15 +196,16 @@ export const ApartmentManagement = () => {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Building2 size={16} style={{ color: tow.color || '#2563EB' }} />
-                      <span style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>
+                      <span style={{ fontWeight: 800, fontSize: '0.9375rem', color: 'var(--text-primary)' }}>
                         {tow.name}
                       </span>
                     </div>
                     <span style={{
                       fontSize: '0.6875rem',
                       fontWeight: 700,
-                      backgroundColor: '#F0FDF4',
-                      color: '#16A34A',
+                      backgroundColor: 'rgba(22, 163, 74, 0.15)',
+                      color: '#22C55E',
+                      border: '1px solid rgba(34, 197, 94, 0.3)',
                       padding: '2px 6px',
                       borderRadius: '6px'
                     }}>
@@ -213,19 +215,19 @@ export const ApartmentManagement = () => {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem', marginTop: '10px' }}>
                     <div>
-                      <span style={{ color: '#64748B' }}>Floors: </span>
-                      <strong style={{ color: '#0F172A' }}>{tow.floors} Floors</strong>
+                      <span style={{ color: 'var(--text-secondary)' }}>Floors: </span>
+                      <strong style={{ color: 'var(--text-primary)' }}>{tow.floors} Floors</strong>
                     </div>
                     <div>
-                      <span style={{ color: '#64748B' }}>Flats: </span>
-                      <strong style={{ color: '#0F172A' }}>{tow.flats} Units</strong>
+                      <span style={{ color: 'var(--text-secondary)' }}>Flats: </span>
+                      <strong style={{ color: 'var(--text-primary)' }}>{tow.flats} Units</strong>
                     </div>
                     <div>
-                      <span style={{ color: '#64748B' }}>Elevators: </span>
-                      <strong style={{ color: '#0F172A' }}>{tow.lifts || 2} Otis Lifts</strong>
+                      <span style={{ color: 'var(--text-secondary)' }}>Elevators: </span>
+                      <strong style={{ color: 'var(--text-primary)' }}>{tow.lifts || 2} Otis Lifts</strong>
                     </div>
                     <div>
-                      <span style={{ color: '#64748B' }}>Occupied: </span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Occupied: </span>
                       <strong style={{ color: '#16A34A' }}>{tow.occupied || tow.flats} Units</strong>
                     </div>
                   </div>
@@ -234,15 +236,15 @@ export const ApartmentManagement = () => {
                     <div style={{
                       marginTop: '10px',
                       paddingTop: '8px',
-                      borderTop: '1px solid #E2E8F0',
+                      borderTop: '1px solid var(--border-color, #E2E8F0)',
                       fontSize: '0.6875rem',
-                      color: '#64748B',
+                      color: 'var(--text-secondary)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px'
                     }}>
                       <span>Leadership:</span>
-                      <strong style={{ color: '#0F172A' }}>{tow.head}</strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>{tow.head}</strong>
                     </div>
                   )}
                 </div>
@@ -255,18 +257,18 @@ export const ApartmentManagement = () => {
 
       {/* Assigned Staff & Maintenance Personnel for this Complex */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg, #FFFFFF)',
         borderRadius: '12px',
         padding: '20px 24px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)'
+        border: '1px solid var(--border-color, #E2E8F0)',
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               Assigned Maintenance Team & Caretakers
             </h2>
-            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
               On-duty personnel stationed at {currentApt.name}
             </div>
           </div>
@@ -305,8 +307,8 @@ export const ApartmentManagement = () => {
                 gap: '12px',
                 padding: '12px',
                 borderRadius: '10px',
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0'
+                backgroundColor: 'var(--card-bg)',
+                border: '1px solid var(--border-color)'
               }}
             >
               <div style={{
@@ -325,7 +327,7 @@ export const ApartmentManagement = () => {
                 {emp.avatar}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '0.8125rem', color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.8125rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {emp.name}
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: '#2563EB', fontWeight: 600 }}>

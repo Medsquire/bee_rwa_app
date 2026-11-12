@@ -30,8 +30,9 @@
 
   /* Light Theme Defaults */
   --bg-page: #F8FAFC;
-  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card: #FFFFFF;
   --bg-card-solid: #FFFFFF;
+  --card-bg: #FFFFFF;
   --bg-elevated: #FFFFFF;
   --bg-hover: #F1F5F9;
   --bg-input: #FFFFFF;
@@ -70,24 +71,57 @@
 
 [data-theme='dark'] {
   --bg-page: #060B14;
-  --bg-card: rgba(15, 23, 42, 0.85);
-  --bg-card-solid: #0B1220;
-  --bg-elevated: #111B2E;
+  --bg-card: #0F172A;
+  --bg-card-solid: #0F172A;
+  --card-bg: #0F172A;
+  --bg-elevated: #111C35;
   --bg-hover: #1E293B;
-  --bg-input: #0B1220;
-  --text-primary: #F8FAFC;
+  --bg-input: #111C35;
+  --text-primary: #FFFFFF;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
   --border-color: #1E293B;
+  --border: #1E293B;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.5);
   --glass-border: rgba(30, 41, 59, 0.7);
-  --header-bg: rgba(11, 18, 32, 0.9);
+  --header-bg: #0B1B3D;
   --sidebar-bg: #060B14;
   --sidebar-text: #F1F5F9;
   --sidebar-text-muted: #64748B;
   --sidebar-hover: #111B2E;
+}
+
+/* Global dark-theme surface adjustments */
+[data-theme='dark'] .card,
+[data-theme='dark'] .glass-card,
+[data-theme='dark'] .modal-content,
+[data-theme='dark'] .stat-card,
+[data-theme='dark'] .agency-card-item {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .table th {
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .form-control,
+[data-theme='dark'] select,
+[data-theme='dark'] input[type="text"],
+[data-theme='dark'] input[type="search"],
+[data-theme='dark'] input[type="email"],
+[data-theme='dark'] input[type="password"],
+[data-theme='dark'] textarea {
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .table td {
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 * {
@@ -511,16 +545,6 @@ select {
 /* Stat Card */
 .stat-card {
   position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--grad-primary);
 }
 .stat-value {
   font-size: 1.875rem;

@@ -41,14 +41,11 @@ export const NotificationsPage = () => {
   };
 
   return (
-    <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Notifications Center</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            System alerts, complaint progress milestones, dues reminders, and committee updates
-          </p>
         </div>
         <button className="btn btn-secondary btn-sm" onClick={markAllNotificationsRead}>
           <Check size={14} /> Mark All as Read

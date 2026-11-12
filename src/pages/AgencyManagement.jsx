@@ -20,20 +20,20 @@ import {
 } from 'lucide-react';
 
 export const AgencyManagement = () => {
-  const { agencies, setAgencies, updateAgencyStatus, setActiveTab, showToast } = useRwa();
+  const { agencies, setAgencies, updateAgencyStatus, setActiveTab, showToast, theme } = useRwa();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All'); // 'All' | 'Active' | 'Inactive'
   const [selectedAgencyForServices, setSelectedAgencyForServices] = useState(null);
 
-  // Categories list tailored to the contracted agencies
+  // Categories list tailored to the contracted agencies (Single words)
   const categories = [
-    { id: 'All', label: 'All Categories', icon: Wrench },
-    { id: 'Cleaning & Gardening', label: 'Cleaning & Gardening', icon: Sparkles, color: '#10B981' },
-    { id: 'Plumbing & Water Systems', label: 'Plumbing & Water', icon: Droplets, color: '#06B6D4' },
-    { id: 'Security & Access Control', label: 'Security & Guarding', icon: ShieldCheck, color: '#8B5CF6' },
-    { id: 'Lift & Elevator Maintenance', label: 'Lift & Elevators', icon: Building2, color: '#F59E0B' }
+    { id: 'All', label: 'All', icon: Wrench },
+    { id: 'Cleaning & Gardening', label: 'Cleaning', icon: Sparkles, color: '#10B981' },
+    { id: 'Plumbing & Water Systems', label: 'Plumbing', icon: Droplets, color: '#06B6D4' },
+    { id: 'Security & Access Control', label: 'Security', icon: ShieldCheck, color: '#8B5CF6' },
+    { id: 'Lift & Elevator Maintenance', label: 'Lifts', icon: Building2, color: '#F59E0B' }
   ];
 
   // Counts for top cards
@@ -90,7 +90,7 @@ export const AgencyManagement = () => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-              Agencies & Service Providers
+              Agencies
             </h1>
           </div>
         </div>
@@ -107,11 +107,11 @@ export const AgencyManagement = () => {
         </div>
       </div>
 
-      {/* 2. TOP METRIC CARDS: Agency Count, Active Agencies, Inactive Agencies, Service Count, Employee Count */}
+      {/* 2. TOP METRIC CARDS: Agency Count, Active Agencies, Inactive Agencies, Service Count, Employee Count (Compact layout matching Dashboard) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '12px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '10px'
       }}>
         {/* Card 1: Agency Count */}
         <div 
@@ -121,44 +121,43 @@ export const AgencyManagement = () => {
           }}
           title="Click to view all agencies"
           style={{
-            backgroundColor: statusFilter === 'All' && categoryFilter === 'All' ? '#EEF2FF' : '#FFFFFF',
-            borderRadius: '10px',
-            padding: '10px 14px',
-            border: statusFilter === 'All' && categoryFilter === 'All' ? '2px solid #4F46E5' : '1px solid #E2E8F0',
-            borderLeft: '4px solid #4F46E5',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
+            borderRadius: '8px',
+            padding: '10px 12px',
+            border: '1px solid var(--border-color)',
+            borderLeft: '3px solid #6366F1',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#475569', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Agency Count
-              </span>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '7px',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#4F46E5'
-              }}>
-                <Building2 size={16} strokeWidth={1.5} />
-              </div>
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#4F46E5', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>AGENCY COUNT</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px', lineHeight: 1.1 }}>
               {totalAgenciesCount}
             </div>
+            <div style={{ fontSize: '0.675rem', color: '#6366F1', fontWeight: 600 }}>
+              Total contracted
+            </div>
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#4338CA', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#4F46E5', display: 'inline-block' }} />
-            <span>Total contracted agencies</span>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '6px',
+            backgroundColor: theme === 'dark' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#6366F1',
+            flexShrink: 0
+          }}>
+            <Building2 size={16} strokeWidth={1.5} />
           </div>
         </div>
 
@@ -167,96 +166,92 @@ export const AgencyManagement = () => {
           onClick={() => setStatusFilter(prev => prev === 'Active' ? 'All' : 'Active')}
           title="Click to filter by Active agencies"
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '10px',
-            padding: '10px 14px',
-            border: statusFilter === 'Active' ? '2px solid #16A34A' : '1px solid #E2E8F0',
-            borderLeft: '4px solid #16A34A',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
+            borderRadius: '8px',
+            padding: '10px 12px',
+            border: '1px solid var(--border-color)',
+            borderLeft: '3px solid #16A34A',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease',
-            background: statusFilter === 'Active' ? '#F0FDF4' : '#FFFFFF'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#475569', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Active Agencies
-              </span>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '7px',
-                backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#16A34A'
-              }}>
-                <ShieldCheck size={16} strokeWidth={1.5} />
-              </div>
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>ACTIVE AGENCIES</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px', lineHeight: 1.1 }}>
               {activeAgenciesCount}
             </div>
+            <div style={{ fontSize: '0.675rem', color: '#16A34A', fontWeight: 600 }}>
+              {activeAgenciesCount} operational
+            </div>
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#15803D', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#22C55E', display: 'inline-block' }} />
-            <span>{activeAgenciesCount} operational partners</span>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '6px',
+            backgroundColor: theme === 'dark' ? 'rgba(22, 163, 74, 0.2)' : 'rgba(22, 163, 74, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#16A34A',
+            flexShrink: 0
+          }}>
+            <ShieldCheck size={16} strokeWidth={1.5} />
           </div>
         </div>
 
-        {/* Card 2: Inactive Agencies */}
+        {/* Card 3: Inactive Agencies */}
         <div 
           onClick={() => setStatusFilter(prev => prev === 'Inactive' ? 'All' : 'Inactive')}
           title="Click to filter by Inactive agencies"
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '10px',
-            padding: '10px 14px',
-            border: statusFilter === 'Inactive' ? '2px solid #EF4444' : '1px solid #E2E8F0',
-            borderLeft: '4px solid #EF4444',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
+            borderRadius: '8px',
+            padding: '10px 12px',
+            border: '1px solid var(--border-color)',
+            borderLeft: '3px solid #EF4444',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease',
-            background: statusFilter === 'Inactive' ? '#FEF2F2' : '#FFFFFF'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#475569', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Inactive Agencies
-              </span>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '7px',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#EF4444'
-              }}>
-                <AlertTriangle size={16} strokeWidth={1.5} />
-              </div>
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>INACTIVE AGENCIES</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px', lineHeight: 1.1 }}>
               {inactiveAgenciesCount}
             </div>
+            <div style={{ fontSize: '0.675rem', color: '#EF4444', fontWeight: 600 }}>
+              {inactiveAgenciesCount} paused / expired
+            </div>
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#B91C1C', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#EF4444', display: 'inline-block' }} />
-            <span>{inactiveAgenciesCount} paused / expired AMC</span>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '6px',
+            backgroundColor: theme === 'dark' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#EF4444',
+            flexShrink: 0
+          }}>
+            <AlertTriangle size={16} strokeWidth={1.5} />
           </div>
         </div>
 
-        {/* Card 3: Service Count */}
+        {/* Card 4: Service Count */}
         <div 
           onClick={() => {
             setStatusFilter('All');
@@ -264,114 +259,110 @@ export const AgencyManagement = () => {
           }}
           title="Click to show all services"
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '10px',
-            padding: '10px 14px',
-            border: '1px solid #E2E8F0',
-            borderLeft: '4px solid #0D9488',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
+            borderRadius: '8px',
+            padding: '10px 12px',
+            border: '1px solid var(--border-color)',
+            borderLeft: '3px solid #0D9488',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#475569', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Service Count
-              </span>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '7px',
-                backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#0D9488'
-              }}>
-                <Wrench size={16} strokeWidth={1.5} />
-              </div>
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>SERVICE COUNT</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px', lineHeight: 1.1 }}>
               {totalServiceCount}
             </div>
+            <div style={{ fontSize: '0.675rem', color: '#0D9488', fontWeight: 600 }}>
+              Active offerings
+            </div>
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#0F766E', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#0D9488', display: 'inline-block' }} />
-            <span>Active service offerings in towers</span>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '6px',
+            backgroundColor: theme === 'dark' ? 'rgba(13, 148, 136, 0.2)' : 'rgba(13, 148, 136, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#0D9488',
+            flexShrink: 0
+          }}>
+            <Wrench size={16} strokeWidth={1.5} />
           </div>
         </div>
 
-        {/* Card 4: Employee Count */}
+        {/* Card 5: Employee Count */}
         <div style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '10px',
-          padding: '10px 14px',
-          border: '1px solid #E2E8F0',
-          borderLeft: '4px solid #2563EB',
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+          backgroundColor: 'var(--card-bg, #FFFFFF)',
+          borderRadius: '8px',
+          padding: '10px 12px',
+          border: '1px solid var(--border-color)',
+          borderLeft: '3px solid #2563EB',
+          boxShadow: 'var(--shadow-sm)',
           display: 'flex',
-          flexDirection: 'column',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+          gap: '8px',
+          transition: 'transform 0.12s ease, box-shadow 0.12s ease'
         }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#475569', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Employee Count
-              </span>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '7px',
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#2563EB'
-              }}>
-                <Users size={16} strokeWidth={1.5} />
-              </div>
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>EMPLOYEE COUNT</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px', lineHeight: 1.1 }}>
               {totalEmployeeCount}
             </div>
+            <div style={{ fontSize: '0.675rem', color: '#2563EB', fontWeight: 600 }}>
+              Deployed staff
+            </div>
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#1D4ED8', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#2563EB', display: 'inline-block' }} />
-            <span>Deployed staff across Golden towers</span>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '6px',
+            backgroundColor: theme === 'dark' ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#2563EB',
+            flexShrink: 0
+          }}>
+            <Users size={16} strokeWidth={1.5} />
           </div>
         </div>
       </div>
 
       {/* 3. Filter Bar with Status & Categories (Reduced Size) */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg)',
         borderRadius: '10px',
         padding: '10px 14px',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '10px',
-        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.02)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         {/* Status & Category Pills */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
           {/* Status Quick Filters */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#F1F5F9', borderRadius: '7px', padding: '2px', marginRight: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-hover)', borderRadius: '7px', padding: '2px', marginRight: '4px' }}>
             <button
               onClick={() => setStatusFilter('All')}
               style={{
                 padding: '4px 10px',
                 borderRadius: '6px',
                 border: 'none',
-                backgroundColor: statusFilter === 'All' ? '#FFFFFF' : 'transparent',
-                color: statusFilter === 'All' ? '#0F172A' : '#64748B',
+                backgroundColor: statusFilter === 'All' ? 'var(--card-bg)' : 'transparent',
+                color: statusFilter === 'All' ? 'var(--text-primary)' : 'var(--text-secondary)',
                 fontSize: '0.75rem',
                 fontWeight: statusFilter === 'All' ? 700 : 500,
                 cursor: 'pointer',
@@ -388,7 +379,7 @@ export const AgencyManagement = () => {
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: statusFilter === 'Active' ? '#16A34A' : 'transparent',
-                color: statusFilter === 'Active' ? '#FFFFFF' : '#15803D',
+                color: statusFilter === 'Active' ? '#FFFFFF' : '#22C55E',
                 fontSize: '0.75rem',
                 fontWeight: statusFilter === 'Active' ? 700 : 600,
                 cursor: 'pointer',
@@ -409,7 +400,7 @@ export const AgencyManagement = () => {
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: statusFilter === 'Inactive' ? '#EF4444' : 'transparent',
-                color: statusFilter === 'Inactive' ? '#FFFFFF' : '#B91C1C',
+                color: statusFilter === 'Inactive' ? '#FFFFFF' : '#EF4444',
                 fontSize: '0.75rem',
                 fontWeight: statusFilter === 'Inactive' ? 700 : 600,
                 cursor: 'pointer',
@@ -426,7 +417,7 @@ export const AgencyManagement = () => {
           </div>
 
           {/* Divider */}
-          <div style={{ width: '1px', height: '20px', backgroundColor: '#CBD5E1', margin: '0 4px' }} />
+          <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-color)', margin: '0 4px' }} />
 
           {/* Categories */}
           {categories.map(cat => {
@@ -442,16 +433,16 @@ export const AgencyManagement = () => {
                   gap: '5px',
                   padding: '5px 10px',
                   borderRadius: '7px',
-                  border: isSelected ? '1px solid #2563EB' : '1px solid #E2E8F0',
-                  backgroundColor: isSelected ? '#2563EB' : '#F8FAFC',
-                  color: isSelected ? '#FFFFFF' : '#334155',
+                  border: isSelected ? '1px solid #2563EB' : '1px solid var(--border-color)',
+                  backgroundColor: isSelected ? '#2563EB' : 'var(--card-bg)',
+                  color: isSelected ? '#FFFFFF' : 'var(--text-primary)',
                   fontSize: '0.75rem',
                   fontWeight: isSelected ? 700 : 500,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease'
                 }}
               >
-                <Icon size={13} strokeWidth={1.5} style={{ color: isSelected ? '#FFFFFF' : (cat.color || '#64748B') }} />
+                <Icon size={13} strokeWidth={1.5} style={{ color: isSelected ? '#FFFFFF' : (cat.color || 'var(--text-secondary)') }} />
                 <span>{cat.label}</span>
               </button>
             );
@@ -460,7 +451,7 @@ export const AgencyManagement = () => {
 
         {/* Search Input */}
         <div style={{ position: 'relative', width: '220px' }}>
-          <Search size={13} strokeWidth={1.5} style={{ position: 'absolute', left: '10px', top: '9px', color: '#94A3B8' }} />
+          <Search size={13} strokeWidth={1.5} style={{ position: 'absolute', left: '10px', top: '9px', color: 'var(--text-muted)' }} />
           <input 
             type="text" 
             placeholder="Search agency..." 
@@ -472,8 +463,9 @@ export const AgencyManagement = () => {
               height: '31px',
               fontSize: '0.78rem',
               borderRadius: '7px',
-              borderColor: '#CBD5E1',
-              backgroundColor: '#F8FAFC'
+              borderColor: 'var(--border-color)',
+              backgroundColor: 'var(--card-bg)',
+              color: 'var(--text-primary)'
             }}
           />
         </div>
@@ -496,10 +488,10 @@ export const AgencyManagement = () => {
             width: '100%',
             padding: '36px 20px',
             textAlign: 'center',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '12px',
-            border: '1px solid #E2E8F0',
-            color: '#64748B'
+            border: '1px solid var(--border-color, #E2E8F0)',
+            color: 'var(--text-secondary)'
           }}>
             <p style={{ margin: 0, fontWeight: 700, fontSize: '0.95rem' }}>No agencies found matching your filters.</p>
             <button 
@@ -530,11 +522,11 @@ export const AgencyManagement = () => {
                   flexShrink: 0,
                   flexGrow: 0,
                   boxSizing: 'border-box',
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'var(--card-bg)',
                   borderRadius: '12px',
-                  border: isActive ? '1px solid #E2E8F0' : '1px solid #FECACA',
+                  border: isActive ? '1px solid var(--border-color)' : '1px solid rgba(239, 68, 68, 0.4)',
                   overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                  boxShadow: 'var(--shadow-sm)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
@@ -545,7 +537,7 @@ export const AgencyManagement = () => {
                 {/* Top Section: Fixed Image Banner + Content */}
                 <div>
                   {/* Agency Image Banner (Fixed height: 146px) */}
-                  <div style={{ position: 'relative', width: '100%', height: '146px', backgroundColor: '#F1F5F9', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '146px', backgroundColor: 'var(--bg-hover)', overflow: 'hidden' }}>
                     <img 
                       src={agency.image} 
                       alt={agency.name}
@@ -570,16 +562,16 @@ export const AgencyManagement = () => {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        backgroundColor: 'var(--card-bg)',
                         backdropFilter: 'blur(4px)',
                         padding: '4px 10px',
                         borderRadius: '16px',
                         fontSize: '0.72rem',
                         fontWeight: 750,
-                        color: isActive ? '#15803D' : '#DC2626',
-                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)',
+                        color: isActive ? '#22C55E' : '#EF4444',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
                         cursor: 'pointer',
-                        border: isActive ? '1px solid #BBF7D0' : '1px solid #FECACA',
+                        border: isActive ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
                         userSelect: 'none'
                       }}
                     >
@@ -622,7 +614,7 @@ export const AgencyManagement = () => {
                       style={{
                         fontSize: '0.975rem',
                         fontWeight: 800,
-                        color: '#0F172A',
+                        color: 'var(--text-primary)',
                         margin: '0 0 8px 0',
                         lineHeight: 1.25,
                         whiteSpace: 'nowrap',
@@ -642,8 +634,8 @@ export const AgencyManagement = () => {
                         gap: '4px',
                         fontSize: '0.6875rem',
                         fontWeight: 700,
-                        backgroundColor: '#EFF6FF',
-                        color: '#1D4ED8',
+                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                        color: '#60A5FA',
                         padding: '3px 7px',
                         borderRadius: '5px',
                         whiteSpace: 'nowrap'
@@ -658,11 +650,11 @@ export const AgencyManagement = () => {
                         gap: '4px',
                         fontSize: '0.6875rem',
                         fontWeight: 600,
-                        backgroundColor: '#F8FAFC',
-                        color: '#475569',
+                        backgroundColor: 'var(--bg-hover)',
+                        color: 'var(--text-secondary)',
                         padding: '3px 7px',
                         borderRadius: '5px',
-                        border: '1px solid #E2E8F0',
+                        border: '1px solid var(--border-color)',
                         whiteSpace: 'nowrap'
                       }}>
                         <Wrench size={12} strokeWidth={1.5} />
@@ -675,8 +667,8 @@ export const AgencyManagement = () => {
                         gap: '4px',
                         fontSize: '0.6875rem',
                         fontWeight: 600,
-                        backgroundColor: '#FEF3C7',
-                        color: '#92400E',
+                        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                        color: '#F59E0B',
                         padding: '3px 7px',
                         borderRadius: '5px',
                         whiteSpace: 'nowrap'
@@ -731,12 +723,12 @@ export const AgencyManagement = () => {
                       fontWeight: 700,
                       padding: '0 10px',
                       borderRadius: '6px',
-                      color: '#DC2626',
-                      borderColor: '#FECACA',
-                      backgroundColor: '#FEF2F2'
+                      color: '#EF4444',
+                      borderColor: 'rgba(239, 68, 68, 0.3)',
+                      backgroundColor: 'rgba(239, 68, 68, 0.1)'
                     }}
                   >
-                    <AlertTriangle size={13} strokeWidth={1.5} color="#DC2626" />
+                    <AlertTriangle size={13} strokeWidth={1.5} color="#EF4444" />
                     <span>Complaints</span>
                   </button>
                 </div>
@@ -762,14 +754,16 @@ export const AgencyManagement = () => {
           padding: '20px'
         }}>
           <div style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
+            color: 'var(--text-primary)',
             borderRadius: '14px',
+            border: '1px solid var(--border-color)',
             maxWidth: '560px',
             width: '100%',
             maxHeight: '90vh',
             overflowY: 'auto',
             padding: '20px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)'
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)'
           }}>
             {/* Modal Header */}
             <div style={{
@@ -778,7 +772,7 @@ export const AgencyManagement = () => {
               justifyContent: 'space-between',
               marginBottom: '16px',
               paddingBottom: '12px',
-              borderBottom: '1px solid #E2E8F0'
+              borderBottom: '1px solid var(--border-color, #E2E8F0)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{
@@ -786,7 +780,7 @@ export const AgencyManagement = () => {
                   height: '42px',
                   borderRadius: '10px',
                   overflow: 'hidden',
-                  backgroundColor: '#F1F5F9',
+                  backgroundColor: 'var(--bg-hover, #F1F5F9)',
                   flexShrink: 0
                 }}>
                   <img 
@@ -796,7 +790,7 @@ export const AgencyManagement = () => {
                   />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                     {selectedAgencyForServices.name}
                   </h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
@@ -814,7 +808,7 @@ export const AgencyManagement = () => {
                       {selectedAgencyForServices.status === 'Active' ? 'Active Contractor' : 'Inactive Contractor'}
                     </span>
                     <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>•</span>
-                    <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                       {selectedAgencyForServices.category}
                     </span>
                   </div>
@@ -824,13 +818,13 @@ export const AgencyManagement = () => {
               <button 
                 onClick={() => setSelectedAgencyForServices(null)}
                 style={{
-                  background: '#F1F5F9',
-                  border: 'none',
+                  background: 'var(--bg-hover, #F1F5F9)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '50%',
                   width: '30px',
                   height: '30px',
                   cursor: 'pointer',
-                  color: '#64748B',
+                  color: 'var(--text-secondary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -848,25 +842,25 @@ export const AgencyManagement = () => {
                 gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '10px',
                 padding: '12px',
-                backgroundColor: '#F8FAFC',
+                backgroundColor: 'var(--bg-hover, #F8FAFC)',
                 borderRadius: '8px',
-                border: '1px solid #E2E8F0'
+                border: '1px solid var(--border-color, #E2E8F0)'
               }}>
                 <div>
-                  <span style={{ color: '#64748B', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>
                     Assigned Employees
                   </span>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <Users size={15} color="#2563EB" strokeWidth={1.5} />
                     <span>{selectedAgencyForServices.employeeCount} Personnel</span>
                   </div>
                 </div>
 
                 <div>
-                  <span style={{ color: '#64748B', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>
                     Lead Field Contact
                   </span>
-                  <div style={{ fontSize: '0.825rem', fontWeight: 700, color: '#0F172A', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <div style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <UserCheck size={15} color="#10B981" strokeWidth={1.5} />
                     <span>{selectedAgencyForServices.leadEngineer}</span>
                   </div>
@@ -895,8 +889,8 @@ export const AgencyManagement = () => {
                 justifyContent: 'space-between',
                 padding: '8px 12px',
                 borderRadius: '8px',
-                backgroundColor: selectedAgencyForServices.status === 'Active' ? '#F0FDF4' : '#FEF2F2',
-                border: selectedAgencyForServices.status === 'Active' ? '1px solid #BBF7D0' : '1px solid #FECACA'
+                backgroundColor: selectedAgencyForServices.status === 'Active' ? 'rgba(22, 163, 74, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                border: selectedAgencyForServices.status === 'Active' ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{
@@ -908,7 +902,7 @@ export const AgencyManagement = () => {
                   <span style={{
                     fontSize: '0.75rem',
                     fontWeight: 700,
-                    color: selectedAgencyForServices.status === 'Active' ? '#15803D' : '#DC2626'
+                    color: selectedAgencyForServices.status === 'Active' ? '#22C55E' : '#EF4444'
                   }}>
                     Contract Status: {selectedAgencyForServices.status === 'Active' ? 'Active & Operational' : 'Inactive / Paused'}
                   </span>
@@ -944,7 +938,7 @@ export const AgencyManagement = () => {
                 <h4 style={{
                   fontSize: '0.825rem',
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: 'var(--text-primary)',
                   margin: '0 0 8px 0',
                   letterSpacing: '0.01em'
                 }}>
@@ -957,9 +951,9 @@ export const AgencyManagement = () => {
                       key={idx}
                       style={{
                         padding: '8px 12px',
-                        backgroundColor: '#FFFFFF',
+                        backgroundColor: 'var(--card-bg)',
                         borderRadius: '7px',
-                        border: '1px solid #E2E8F0',
+                        border: '1px solid var(--border-color)',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px'
@@ -969,8 +963,8 @@ export const AgencyManagement = () => {
                         width: '20px',
                         height: '20px',
                         borderRadius: '50%',
-                        backgroundColor: '#F0FDF4',
-                        color: '#16A34A',
+                        backgroundColor: 'rgba(22, 163, 74, 0.15)',
+                        color: '#22C55E',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -978,7 +972,7 @@ export const AgencyManagement = () => {
                       }}>
                         <CheckCircle2 size={13} strokeWidth={1.5} />
                       </div>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#1E293B' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                         {service}
                       </span>
                     </div>
@@ -990,13 +984,13 @@ export const AgencyManagement = () => {
               <div style={{
                 padding: '10px 12px',
                 borderRadius: '7px',
-                backgroundColor: '#FFFBEB',
-                border: '1px solid #FDE68A'
+                backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                border: '1px solid rgba(245, 158, 11, 0.3)'
               }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#B45309', marginBottom: '2px' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#F59E0B', marginBottom: '2px' }}>
                   Coverage Scope
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#92400E', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 600 }}>
                   Active across Golden Apartment: Golden Tower 1, Golden Tower 2, and Golden Tower 3.
                 </div>
               </div>
@@ -1009,7 +1003,7 @@ export const AgencyManagement = () => {
               justifyContent: 'space-between',
               marginTop: '16px',
               paddingTop: '12px',
-              borderTop: '1px solid #E2E8F0',
+              borderTop: '1px solid var(--border-color)',
               gap: '8px'
             }}>
               {/* Redirect to complaints */}
@@ -1025,13 +1019,13 @@ export const AgencyManagement = () => {
                   gap: '5px',
                   fontSize: '0.78rem',
                   fontWeight: 700,
-                  color: '#DC2626',
-                  borderColor: '#FECACA',
-                  backgroundColor: '#FEF2F2',
+                  color: '#EF4444',
+                  borderColor: 'rgba(239, 68, 68, 0.3)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
                   padding: '6px 12px'
                 }}
               >
-                <AlertTriangle size={13} strokeWidth={1.5} color="#DC2626" />
+                <AlertTriangle size={13} strokeWidth={1.5} color="#EF4444" />
                 <span>Redirect to Complaints</span>
               </button>
 

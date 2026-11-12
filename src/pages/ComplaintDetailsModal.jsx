@@ -733,10 +733,10 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
             flexWrap: 'wrap',
             gap: '10px',
             padding: '10px 14px',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '8px',
-            border: '1px solid #E2E8F0',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+            border: '1px solid var(--border-color, #E2E8F0)',
+            boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               {/* First show only Pending Approval status. After clicking "Send directly to the agency app", then show Approved */}
@@ -795,9 +795,9 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
                   fontSize: '0.8125rem',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  backgroundColor: '#F8FAFC',
-                  color: '#1E293B',
-                  border: '1px solid #CBD5E1',
+                  backgroundColor: 'var(--card-bg)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
                   transition: 'all 0.15s ease'
                 }}
                 title="Check full audit log and history"
@@ -839,14 +839,14 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
 
           {/* 1. PHOTO (Visible clearly with Zoom, NO PDF format) */}
           <div style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
             padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '10px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+            boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -972,14 +972,14 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
 
           {/* 2. DESCRIPTION */}
           <div style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
             padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '10px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+            boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -996,11 +996,11 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
             <div style={{
               padding: '12px 14px',
               borderRadius: '6px',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
+              backgroundColor: 'var(--bg-hover, #F8FAFC)',
+              border: '1px solid var(--border-color, #E2E8F0)',
               fontSize: '0.84rem',
               lineHeight: 1.55,
-              color: '#1E293B'
+              color: 'var(--text-primary)'
             }}>
               {complaint.description}
             </div>
@@ -1017,11 +1017,11 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
             }}>
               <div>
                 <span style={{ color: 'var(--text-secondary)' }}>Reported By:</span>{' '}
-                <strong style={{ color: '#0F172A' }}>{complaint.submittedBy}</strong>
+                <strong style={{ color: 'var(--text-primary)' }}>{complaint.submittedBy}</strong>
               </div>
               <div>
                 <span style={{ color: 'var(--text-secondary)' }}>Registered:</span>{' '}
-                <strong style={{ color: '#0F172A' }}>{complaint.createdAt}</strong>
+                <strong style={{ color: 'var(--text-primary)' }}>{complaint.createdAt}</strong>
               </div>
              
             </div>
@@ -1029,14 +1029,14 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
 
           {/* 3. LOCATION (Place, Floor, Asset, Additional details) */}
           <div style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
             padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+            boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1070,7 +1070,7 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    backgroundColor: isApproved ? '#F8FAFC' : '#FFFFFF',
+                    backgroundColor: isApproved ? 'var(--bg-hover, #F8FAFC)' : 'var(--bg-input, #FFFFFF)',
                     cursor: isApproved ? 'not-allowed' : 'pointer',
                     textAlign: 'left',
                     borderRadius: '6px',
@@ -1096,7 +1096,7 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
                     left: 0,
                     right: 0,
                     zIndex: 50,
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'var(--card-bg, #FFFFFF)',
                     border: '1px solid var(--border-color)',
                     borderRadius: '8px',
                     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
@@ -1292,14 +1292,14 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
 
           {/* 4. CATEGORY (Category & Dependent Issue Type) */}
           <div style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
             padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+            boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1610,19 +1610,19 @@ export const ComplaintDetailsModal = ({ complaint, isOpen, onClose }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
+              backgroundColor: 'var(--bg-hover)',
+              border: '1px solid var(--border-color)',
               padding: '10px 14px',
               borderRadius: '8px',
               fontSize: '0.8rem'
             }}>
               <div>
-                <span style={{ color: '#64748B' }}>Ticket Status:</span>{' '}
+                <span style={{ color: 'var(--text-muted)' }}>Ticket Status:</span>{' '}
                 <StatusPill status={selectedStatus || complaint.status} />
               </div>
               <div>
-                <span style={{ color: '#64748B' }}>Registered:</span>{' '}
-                <strong style={{ color: '#0F172A' }}>{complaint.createdAt}</strong>
+                <span style={{ color: 'var(--text-muted)' }}>Registered:</span>{' '}
+                <strong style={{ color: 'var(--text-primary)' }}>{complaint.createdAt}</strong>
               </div>
             </div>
 
@@ -1812,9 +1812,9 @@ export const ComplaintTrackingModal = ({ complaint, isOpen, onClose, category })
         
         {/* SLA & Live Status Banner */}
         <div style={{
-          backgroundColor: '#F8FAFC',
+          backgroundColor: 'var(--bg-hover)',
           borderRadius: '8px',
-          border: '1px solid #E2E8F0',
+          border: '1px solid var(--border-color)',
           padding: '12px 16px',
           display: 'flex',
           alignItems: 'center',
@@ -1903,15 +1903,15 @@ export const ComplaintTrackingModal = ({ complaint, isOpen, onClose, category })
                     <span style={{
                       fontSize: '0.72rem',
                       fontWeight: 600,
-                      color: st.done ? '#059669' : st.active ? '#D97706' : '#94A3B8',
-                      backgroundColor: st.done ? '#ECFDF5' : st.active ? '#FFFBEB' : '#F1F5F9',
+                      color: st.done ? '#10B981' : st.active ? '#F59E0B' : 'var(--text-muted)',
+                      backgroundColor: st.done ? 'rgba(16, 185, 129, 0.15)' : st.active ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-hover)',
                       padding: '2px 7px',
                       borderRadius: '4px'
                     }}>
                       {st.time}
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '2px', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.4 }}>
                     {st.desc}
                   </div>
                 </div>
@@ -1923,8 +1923,8 @@ export const ComplaintTrackingModal = ({ complaint, isOpen, onClose, category })
         {/* Assigned Technician Card */}
         {complaint.assignedTo && complaint.assignedTo !== 'Unassigned' && (
           <div style={{
-            backgroundColor: '#EFF6FF',
-            border: '1px solid #BFDBFE',
+            backgroundColor: 'rgba(37, 99, 235, 0.12)',
+            border: '1px solid rgba(37, 99, 235, 0.25)',
             borderRadius: '8px',
             padding: '12px 14px',
             display: 'flex',
@@ -1958,7 +1958,7 @@ export const ComplaintTrackingModal = ({ complaint, isOpen, onClose, category })
             </div>
 
             <div style={{
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'var(--card-bg, #FFFFFF)',
               border: '1px solid #BFDBFE',
               borderRadius: '6px',
               padding: '4px 10px',

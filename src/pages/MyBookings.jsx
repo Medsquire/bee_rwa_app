@@ -37,11 +37,6 @@ export const MyBookings = () => {
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>
             {isManagement ? 'All Community Facility Bookings' : 'My Facility Bookings'}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            {isManagement 
-              ? 'Complete schedule of reserved gym, park, and indoor sports sessions' 
-              : `Active reservations and history for Flat ${currentUser.flatNumber}`}
-          </p>
         </div>
         <button className="btn btn-primary btn-sm" onClick={() => setActiveTab('book-facility')}>
           <PlusCircle size={16} /> New Slot Reservation

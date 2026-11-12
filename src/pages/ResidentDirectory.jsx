@@ -500,6 +500,7 @@ export const ResidentDirectory = () => {
         <StatCard 
           title="TOTAL RESIDENTS" 
           value={residents.length} 
+          subtitle="Registered occupants"
           icon={Users} 
           color="blue" 
           compact
@@ -507,6 +508,7 @@ export const ResidentDirectory = () => {
         <StatCard 
           title="FLAT OWNERS" 
           value={ownersCount}  
+          subtitle={`${Math.round((ownersCount / (residents.length || 1)) * 100)}% Title deeds`}
           icon={Key} 
           color="indigo" 
           compact
@@ -514,48 +516,60 @@ export const ResidentDirectory = () => {
         <StatCard 
           title="TENANTS" 
           value={tenantsCount} 
+          subtitle={`${Math.round((tenantsCount / (residents.length || 1)) * 100)}% Leaseholders`}
           icon={CheckCircle2} 
           color="cyan" 
           compact
         />
         <div 
-          className="glass-card stat-card"
-          style={{ borderLeft: '4px solid #F59E0B', padding: '12px 16px' }}
+          style={{ 
+            backgroundColor: 'var(--card-bg)',
+            borderRadius: '8px',
+            padding: '10px 14px',
+            border: '1px solid var(--border-color)',
+            borderLeft: '3px solid #F59E0B',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px'
+          }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    TOTAL TOWERS
-                  </div>
-                  <div className="stat-value" style={{ marginTop: '2px', fontSize: '1.4rem' }}>
-                    {allTowers.length}
-                  </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div>
+                <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  TOTAL TOWERS
                 </div>
-                <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '14px' }}>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    TOTAL FLATS
-                  </div>
-                  <div className="stat-value" style={{ marginTop: '2px', fontSize: '1.4rem', color: '#F59E0B' }}>
-                    {totalFlatsCount}
-                  </div>
+                <div style={{ marginTop: '2px', fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+                  {allTowers.length}
+                </div>
+              </div>
+              <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '14px' }}>
+                <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  TOTAL FLATS
+                </div>
+                <div style={{ marginTop: '2px', fontSize: '1.35rem', fontWeight: 800, color: '#F59E0B', lineHeight: 1.1 }}>
+                  {totalFlatsCount}
                 </div>
               </div>
             </div>
-            <div style={{ 
-              width: '36px', 
-              height: '36px', 
-              borderRadius: '8px', 
-              backgroundColor: 'rgba(245, 158, 11, 0.15)', 
-              color: '#F59E0B',
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <Building2 size={18} />
+            <div style={{ fontSize: '0.675rem', color: '#F59E0B', fontWeight: 600, marginTop: '3px' }}>
+              Golden Towers 1, 2, 3
             </div>
+          </div>
+          <div style={{ 
+            width: '32px', 
+            height: '32px', 
+            borderRadius: '6px', 
+            backgroundColor: 'rgba(245, 158, 11, 0.15)', 
+            color: '#F59E0B',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <Building2 size={16} strokeWidth={1.5} />
           </div>
         </div>
       </div>
@@ -615,8 +629,8 @@ export const ResidentDirectory = () => {
                 fontWeight: 700,
                 cursor: 'pointer',
                 border: showTowerFloorFilters ? '1.5px solid #2563EB' : '1px solid var(--border-color)',
-                backgroundColor: showTowerFloorFilters ? '#EFF6FF' : '#FFFFFF',
-                color: showTowerFloorFilters ? '#1D4ED8' : 'var(--text-secondary)',
+                backgroundColor: showTowerFloorFilters ? 'rgba(37, 99, 235, 0.15)' : 'var(--card-bg)',
+                color: showTowerFloorFilters ? 'var(--electric-blue)' : 'var(--text-secondary)',
                 transition: 'all 0.15s ease',
                 boxShadow: showTowerFloorFilters ? '0 1px 3px rgba(37, 99, 235, 0.15)' : 'none'
               }}
@@ -626,8 +640,8 @@ export const ResidentDirectory = () => {
               <span>{showTowerFloorFilters ? 'Hide Filters' : 'Tower & Floor Filters'}</span>
               <span style={{
                 fontSize: '0.6875rem',
-                backgroundColor: showTowerFloorFilters ? '#2563EB' : '#F1F5F9',
-                color: showTowerFloorFilters ? '#FFFFFF' : '#475569',
+                backgroundColor: showTowerFloorFilters ? '#2563EB' : 'var(--bg-hover)',
+                color: showTowerFloorFilters ? '#FFFFFF' : 'var(--text-secondary)',
                 padding: '1px 6px',
                 borderRadius: '5px',
                 fontWeight: 700
@@ -904,19 +918,19 @@ export const ResidentDirectory = () => {
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               gap: '12px',
-              backgroundColor: '#EFF6FF',
-              border: '1px solid #BFDBFE',
+              backgroundColor: 'rgba(37, 99, 235, 0.15)',
+              border: '1px solid rgba(37, 99, 235, 0.3)',
               padding: '12px 18px',
               borderRadius: '10px',
-              color: '#1E40AF'
+              color: 'var(--text-primary)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Search size={18} style={{ color: '#2563EB', flexShrink: 0 }} />
                 <div>
                   <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>
-                    Search Results for <span style={{ color: '#1D4ED8', textDecoration: 'underline' }}>"{searchTerm}"</span>
+                    Search Results for <span style={{ color: 'var(--electric-blue)', textDecoration: 'underline' }}>"{searchTerm}"</span>
                   </span>
-                  <span style={{ fontSize: '0.8125rem', color: '#3B82F6', marginLeft: '8px' }}>
+                  <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginLeft: '8px' }}>
                     ({visibleFloorsList.reduce((sum, f) => sum + f.flats.length, 0)} matching flat(s) on {visibleFloorsList.length} floor(s) in {currentTowerObj.name})
                   </span>
                 </div>
@@ -942,11 +956,11 @@ export const ResidentDirectory = () => {
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               gap: '12px',
-              backgroundColor: '#FFFBEB',
-              border: '1px solid #FDE68A',
+              backgroundColor: 'rgba(245, 158, 11, 0.15)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
               padding: '12px 18px',
               borderRadius: '10px',
-              color: '#92400E'
+              color: 'var(--text-primary)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Building2 size={18} style={{ color: '#D97706', flexShrink: 0 }} />
@@ -966,7 +980,7 @@ export const ResidentDirectory = () => {
                       padding: '5px 12px',
                       borderRadius: '6px',
                       border: '1px solid #F59E0B',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: 'var(--card-bg, #FFFFFF)',
                       color: '#B45309',
                       fontSize: '0.75rem',
                       fontWeight: 700,
@@ -1071,8 +1085,8 @@ export const ResidentDirectory = () => {
                       <span style={{
                         fontSize: '0.6875rem',
                         fontWeight: 700,
-                        backgroundColor: '#DCFCE7',
-                        color: '#16A34A',
+                        backgroundColor: 'rgba(22, 163, 74, 0.15)',
+                        color: '#22C55E',
                         padding: '2px 8px',
                         borderRadius: '6px'
                       }}>
@@ -1082,10 +1096,10 @@ export const ResidentDirectory = () => {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#16A34A', fontWeight: 700, backgroundColor: '#DCFCE7', padding: '2px 8px', borderRadius: '10px' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#22C55E', fontWeight: 700, backgroundColor: 'rgba(22, 163, 74, 0.15)', padding: '2px 8px', borderRadius: '10px' }}>
                       {floor.flats.filter(f => f.occupied).length} Occupied
                     </span>
-                    <span style={{ fontSize: '0.75rem', color: '#B45309', fontWeight: 700, backgroundColor: '#FEF3C7', padding: '2px 8px', borderRadius: '10px' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#F59E0B', fontWeight: 700, backgroundColor: 'rgba(245, 158, 11, 0.15)', padding: '2px 8px', borderRadius: '10px' }}>
                       {floor.flats.filter(f => !f.occupied).length} Unoccupied
                     </span>
                   </div>
@@ -1114,12 +1128,12 @@ export const ResidentDirectory = () => {
                             key={flatItem.flatNo}
                             style={{ 
                               borderBottom: '1px solid var(--border-color)',
-                              backgroundColor: isOccupied ? 'transparent' : '#FFFBEB',
+                              backgroundColor: isOccupied ? 'transparent' : 'rgba(245, 158, 11, 0.06)',
                               borderLeft: isOccupied ? '4px solid #3B82F6' : '4px solid #F59E0B',
                               transition: 'background-color 0.15s ease'
                             }}
-                            onMouseEnter={e => e.currentTarget.style.backgroundColor = isOccupied ? 'var(--bg-hover)' : '#FEF3C7'}
-                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isOccupied ? 'transparent' : '#FFFBEB'}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = isOccupied ? 'var(--bg-hover)' : 'rgba(245, 158, 11, 0.12)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isOccupied ? 'transparent' : 'rgba(245, 158, 11, 0.06)'}
                           >
                             {/* Flat No */}
                             <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
@@ -1127,9 +1141,9 @@ export const ResidentDirectory = () => {
                                 <span style={{ 
                                   fontWeight: 800, 
                                   fontSize: '0.875rem',
-                                  color: isOccupied ? 'var(--text-primary)' : '#92400E',
-                                  backgroundColor: searchTerm.trim() ? '#FEF9C3' : 'transparent',
-                                  border: searchTerm.trim() ? '1px solid #FDE047' : 'none',
+                                  color: isOccupied ? 'var(--text-primary)' : '#F59E0B',
+                                  backgroundColor: searchTerm.trim() ? 'rgba(245, 158, 11, 0.2)' : 'transparent',
+                                  border: searchTerm.trim() ? '1px solid #F59E0B' : 'none',
                                   padding: searchTerm.trim() ? '2px 6px' : '0',
                                   borderRadius: '4px'
                                 }}>
@@ -1139,9 +1153,9 @@ export const ResidentDirectory = () => {
                                   <span style={{
                                     fontSize: '0.625rem',
                                     fontWeight: 800,
-                                    backgroundColor: res.designation.includes('President') && !res.designation.includes('Vice') ? '#FEF3C7' : '#EFF6FF',
-                                    color: res.designation.includes('President') && !res.designation.includes('Vice') ? '#B45309' : '#1D4ED8',
-                                    border: `1px solid ${res.designation.includes('President') && !res.designation.includes('Vice') ? '#FDE68A' : '#BFDBFE'}`,
+                                    backgroundColor: res.designation.includes('President') && !res.designation.includes('Vice') ? 'rgba(245, 158, 11, 0.15)' : 'rgba(37, 99, 235, 0.15)',
+                                    color: res.designation.includes('President') && !res.designation.includes('Vice') ? '#F59E0B' : '#60A5FA',
+                                    border: `1px solid ${res.designation.includes('President') && !res.designation.includes('Vice') ? 'rgba(245, 158, 11, 0.3)' : 'rgba(37, 99, 235, 0.3)'}`,
                                     padding: '1px 6px',
                                     borderRadius: '6px'
                                   }}>
@@ -1183,11 +1197,11 @@ export const ResidentDirectory = () => {
                                   borderRadius: '9999px',
                                   fontSize: '0.75rem',
                                   fontWeight: 700,
-                                  backgroundColor: '#FEF3C7',
-                                  color: '#92400E',
-                                  border: '1px solid #FDE68A'
+                                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                  color: '#F59E0B',
+                                  border: '1px solid rgba(245, 158, 11, 0.3)'
                                 }}>
-                                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D97706' }} />
+                                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
                                   Unoccupied / Vacant
                                 </span>
                               )}
@@ -1278,16 +1292,16 @@ export const ResidentDirectory = () => {
                                     alignItems: 'center',
                                     gap: '4px',
                                     padding: '4px 10px',
-                                    backgroundColor: '#FEF3C7',
-                                    color: '#92400E',
-                                    border: '1px solid #FCD34D',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                    color: '#F59E0B',
+                                    border: '1px solid rgba(245, 158, 11, 0.3)',
                                     fontWeight: 700,
                                     borderRadius: '6px',
                                     cursor: 'pointer',
                                     transition: 'background-color 0.15s ease'
                                   }}
-                                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#FDE68A'}
-                                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#FEF3C7'}
+                                  onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.25)'}
+                                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.15)'}
                                 >
                                   <UserPlus size={12} />
                                   <span>+ Assign Resident</span>
@@ -1311,15 +1325,49 @@ export const ResidentDirectory = () => {
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               gap: '12px',
-              backgroundColor: 'var(--card-bg, #FFFFFF)',
+              backgroundColor: 'var(--card-bg)',
               padding: '14px 20px',
               borderRadius: '12px',
               border: '1px solid var(--border-color)',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
               marginTop: '6px'
             }}>
-              <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                Showing floors <strong style={{ color: 'var(--text-primary)' }}>{paginatedFloors[0]?.floorNumber}</strong> to <strong style={{ color: 'var(--text-primary)' }}>{paginatedFloors[paginatedFloors.length - 1]?.floorNumber}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{visibleFloorsList.length}</strong> total floors (Page {currentFloorPage} of {totalFloorPages})
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: 'var(--bg-hover)',
+                  color: 'var(--text-secondary)',
+                  padding: '5px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  border: '1px solid var(--border-color)'
+                }}>
+                  <span>Floors</span>
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    {paginatedFloors[0]?.floorNumber}–{paginatedFloors[paginatedFloors.length - 1]?.floorNumber}
+                  </strong>
+                  <span style={{ color: 'var(--text-muted)' }}>/</span>
+                  <strong style={{ color: 'var(--text-primary)' }}>{visibleFloorsList.length}</strong>
+                </span>
+
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                  color: 'var(--electric-blue)',
+                  padding: '5px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.8125rem',
+                  fontWeight: 700,
+                  border: '1px solid rgba(37, 99, 235, 0.3)'
+                }}>
+                  <span>Page</span>
+                  <strong>{currentFloorPage} / {totalFloorPages}</strong>
+                </span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1470,9 +1518,27 @@ export const ResidentDirectory = () => {
               </div>
             </div>
 
-            <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-              Showing <strong>{filteredResidents.length > 0 ? startListIndex + 1 : 0} - {endListIndex}</strong> of <strong>{filteredResidents.length}</strong> residents
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: 'var(--bg-hover)',
+                color: 'var(--text-secondary)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                border: '1px solid var(--border-color)'
+              }}>
+                <span>Residents</span>
+                <strong style={{ color: 'var(--text-primary)' }}>
+                  {filteredResidents.length > 0 ? startListIndex + 1 : 0}–{endListIndex}
+                </strong>
+                <span style={{ color: 'var(--text-muted)' }}>/</span>
+                <strong style={{ color: 'var(--text-primary)' }}>{filteredResidents.length}</strong>
+              </span>
+            </div>
           </div>
 
           {/* Directory List Table */}

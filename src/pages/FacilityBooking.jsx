@@ -131,12 +131,9 @@ export const FacilityBooking = () => {
   }
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <div>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Reserve Facility Slot</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          Real-time slot reservation with instant conflict detection across all 3 apartment complexes
-        </p>
       </div>
 
       <div className="glass-card">

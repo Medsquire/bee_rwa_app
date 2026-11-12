@@ -49,15 +49,31 @@ export const ComplaintList = () => {
   const [trackingComplaint, setTrackingComplaint] = useState(null);
 
   const categories = [
-    { id: 'All', label: 'All Issues', icon: Wrench },
-    { id: 'Lift / Elevator', label: 'Lifts & Elevators', icon: Layers },
-    { id: 'Water Supply', label: 'Water & Pumps', icon: Droplets },
-    { id: 'Electricity and Lighting', label: 'Power & DG Backup', icon: Zap },
-    { id: 'Park and Garden', label: 'Parks & Grounds', icon: Trees },
-    { id: 'Gym Equipment', label: 'Gym & Sports', icon: Dumbbell },
-    { id: 'Cleanliness', label: 'Cleaning & STP', icon: Sparkles },
-    { id: 'Function Hall', label: 'Function Hall', icon: PartyPopper }
+    { id: 'All', label: 'All', icon: Wrench },
+    { id: 'Lift / Elevator', label: 'Lifts', icon: Layers },
+    { id: 'Water Supply', label: 'Water', icon: Droplets },
+    { id: 'Electricity and Lighting', label: 'Power', icon: Zap },
+    { id: 'Park and Garden', label: 'Parks', icon: Trees },
+    { id: 'Gym Equipment', label: 'Gym', icon: Dumbbell },
+    { id: 'Cleanliness', label: 'Cleaning', icon: Sparkles },
+    { id: 'Function Hall', label: 'Hall', icon: PartyPopper }
   ];
+
+  const getCategoryShort = (cat) => {
+    if (!cat) return '';
+    const map = {
+      'Lift / Elevator': 'Lifts',
+      'Water Supply': 'Water',
+      'Electricity and Lighting': 'Power',
+      'Park and Garden': 'Parks',
+      'Gym Equipment': 'Gym',
+      'Cleanliness': 'Cleaning',
+      'Function Hall': 'Hall',
+      'Function Haul': 'Hall',
+      'function haul': 'Hall'
+    };
+    return map[cat] || cat.split(' ')[0] || cat;
+  };
 
   const getComplaintScope = (cmp) => {
     const loc = (cmp.location || '').toLowerCase();
@@ -193,7 +209,7 @@ export const ComplaintList = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-            Issue Resolving & Maintenance
+            Complaints
           </h1>
         </div>
 
@@ -210,9 +226,9 @@ export const ComplaintList = () => {
       {/* 4 Cards: Golden Tower 1, Golden Tower 2, Golden Tower 3, Common Area Complaints */}
       <div className="grid-cols-4" style={{ gap: '14px' }}>
         <StatCard 
-          title="GOLDEN TOWER 1 COMPLAINT"
+          title="GOLDEN TOWER 1"
           value={tower1Complaints.length}
-          subtitle={`${tower1Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${tower1Complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          subtitle={`${tower1Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} active issues`}
           icon={Building2}
           color="amber"
           compact
@@ -222,13 +238,14 @@ export const ComplaintList = () => {
             transition: 'all 0.15s ease',
             transform: selectedScope === 'Golden Tower 1' ? 'translateY(-2px)' : 'none',
             boxShadow: selectedScope === 'Golden Tower 1' ? '0 0 0 2px #F59E0B, 0 4px 12px rgba(245, 158, 11, 0.25)' : undefined,
-            backgroundColor: selectedScope === 'Golden Tower 1' ? 'rgba(245, 158, 11, 0.08)' : undefined
+            borderLeft: '3px solid #F59E0B',
+            backgroundColor: selectedScope === 'Golden Tower 1' ? 'rgba(245, 158, 11, 0.1)' : 'var(--card-bg)'
           }}
         />
         <StatCard 
-          title="GOLDEN TOWER 2 COMPLAINT"
+          title="GOLDEN TOWER 2"
           value={tower2Complaints.length}
-          subtitle={`${tower2Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${tower2Complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          subtitle={`${tower2Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} active issues`}
           icon={Building2}
           color="blue"
           compact
@@ -238,13 +255,14 @@ export const ComplaintList = () => {
             transition: 'all 0.15s ease',
             transform: selectedScope === 'Golden Tower 2' ? 'translateY(-2px)' : 'none',
             boxShadow: selectedScope === 'Golden Tower 2' ? '0 0 0 2px #3B82F6, 0 4px 12px rgba(59, 130, 246, 0.25)' : undefined,
-            backgroundColor: selectedScope === 'Golden Tower 2' ? 'rgba(59, 130, 246, 0.08)' : undefined
+            borderLeft: '3px solid #2563EB',
+            backgroundColor: selectedScope === 'Golden Tower 2' ? 'rgba(37, 99, 235, 0.1)' : 'var(--card-bg)'
           }}
         />
         <StatCard 
-          title="GOLDEN TOWER 3 COMPLAINT"
+          title="GOLDEN TOWER 3"
           value={tower3Complaints.length}
-          subtitle={`${tower3Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${tower3Complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          subtitle={`${tower3Complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} active issues`}
           icon={Building2}
           color="indigo"
           compact
@@ -254,13 +272,14 @@ export const ComplaintList = () => {
             transition: 'all 0.15s ease',
             transform: selectedScope === 'Golden Tower 3' ? 'translateY(-2px)' : 'none',
             boxShadow: selectedScope === 'Golden Tower 3' ? '0 0 0 2px #6366F1, 0 4px 12px rgba(99, 102, 241, 0.25)' : undefined,
-            backgroundColor: selectedScope === 'Golden Tower 3' ? 'rgba(99, 102, 241, 0.08)' : undefined
+            borderLeft: '3px solid #6366F1',
+            backgroundColor: selectedScope === 'Golden Tower 3' ? 'rgba(99, 102, 241, 0.1)' : 'var(--card-bg)'
           }}
         />
         <StatCard 
-          title="COMMON AREA COMPLAINTS"
+          title="COMMON AREA"
           value={commonAreaComplaints.length}
-          subtitle={`${commonAreaComplaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} Active • ${commonAreaComplaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length} Resolved`}
+          subtitle={`${commonAreaComplaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length} active issues`}
           icon={Trees}
           color="green"
           compact
@@ -270,7 +289,8 @@ export const ComplaintList = () => {
             transition: 'all 0.15s ease',
             transform: selectedScope === 'Common Area' ? 'translateY(-2px)' : 'none',
             boxShadow: selectedScope === 'Common Area' ? '0 0 0 2px #10B981, 0 4px 12px rgba(16, 185, 129, 0.25)' : undefined,
-            backgroundColor: selectedScope === 'Common Area' ? 'rgba(16, 185, 129, 0.08)' : undefined
+            borderLeft: '3px solid #10B981',
+            backgroundColor: selectedScope === 'Common Area' ? 'rgba(16, 185, 129, 0.1)' : 'var(--card-bg)'
           }}
         />
       </div>
@@ -315,9 +335,9 @@ export const ComplaintList = () => {
                 gap: '8px',
                 padding: '8px 14px',
                 borderRadius: '8px',
-                border: isSelected ? '1px solid #2563EB' : '1px solid #E2E8F0',
-                backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
-                color: isSelected ? '#2563EB' : '#475569',
+                border: isSelected ? '1px solid #2563EB' : '1px solid var(--border-color)',
+                backgroundColor: isSelected ? 'rgba(37, 99, 235, 0.15)' : 'var(--card-bg)',
+                color: isSelected ? 'var(--electric-blue)' : 'var(--text-secondary)',
                 fontWeight: isSelected ? 700 : 500,
                 fontSize: '0.8125rem',
                 cursor: 'pointer',
@@ -325,11 +345,11 @@ export const ComplaintList = () => {
                 transition: 'all 0.15s ease'
               }}
             >
-              <Icon size={16} style={{ color: isSelected ? '#2563EB' : '#94A3B8' }} />
+              <Icon size={16} strokeWidth={1.5} style={{ color: isSelected ? 'var(--electric-blue)' : 'var(--text-muted)' }} />
               <span>{cat.label}</span>
               <span style={{
-                backgroundColor: isSelected ? '#2563EB' : '#F1F5F9',
-                color: isSelected ? '#FFFFFF' : '#64748B',
+                backgroundColor: isSelected ? 'var(--electric-blue)' : 'var(--bg-hover)',
+                color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
                 fontSize: '0.6875rem',
                 fontWeight: 700,
                 padding: '1px 6px',
@@ -344,10 +364,10 @@ export const ComplaintList = () => {
 
       {/* Filter and Search Bar */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg, #FFFFFF)',
         borderRadius: '12px',
         padding: '14px 18px',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--border-color, #E2E8F0)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -396,24 +416,24 @@ export const ComplaintList = () => {
 
       {/* Classified Table matching parallel app */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg, #FFFFFF)',
         borderRadius: '10px',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--border-color, #E2E8F0)',
         overflow: 'hidden',
-        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div className="table-responsive">
           <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', width: '50px', textAlign: 'center' }}>S.NO</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CATEGORY</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>FLOOR</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LOCATION</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ASSIGNED TECHNICIAN</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>STATUS</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>IMAGE</th>
-                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>ACTION</th>
+              <tr style={{ borderBottom: '1px solid var(--border-color, #E2E8F0)', backgroundColor: 'var(--bg-hover, #F8FAFC)' }}>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '50px', textAlign: 'center' }}>S.NO</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CATEGORY</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>FLOOR</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LOCATION</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ASSIGNED TECHNICIAN</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>STATUS</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>IMAGE</th>
+                <th style={{ padding: '8px 10px', fontSize: '0.675rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>ACTION</th>
               </tr>
             </thead>
             <tbody>
@@ -429,8 +449,22 @@ export const ComplaintList = () => {
                   const isPending = cmp.status === 'Pending' || cmp.status === 'Submitted';
                   const isInProgress = cmp.status === 'In Progress' || cmp.status === 'Assigned';
 
+                  const rowAccent = cmp.status === 'Resolved' || cmp.status === 'Closed' ? '#10B981' :
+                                    cmp.priority === 'Urgent' ? '#EF4444' :
+                                    cmp.priority === 'High' ? '#F59E0B' : '#3B82F6';
+
                   return (
-                    <tr key={cmp.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                    <tr 
+                      key={cmp.id} 
+                      style={{ 
+                        borderBottom: '1px solid var(--border-color)',
+                        borderLeft: `3px solid ${rowAccent}`,
+                        backgroundColor: 'transparent',
+                        transition: 'background-color 0.15s ease'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+                      onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
                       {/* S.NO */}
                       <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <span style={{
@@ -460,8 +494,8 @@ export const ComplaintList = () => {
                           }}>
                             {getCategoryIcon(cmp.category)}
                           </div>
-                          <span style={{ fontWeight: 650, fontSize: '0.8125rem', color: '#0F172A' }}>
-                            {cmp.category}
+                          <span style={{ fontWeight: 650, fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                            {getCategoryShort(cmp.category)}
                           </span>
                         </div>
                       </td>
@@ -469,9 +503,9 @@ export const ComplaintList = () => {
                       {/* FLOOR */}
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
                         <span style={{
-                          backgroundColor: '#F8FAFC',
-                          border: '1px solid #E2E8F0',
-                          color: '#334155',
+                          backgroundColor: 'var(--bg-hover, #F8FAFC)',
+                          border: '1px solid var(--border-color, #E2E8F0)',
+                          color: 'var(--text-primary)',
                           padding: '2px 7px',
                           borderRadius: '5px',
                           fontWeight: 600,
@@ -484,10 +518,10 @@ export const ComplaintList = () => {
 
                       {/* LOCATION */}
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontSize: '0.76rem', fontWeight: 600, color: '#334155' }}>
+                        <div style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                           {cmp.apartment.split(' ')[0]}
                         </div>
-                        <div style={{ fontSize: '0.675rem', color: '#64748B', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {cmp.location}
                         </div>
                       </td>
@@ -495,7 +529,7 @@ export const ComplaintList = () => {
                       {/* ASSIGNED TECHNICIAN */}
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
                         {cmp.assignedTo && cmp.assignedTo !== 'Unassigned' ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', fontWeight: 600, color: '#0F172A' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                             <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
                             <span>{cmp.assignedTo.split('(')[0].trim()}</span>
                           </div>
@@ -587,9 +621,9 @@ export const ComplaintList = () => {
                           <button
                             onClick={() => setSelectedComplaint(cmp)}
                             style={{
-                              backgroundColor: isAwaitingApproval ? '#FFFBEB' : 'transparent',
-                              border: isAwaitingApproval ? '1px solid #F59E0B' : '1px solid #CBD5E1',
-                              color: isAwaitingApproval ? '#B45309' : '#2563EB',
+                              backgroundColor: isAwaitingApproval ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                              border: isAwaitingApproval ? '1px solid #F59E0B' : '1px solid var(--border-color)',
+                              color: isAwaitingApproval ? '#F59E0B' : 'var(--electric-blue)',
                               padding: '4px 9px',
                               borderRadius: '5px',
                               fontSize: '0.7rem',
@@ -601,12 +635,12 @@ export const ComplaintList = () => {
                               transition: 'all 0.15s ease'
                             }}
                             onMouseEnter={e => {
-                              e.currentTarget.style.backgroundColor = '#EFF6FF';
-                              e.currentTarget.style.borderColor = '#2563EB';
+                              e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.15)';
+                              e.currentTarget.style.borderColor = 'var(--electric-blue)';
                             }}
                             onMouseLeave={e => {
-                              e.currentTarget.style.backgroundColor = isAwaitingApproval ? '#FFFBEB' : 'transparent';
-                              e.currentTarget.style.borderColor = isAwaitingApproval ? '#F59E0B' : '#CBD5E1';
+                              e.currentTarget.style.backgroundColor = isAwaitingApproval ? 'rgba(245, 158, 11, 0.15)' : 'transparent';
+                              e.currentTarget.style.borderColor = isAwaitingApproval ? '#F59E0B' : 'var(--border-color)';
                             }}
                           >
                             <span>{isAwaitingApproval ? 'Review & Approve' : 'Manage'}</span>

@@ -3,7 +3,6 @@ import { useRwa } from '../context/RwaContext';
 import { ComplaintDetailsModal, isComplaintApproved } from './ComplaintDetailsModal';
 import {
   Wrench,
-  UserPlus,
   Search,
   ChevronRight,
   ShieldCheck,
@@ -29,7 +28,8 @@ export const Dashboard = () => {
     announcements,
     agencies,
     residents,
-    setActiveTab
+    setActiveTab,
+    theme
   } = useRwa();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -156,6 +156,26 @@ export const Dashboard = () => {
     return <Wrench size={15} strokeWidth={1.5} />;
   };
 
+  const getCategoryShort = (cat) => {
+    if (!cat) return '';
+    const map = {
+      'Lift / Elevator': 'Lifts',
+      'Lift & Elevator': 'Lifts',
+      'Water Supply': 'Water',
+      'Water & Pump': 'Water',
+      'Electricity and Lighting': 'Power',
+      'Plumbing': 'Plumbing',
+      'Park and Garden': 'Parks',
+      'Gym Equipment': 'Gym',
+      'Indoor Sports': 'Sports',
+      'Cleanliness': 'Cleaning',
+      'Security': 'Security',
+      'Function Hall': 'Hall',
+      'Civil & Structural': 'Structure'
+    };
+    return map[cat] || cat.split(' ')[0] || cat;
+  };
+
   // Overview Counts (Staff activity, bookings, and lifts active cards removed as requested)
   const totalComplaintsCount = (complaints || []).length;
   const pendingCount = (complaints || []).filter(c => ['Submitted', 'Pending', 'Pending Approval'].includes(c.status)).length;
@@ -228,31 +248,13 @@ export const Dashboard = () => {
       {/* Top Header Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
             Dashboard
           </h1>
-
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={() => setActiveTab('complaint_new')}
-            className="btn btn-primary btn-sm"
-            style={{ padding: '6px 12px', fontSize: '0.78rem', borderRadius: '6px' }}
-          >
-            <Wrench size={13} strokeWidth={1.5} /> Log Complaint
-          </button>
-          <button
-            onClick={() => setActiveTab('register')}
-            className="btn btn-secondary btn-sm"
-            style={{ padding: '6px 12px', fontSize: '0.78rem', borderRadius: '6px' }}
-          >
-            <UserPlus size={13} strokeWidth={1.5} /> Add Resident
-          </button>
         </div>
       </div>
 
-      {/* 1. Overview of Application in Small Cards (Staff activity, bookings, and lifts active cards removed) */}
+      {/* 1. Overview of Application in Small Cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
@@ -262,12 +264,12 @@ export const Dashboard = () => {
         <div
           onClick={() => setActiveTab('complaints')}
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '8px',
             padding: '10px 12px',
-            border: '1px solid #E2E8F0',
+            border: '1px solid var(--border-color)',
             borderLeft: '3px solid #2563EB',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -275,19 +277,19 @@ export const Dashboard = () => {
             gap: '8px',
             transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.03)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: '#64748B' }}>COMPLAINTS</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>COMPLAINTS</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
               {totalComplaintsCount}
             </div>
             <div style={{ fontSize: '0.675rem', color: '#F97316', fontWeight: 600 }}>
               {pendingCount} pending
             </div>
           </div>
-          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: theme === 'dark' ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Wrench size={16} strokeWidth={1.5} />
           </div>
         </div>
@@ -296,12 +298,12 @@ export const Dashboard = () => {
         <div
           onClick={() => setActiveTab('approvals')}
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '8px',
             padding: '10px 12px',
-            border: '1px solid #E2E8F0',
+            border: '1px solid var(--border-color)',
             borderLeft: '3px solid #F59E0B',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -309,19 +311,19 @@ export const Dashboard = () => {
             gap: '8px',
             transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.03)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: '#64748B' }}>APPROVALS</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>APPROVALS</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
               {pendingApprovalsCount}
             </div>
             <div style={{ fontSize: '0.675rem', color: '#F59E0B', fontWeight: 600 }}>
               Pending sign-off
             </div>
           </div>
-          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: theme === 'dark' ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <ShieldCheck size={16} strokeWidth={1.5} />
           </div>
         </div>
@@ -330,12 +332,12 @@ export const Dashboard = () => {
         <div
           onClick={() => setActiveTab('announcements')}
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '8px',
             padding: '10px 12px',
-            border: '1px solid #E2E8F0',
+            border: '1px solid var(--border-color)',
             borderLeft: '3px solid #8B5CF6',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -343,20 +345,20 @@ export const Dashboard = () => {
             gap: '8px',
             transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.03)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
           title={todaysAnnouncements[0] ? `Today: ${todaysAnnouncements[0].title}` : "Today's Announcements"}
         >
           <div>
-            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: '#64748B' }}>TODAY'S ANNOUNCEMENTS</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>TODAY'S ANNOUNCEMENTS</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
               {todaysAnnouncementsCount}
             </div>
             <div style={{ fontSize: '0.675rem', color: '#8B5CF6', fontWeight: 600 }}>
               {todaysAnnouncementsCount === 1 ? '1 notice today' : `${todaysAnnouncementsCount} notices today`}
             </div>
           </div>
-          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#F3E8FF', color: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : '#F3E8FF', color: '#A78BFA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Megaphone size={16} strokeWidth={1.5} />
           </div>
         </div>
@@ -365,12 +367,12 @@ export const Dashboard = () => {
         <div
           onClick={() => setActiveTab('agencies')}
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '8px',
             padding: '10px 12px',
-            border: '1px solid #E2E8F0',
+            border: '1px solid var(--border-color)',
             borderLeft: '3px solid #10B981',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -378,19 +380,19 @@ export const Dashboard = () => {
             gap: '8px',
             transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.03)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: '#64748B' }}>ACTIVE AGENCIES</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>ACTIVE AGENCIES</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
               {activeAgenciesCount}
             </div>
             <div style={{ fontSize: '0.675rem', color: '#10B981', fontWeight: 600 }}>
               Facility vendors
             </div>
           </div>
-          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Building2 size={16} strokeWidth={1.5} />
           </div>
         </div>
@@ -399,12 +401,12 @@ export const Dashboard = () => {
         <div
           onClick={() => setActiveTab('residents')}
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--card-bg, #FFFFFF)',
             borderRadius: '8px',
             padding: '10px 12px',
-            border: '1px solid #E2E8F0',
+            border: '1px solid var(--border-color)',
             borderLeft: '3px solid #06B6D4',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -412,19 +414,19 @@ export const Dashboard = () => {
             gap: '8px',
             transition: 'transform 0.12s ease, box-shadow 0.12s ease'
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.03)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
         >
           <div>
-            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: '#64748B' }}>RESIDENTS</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.675rem', fontWeight: 700, color: 'var(--text-secondary)' }}>RESIDENTS</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
               {residentsCount}
             </div>
             <div style={{ fontSize: '0.675rem', color: '#06B6D4', fontWeight: 600 }}>
               Enclave members
             </div>
           </div>
-          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#ECFEFF', color: '#06B6D4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: theme === 'dark' ? 'rgba(6, 182, 212, 0.2)' : '#ECFEFF', color: '#06B6D4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Users size={16} strokeWidth={1.5} />
           </div>
         </div>
@@ -438,11 +440,11 @@ export const Dashboard = () => {
       }}>
         {/* Left Card: Ticket Resolution Status Donut */}
         <div style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--card-bg, #FFFFFF)',
           borderRadius: '10px',
           padding: '14px 18px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -452,7 +454,7 @@ export const Dashboard = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <PieChart size={17} strokeWidth={1.5} color="#2563EB" />
-              <span style={{ fontSize: '0.825rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.02em' }}>
+              <span style={{ fontSize: '0.825rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
                 TICKETS RESOLUTION STATUS
               </span>
             </div>
@@ -460,10 +462,10 @@ export const Dashboard = () => {
               fontSize: '0.7rem',
               fontWeight: 700,
               color: '#16A34A',
-              backgroundColor: '#F0FDF4',
+              backgroundColor: theme === 'dark' ? 'rgba(22, 163, 74, 0.2)' : '#F0FDF4',
               padding: '2px 7px',
               borderRadius: '5px',
-              border: '1px solid #DCFCE7'
+              border: '1px solid rgba(22, 163, 74, 0.3)'
             }}>
               {resolutionPct}% Resolved
             </span>
@@ -475,7 +477,7 @@ export const Dashboard = () => {
             <div style={{ position: 'relative', width: '92px', height: '92px', flexShrink: 0, margin: '0 auto' }}>
               <svg width="92" height="92" viewBox="0 0 100 100">
                 {/* Background Ring Track */}
-                <circle cx="50" cy="50" r={donutRadius} fill="none" stroke="#F1F5F9" strokeWidth="12" />
+                <circle cx="50" cy="50" r={donutRadius} fill="none" stroke={theme === 'dark' ? '#1E293B' : '#F1F5F9'} strokeWidth="12" />
                 <g transform="rotate(-90 50 50)">
                   {resolvedStroke > 0 && (
                     <circle cx="50" cy="50" r={donutRadius} fill="none" stroke="#10B981" strokeWidth="12"
@@ -490,10 +492,10 @@ export const Dashboard = () => {
                       strokeDasharray={`${pendingStroke} ${donutCircumference}`} strokeDashoffset={-(resolvedStroke + inProgressStroke)} />
                   )}
                 </g>
-                <text x="50" y="47" textAnchor="middle" fontSize="15" fontWeight="800" fill="#0F172A">
+                <text x="50" y="47" textAnchor="middle" fontSize="15" fontWeight="800" fill="var(--text-primary)">
                   {totalComplaintsCount}
                 </text>
-                <text x="50" y="59" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="#64748B">
+                <text x="50" y="59" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="var(--text-muted)">
                   TICKETS
                 </text>
               </svg>
@@ -506,8 +508,8 @@ export const Dashboard = () => {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '3px 8px', borderRadius: '6px',
-                  backgroundColor: statusFilter === 'Resolved' ? '#F0FDF4' : '#F8FAFC',
-                  border: statusFilter === 'Resolved' ? '1px solid #86EFAC' : '1px solid #E2E8F0',
+                  backgroundColor: statusFilter === 'Resolved' ? (theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : '#F0FDF4') : 'var(--bg-hover)',
+                  border: statusFilter === 'Resolved' ? '1px solid #10B981' : '1px solid var(--border-color)',
                   cursor: 'pointer', fontSize: '0.7rem', transition: 'all 0.12s ease'
                 }}
               >
@@ -515,7 +517,7 @@ export const Dashboard = () => {
                   <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10B981' }} />
                   Resolved
                 </span>
-                <span style={{ fontWeight: 800, color: '#0F172A' }}>{completedCount}</span>
+                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{completedCount}</span>
               </div>
 
               <div
@@ -523,8 +525,8 @@ export const Dashboard = () => {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '3px 8px', borderRadius: '6px',
-                  backgroundColor: statusFilter === 'In Progress' ? '#EFF6FF' : '#F8FAFC',
-                  border: statusFilter === 'In Progress' ? '1px solid #BFDBFE' : '1px solid #E2E8F0',
+                  backgroundColor: statusFilter === 'In Progress' ? (theme === 'dark' ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF') : 'var(--bg-hover)',
+                  border: statusFilter === 'In Progress' ? '1px solid #3B82F6' : '1px solid var(--border-color)',
                   cursor: 'pointer', fontSize: '0.7rem', transition: 'all 0.12s ease'
                 }}
               >
@@ -532,7 +534,7 @@ export const Dashboard = () => {
                   <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#2563EB' }} />
                   In Progress
                 </span>
-                <span style={{ fontWeight: 800, color: '#0F172A' }}>{inProgressCount}</span>
+                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{inProgressCount}</span>
               </div>
 
               <div
@@ -540,8 +542,8 @@ export const Dashboard = () => {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '3px 8px', borderRadius: '6px',
-                  backgroundColor: statusFilter === 'Pending' ? '#FFF7ED' : '#F8FAFC',
-                  border: statusFilter === 'Pending' ? '1px solid #FED7AA' : '1px solid #E2E8F0',
+                  backgroundColor: statusFilter === 'Pending' ? (theme === 'dark' ? 'rgba(249, 115, 22, 0.2)' : '#FFF7ED') : 'var(--bg-hover)',
+                  border: statusFilter === 'Pending' ? '1px solid #F97316' : '1px solid var(--border-color)',
                   cursor: 'pointer', fontSize: '0.7rem', transition: 'all 0.12s ease'
                 }}
               >
@@ -549,7 +551,7 @@ export const Dashboard = () => {
                   <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#F97316' }} />
                   Pending
                 </span>
-                <span style={{ fontWeight: 800, color: '#0F172A' }}>{pendingCount}</span>
+                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{pendingCount}</span>
               </div>
             </div>
           </div>
@@ -557,11 +559,11 @@ export const Dashboard = () => {
 
         {/* Right Card: Complaints by Category Bar Graph */}
         <div style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--card-bg, #FFFFFF)',
           borderRadius: '10px',
           padding: '14px 18px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -571,7 +573,7 @@ export const Dashboard = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <BarChart3 size={17} strokeWidth={1.5} color="#2563EB" />
-              <span style={{ fontSize: '0.825rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.02em' }}>
+              <span style={{ fontSize: '0.825rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
                 COMPLAINTS BY CATEGORY
               </span>
             </div>
@@ -583,10 +585,10 @@ export const Dashboard = () => {
                   fontSize: '0.675rem',
                   fontWeight: 700,
                   color: '#2563EB',
-                  backgroundColor: '#EFF6FF',
+                  backgroundColor: theme === 'dark' ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
                   padding: '2px 7px',
                   borderRadius: '5px',
-                  border: '1px solid #BFDBFE',
+                  border: '1px solid rgba(37, 99, 235, 0.35)',
                   cursor: 'pointer'
                 }}
                 title="Click to reset category filter"
@@ -594,7 +596,7 @@ export const Dashboard = () => {
                 Filtered: {categoryFilter} ✕
               </button>
             ) : (
-              <span style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                 {categoryBarData.total} Complaints Logged
               </span>
             )}
@@ -604,9 +606,9 @@ export const Dashboard = () => {
           <div style={{ width: '100%', height: '94px', position: 'relative' }}>
             <svg width="100%" height="94" viewBox="0 0 320 94" style={{ overflow: 'visible' }}>
               {/* Background Guideline Lines */}
-              <line x1="8" y1="20" x2="312" y2="20" stroke="#F1F5F9" strokeDasharray="3 3" />
-              <line x1="8" y1="46" x2="312" y2="46" stroke="#F1F5F9" strokeDasharray="3 3" />
-              <line x1="8" y1="74" x2="312" y2="74" stroke="#E2E8F0" strokeWidth="1" />
+              <line x1="8" y1="20" x2="312" y2="20" stroke={theme === 'dark' ? '#1E293B' : '#F1F5F9'} strokeDasharray="3 3" />
+              <line x1="8" y1="46" x2="312" y2="46" stroke={theme === 'dark' ? '#1E293B' : '#F1F5F9'} strokeDasharray="3 3" />
+              <line x1="8" y1="74" x2="312" y2="74" stroke="var(--border-color)" strokeWidth="1" />
 
               {/* Render Each Category Bar */}
               {categoryBarData.bars.map((bar, idx) => {
@@ -654,7 +656,7 @@ export const Dashboard = () => {
                       height={barHeight}
                       rx="4"
                       ry="4"
-                      fill={bar.count > 0 ? bar.color : '#E2E8F0'}
+                      fill={bar.count > 0 ? bar.color : (theme === 'dark' ? '#1E293B' : '#E2E8F0')}
                       opacity={isSelected ? 1 : 0.88}
                       style={{ transition: 'all 0.2s ease' }}
                     />
@@ -667,7 +669,7 @@ export const Dashboard = () => {
                         textAnchor="middle"
                         fontSize="9.5"
                         fontWeight="800"
-                        fill="#0F172A"
+                        fill="var(--text-primary)"
                       >
                         {bar.count}
                       </text>
@@ -680,7 +682,7 @@ export const Dashboard = () => {
                       textAnchor="middle"
                       fontSize="9"
                       fontWeight={isSelected ? '800' : '700'}
-                      fill={isSelected ? '#2563EB' : '#475569'}
+                      fill={isSelected ? '#3B82F6' : 'var(--text-secondary)'}
                     >
                       {bar.label}
                     </text>
@@ -694,18 +696,18 @@ export const Dashboard = () => {
 
       {/* 3. Complaints Grouped by Category - NO DESCRIPTION DISPLAYED */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--card-bg, #FFFFFF)',
         borderRadius: '10px',
         padding: '14px 16px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)'
+        border: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow-sm)'
       }}>
         {/* Filter Toolbar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             {/* Search */}
             <div style={{ position: 'relative', width: '220px' }}>
-              <Search size={13} strokeWidth={1.5} style={{ position: 'absolute', left: '9px', top: '9px', color: '#94A3B8' }} />
+              <Search size={13} strokeWidth={1.5} style={{ position: 'absolute', left: '9px', top: '9px', color: 'var(--text-muted)' }} />
               <input
                 type="text"
                 placeholder="Search ticket, category, flat..."
@@ -717,28 +719,29 @@ export const Dashboard = () => {
                   height: '32px',
                   fontSize: '0.78rem',
                   borderRadius: '6px',
-                  backgroundColor: '#F8FAFC',
-                  borderColor: '#E2E8F0'
+                  backgroundColor: 'var(--bg-input, #F8FAFC)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
 
             {/* Status Pills */}
-            <div style={{ display: 'flex', backgroundColor: '#F1F5F9', padding: '2px', borderRadius: '6px', gap: '2px' }}>
+            <div style={{ display: 'flex', backgroundColor: 'var(--bg-hover)', padding: '2px', borderRadius: '6px', gap: '2px' }}>
               {['All', 'Pending', 'In Progress', 'Resolved'].map(st => (
                 <button
                   key={st}
                   onClick={() => setStatusFilter(st)}
                   style={{
-                    backgroundColor: statusFilter === st ? '#FFFFFF' : 'transparent',
-                    color: statusFilter === st ? '#0F172A' : '#64748B',
+                    backgroundColor: statusFilter === st ? 'var(--card-bg, #FFFFFF)' : 'transparent',
+                    color: statusFilter === st ? 'var(--text-primary)' : 'var(--text-secondary)',
                     border: 'none',
                     borderRadius: '4px',
                     padding: '4px 10px',
                     fontSize: '0.72rem',
                     fontWeight: statusFilter === st ? 700 : 500,
                     cursor: 'pointer',
-                    boxShadow: statusFilter === st ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                    boxShadow: statusFilter === st ? 'var(--shadow-sm)' : 'none'
                   }}
                 >
                   {st}
@@ -756,19 +759,12 @@ export const Dashboard = () => {
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '6px',
-                border: '1px solid #E2E8F0',
-                backgroundColor: '#F8FAFC',
-                color: '#334155',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-input, #F8FAFC)',
+                color: 'var(--text-primary)',
                 cursor: 'pointer',
                 lineHeight: '30px',
-                boxSizing: 'border-box',
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 6px center',
-                backgroundSize: '11px 11px'
+                boxSizing: 'border-box'
               }}
             >
               {categoriesList.map(cat => (
@@ -786,19 +782,12 @@ export const Dashboard = () => {
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '6px',
-                border: '1px solid #E2E8F0',
-                backgroundColor: '#F8FAFC',
-                color: '#334155',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-input, #F8FAFC)',
+                color: 'var(--text-primary)',
                 cursor: 'pointer',
                 lineHeight: '30px',
-                boxSizing: 'border-box',
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 6px center',
-                backgroundSize: '11px 11px'
+                boxSizing: 'border-box'
               }}
               title="Filter by Tower"
             >
@@ -834,163 +823,223 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Category Cards: Displays complaints based on category (e.g. "Water Supply - 2 complaints", "Lift / Elevator - 1 complaint") */}
-        {Object.keys(complaintsByCategory).length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '36px 12px', color: '#64748B', fontSize: '0.8125rem' }}>
+        {/* Individual Complaint Cards - Separate Cards with Redesigned Modern UI */}
+        {filteredComplaints.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '36px 12px', color: 'var(--text-muted)', fontSize: '0.8125rem' }}>
             No complaints found matching current filters.
           </div>
         ) : (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '12px'
+            gap: '14px'
           }}>
-            {Object.entries(complaintsByCategory).map(([catName, catComplaints]) => {
+            {filteredComplaints.map(cmp => {
+              const isApproved = isComplaintApproved(cmp);
+              const towerName = getComplaintTower(cmp);
+              const isCommon = towerName === 'Common Area';
+              const locationText = cmp.floor || cmp.location || cmp.apartment;
+              const cleanSubmitter = cmp.submittedBy ? cmp.submittedBy.split('(')[0].trim() : '';
+
+              const priorityStyles = {
+                'Urgent': { bg: theme === 'dark' ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2', text: '#EF4444', border: 'rgba(239, 68, 68, 0.35)' },
+                'High': { bg: theme === 'dark' ? 'rgba(245, 158, 11, 0.2)' : '#FFFBEB', text: '#F59E0B', border: 'rgba(245, 158, 11, 0.35)' },
+                'Medium': { bg: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : '#EFF6FF', text: '#3B82F6', border: 'rgba(59, 130, 246, 0.35)' },
+                'Low': { bg: theme === 'dark' ? 'rgba(148, 163, 184, 0.15)' : '#F1F5F9', text: '#94A3B8', border: 'rgba(148, 163, 184, 0.3)' }
+              };
+              const pStyle = priorityStyles[cmp.priority] || priorityStyles['Medium'];
+
               return (
                 <div
-                  key={catName}
+                  key={cmp.id}
+                  onClick={() => setSelectedComplaint(cmp)}
                   style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '8px',
-                    border: '1px solid #E2E8F0',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-                    overflow: 'hidden',
+                    backgroundColor: 'var(--card-bg, #FFFFFF)',
+                    color: 'var(--text-primary)',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border-color)',
+                    padding: '16px',
+                    boxShadow: 'var(--shadow-sm)',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.18s ease',
+                    height: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                    e.currentTarget.style.borderColor = '#3B82F6';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                    e.currentTarget.style.borderColor = 'var(--border-color)';
                   }}
                 >
-                  {/* Category Header: Name & Total Complaints */}
-                  <div style={{
-                    padding: '10px 14px',
-                    backgroundColor: '#F8FAFC',
-                    borderBottom: '1px solid #E2E8F0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '6px',
-                        backgroundColor: '#EFF6FF',
-                        color: '#2563EB',
-                        display: 'flex',
+                  {/* Top Header: Category Pill & ID on left, Approval Badge neatly at top-right */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{
+                        display: 'inline-flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
+                        gap: '5px',
+                        backgroundColor: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : '#EFF6FF',
+                        color: theme === 'dark' ? '#93C5FD' : '#1D4ED8',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        border: '1px solid rgba(59, 130, 246, 0.25)'
                       }}>
-                        {getCategoryIcon(catName)}
-                      </div>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#0F172A' }}>
-                        {catName}
+                        {getCategoryIcon(cmp.category)}
+                        <span>{getCategoryShort(cmp.category)}</span>
+                      </span>
+
+                      <span style={{
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        color: 'var(--text-muted)',
+                        backgroundColor: 'var(--bg-hover)',
+                        padding: '3px 7px',
+                        borderRadius: '6px',
+                        border: '1px solid var(--border-color)'
+                      }}>
+                        {cmp.id}
                       </span>
                     </div>
 
                     <span style={{
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      color: '#2563EB',
-                      backgroundColor: '#EFF6FF',
-                      padding: '2px 8px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 9px',
                       borderRadius: '9999px',
-                      border: '1px solid #DBEAFE',
+                      fontSize: '0.675rem',
+                      fontWeight: 700,
+                      backgroundColor: isApproved ? (theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5') : (theme === 'dark' ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7'),
+                      color: isApproved ? '#10B981' : '#F59E0B',
+                      border: `1px solid ${isApproved ? 'rgba(16, 185, 129, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`,
                       flexShrink: 0
                     }}>
-                      {catComplaints.length} {catComplaints.length === 1 ? 'complaint' : 'complaints'}
+                      <span style={{
+                        width: '5px',
+                        height: '5px',
+                        borderRadius: '50%',
+                        backgroundColor: isApproved ? '#10B981' : '#F59E0B'
+                      }} />
+                      {isApproved ? 'Approved' : 'Pending'}
                     </span>
                   </div>
 
-                  {/* Compact Complaint Items - WITHOUT description */}
-                  <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
-                    {catComplaints.map(cmp => {
-                      const isApproved = isComplaintApproved(cmp);
+                  {/* Complaint Title with improved typography & spacing */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <h4 style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 650,
+                      color: 'var(--text-primary)',
+                      margin: 0,
+                      lineHeight: 1.4,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }} title={cmp.title}>
+                      {cmp.title}
+                    </h4>
 
-                      return (
-                        <div
-                          key={cmp.id}
-                          onClick={() => setSelectedComplaint(cmp)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '7px 9px',
-                            borderRadius: '6px',
-                            backgroundColor: '#F8FAFC',
-                            border: '1px solid #F1F5F9',
-                            cursor: 'pointer',
-                            transition: 'all 0.12s ease',
-                            fontSize: '0.75rem',
-                            gap: '8px'
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.backgroundColor = '#EFF6FF';
-                            e.currentTarget.style.borderColor = '#BFDBFE';
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.backgroundColor = '#F8FAFC';
-                            e.currentTarget.style.borderColor = '#F1F5F9';
-                          }}
-                        >
-                          {/* Ticket ID, Tower Badge & Floor/Location */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1 }}>
-                            <span style={{ fontWeight: 800, color: '#2563EB', flexShrink: 0 }}>
-                              {cmp.id}
-                            </span>
-                            {(() => {
-                              const towerName = getComplaintTower(cmp);
-                              const isCommon = towerName === 'Common Area';
-                              return (
-                                <span style={{
-                                  fontSize: '0.625rem',
-                                  fontWeight: 700,
-                                  padding: '1px 5px',
-                                  borderRadius: '4px',
-                                  backgroundColor: isCommon ? '#F0FDF4' : '#EFF6FF',
-                                  color: isCommon ? '#15803D' : '#1D4ED8',
-                                  border: isCommon ? '1px solid #BBF7D0' : '1px solid #DBEAFE',
-                                  flexShrink: 0
-                                }}>
-                                  {isCommon ? 'Common Area' : towerName.replace('Golden ', '')}
-                                </span>
-                              );
-                            })()}
-                            <span style={{ color: '#CBD5E1', flexShrink: 0 }}>•</span>
-                            <span style={{ color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {cmp.floor || cmp.location || cmp.apartment}
-                            </span>
-                          </div>
+                    {/* Organized Tower & Location Section */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '0.73rem',
+                      color: 'var(--text-secondary)',
+                      flexWrap: 'wrap'
+                    }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        backgroundColor: isCommon ? (theme === 'dark' ? 'rgba(16, 185, 129, 0.15)' : '#F0FDF4') : (theme === 'dark' ? 'rgba(59, 130, 246, 0.15)' : '#F8FAFC'),
+                        color: isCommon ? '#10B981' : (theme === 'dark' ? '#93C5FD' : '#334155'),
+                        border: `1px solid ${isCommon ? 'rgba(16, 185, 129, 0.25)' : 'var(--border-color)'}`,
+                        padding: '2px 7px',
+                        borderRadius: '5px',
+                        fontWeight: 700,
+                        flexShrink: 0
+                      }}>
+                        <Building2 size={11} strokeWidth={1.5} />
+                        {isCommon ? 'Common Area' : towerName.replace('Golden ', '')}
+                      </span>
 
-                          {/* Status Pill & Action Arrow */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px',
-                              padding: '2px 6px',
-                              borderRadius: '9999px',
-                              fontSize: '0.65rem',
-                              fontWeight: 700,
-                              backgroundColor: isApproved ? '#ECFDF5' : '#FEF3C7',
-                              color: isApproved ? '#065F46' : '#92400E',
-                              border: isApproved ? '1px solid #A7F3D0' : '1px solid #FCD34D'
-                            }}>
-                              <span style={{
-                                width: '4px',
-                                height: '4px',
-                                borderRadius: '50%',
-                                backgroundColor: isApproved ? '#059669' : '#D97706'
-                              }} />
-                              {isApproved ? 'Approved' : 'Pending Approval'}
-                            </span>
+                      {locationText && (
+                        <span style={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          color: 'var(--text-secondary)',
+                          maxWidth: '190px'
+                        }}>
+                          • {locationText}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                            <span style={{ color: '#2563EB', display: 'flex', alignItems: 'center' }}>
-                              <ChevronRight size={13} strokeWidth={1.5} />
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  {/* Footer Row: Priority & Submitter Visually Separated, Details on Right */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderTop: '1px solid var(--border-color)',
+                    paddingTop: '10px',
+                    marginTop: '2px',
+                    fontSize: '0.72rem'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                      <span style={{
+                        fontSize: '0.675rem',
+                        fontWeight: 800,
+                        padding: '2px 7px',
+                        borderRadius: '4px',
+                        backgroundColor: pStyle.bg,
+                        color: pStyle.text,
+                        border: `1px solid ${pStyle.border}`,
+                        flexShrink: 0
+                      }}>
+                        {cmp.priority || 'Normal'}
+                      </span>
+
+                      {cleanSubmitter && (
+                        <span style={{
+                          color: 'var(--text-secondary)',
+                          fontSize: '0.7rem',
+                          maxWidth: '110px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {cleanSubmitter}
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      color: '#3B82F6',
+                      fontWeight: 700,
+                      fontSize: '0.74rem',
+                      flexShrink: 0
+                    }}>
+                      <span>Details</span>
+                      <ChevronRight size={13} strokeWidth={1.5} />
+                    </div>
                   </div>
                 </div>
               );
