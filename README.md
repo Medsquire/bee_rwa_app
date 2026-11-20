@@ -37,6 +37,16 @@ npm run build
 npm run preview
 ```
 
+## Deploying to Vercel
+
+Import the GitHub repository into Vercel and use the Vite defaults:
+
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Install command:** `npm install`
+
+These settings are also defined in `vercel.json`. Its rewrite serves the SPA entry point for client-side routes.
+
 ---
 
 ## 👥 Demo Roles
